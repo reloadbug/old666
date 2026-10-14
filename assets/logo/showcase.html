@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>老六清净 old666 · 品牌标志规范</title>
+<style>
+  :root{
+    --bg:#F4F8F8; --surface:#FFFFFF; --surface-2:#F7FBFA;
+    --ink:#0E1116; --ink-2:#1E2836;
+    --primary:#0EA5A4; --primary-d:#0F766E; --primary-l:#CCFBF1;
+    --green:#22C55E; --red:#F5340F;
+    --text:#0F172A; --muted:#64748B; --line:#E2E8F0; --line-2:#EFF3F4;
+    --shadow:0 1px 2px rgba(15,23,42,.04), 0 8px 24px rgba(15,23,42,.06);
+    --shadow-lg:0 4px 12px rgba(15,23,42,.06), 0 24px 60px rgba(15,23,42,.10);
+    --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei","PingFang SC",sans-serif;
+    background:
+      radial-gradient(1100px 560px at 8% -8%, #D9F5F1 0%, transparent 55%),
+      radial-gradient(900px 460px at 100% 0%, #E4EEFF 0%, transparent 50%),
+      var(--bg);
+    color:var(--text); line-height:1.7; font-size:15px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1040px;margin:0 auto;padding:0 24px 96px}
+  .top{padding:56px 0 8px}
+  .kicker{font-size:12.5px;letter-spacing:2.2px;text-transform:uppercase;color:var(--primary-d);font-weight:700;margin-bottom:10px}
+  h1{font-size:clamp(28px,4.2vw,40px);font-weight:800;letter-spacing:-.6px;line-height:1.24;margin-bottom:12px}
+  h1 .hl{background:linear-gradient(120deg,#0EA5A4,#22C55E 70%);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .lede{color:#334155;max-width:720px;font-size:16px}
+  .meta{display:flex;flex-wrap:wrap;gap:9px;margin-top:22px}
+  .tag{font-size:12.5px;padding:5px 13px;border-radius:999px;background:#fff;border:1px solid var(--line);color:#334155}
+  .tag.on{background:linear-gradient(135deg,#0EA5A4,#14B8A6);color:#fff;border-color:transparent}
+
+  section{margin-top:62px}
+  .sec-head{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+  .sec-num{font-size:11.5px;font-weight:800;letter-spacing:1px;color:#fff;
+    background:linear-gradient(135deg,#0EA5A4,#14B8A6);padding:4px 10px;border-radius:8px}
+  h2{font-size:23px;font-weight:800;letter-spacing:-.3px}
+  .sec-desc{color:var(--muted);font-size:14px;margin:6px 0 22px;max-width:800px}
+  h3{font-size:15.5px;font-weight:700;margin:26px 0 12px;color:#334155}
+
+  .panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+    padding:30px;box-shadow:var(--shadow);display:flex;align-items:center;justify-content:center}
+  .panel.dark{background:linear-gradient(160deg,#141C26,#070A0F);border-color:#1E2836}
+  .panel.tint{background:linear-gradient(160deg,#EAF3F2,#F6FAFF)}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+  @media(max-width:880px){.grid2,.grid4{grid-template-columns:1fr 1fr}}
+  @media(max-width:560px){.grid2,.grid4{grid-template-columns:1fr}}
+
+  .vcard{background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);overflow:hidden}
+  .vcard .stage{height:190px;display:flex;align-items:center;justify-content:center;background:#FBFDFD}
+  .vcard .stage.dark{background:linear-gradient(160deg,#141C26,#070A0F)}
+  .vcard .cap{padding:12px 15px;border-top:1px solid var(--line-2);font-size:12.5px}
+  .vcard .cap b{display:block;font-size:13.5px;color:var(--text);font-weight:700}
+  .vcard .cap code{font-size:11.5px;color:#94A3B8;font-family:ui-monospace,Menlo,Consolas,monospace}
+  .vcard .cap .use{color:var(--primary-d);font-size:12px;font-weight:600;margin-top:3px;display:block}
+
+  .mk{width:120px;height:120px;display:block}
+  .mk.sm{width:88px;height:88px}
+  .lk{width:100%;max-width:560px;height:auto;display:block}
+  .lkv{width:100%;max-width:300px;height:auto;display:block}
+
+  .icons{display:flex;align-items:flex-end;gap:26px;flex-wrap:wrap}
+  .icon-demo{text-align:center}
+  .icon-demo .lab{font-size:11.5px;color:var(--muted);margin-top:8px}
+  .app128{width:128px;height:128px;border-radius:29px;box-shadow:0 12px 30px rgba(15,23,42,.18)}
+  .app64{width:64px;height:64px;border-radius:15px;box-shadow:0 8px 18px rgba(15,23,42,.16)}
+  .app32{width:32px;height:32px;border-radius:8px;box-shadow:0 4px 10px rgba(15,23,42,.16)}
+  .app16{width:16px;height:16px;border-radius:4px}
+
+  .swatches{display:grid;grid-template-columns:repeat(6,1fr);gap:12px}
+  @media(max-width:880px){.swatches{grid-template-columns:repeat(3,1fr)}}
+  .sw{border-radius:12px;overflow:hidden;border:1px solid var(--line);background:#fff}
+  .sw .c{height:62px}
+  .sw .l{padding:8px 10px;font-size:11.5px;color:#334155;font-weight:700;line-height:1.45}
+  .sw .l code{display:block;color:#94A3B8;font-weight:500;font-size:10.5px}
+
+  .clearspace{position:relative;display:inline-block;padding:0}
+  .clearspace .box{position:relative;border:1.5px dashed #CBD5E1;border-radius:10px;padding:34px;display:inline-block}
+  .clearspace .inner{position:relative;outline:1px solid #0EA5A4;outline-offset:0;display:inline-block}
+  .xlab{position:absolute;font-size:11px;color:var(--primary-d);font-weight:700}
+
+  .rules{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+  @media(max-width:880px){.rules{grid-template-columns:1fr 1fr}}
+  .rule{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:var(--shadow)}
+  .rule .stage{height:120px;display:flex;align-items:center;justify-content:center;background:#FBFDFD}
+  .rule .cap{padding:10px 13px;font-size:12px;color:#B91C1C;font-weight:700;border-top:1px solid var(--line-2);display:flex;gap:6px;align-items:center}
+  .rule .cap::before{content:"";width:14px;height:14px;border-radius:50%;background:#FEE2E2;
+    background-image:linear-gradient(45deg,transparent 44%,#B91C1C 44%,#B91C1C 56%,transparent 56%),
+                     linear-gradient(-45deg,transparent 44%,#B91C1C 44%,#B91C1C 56%,transparent 56%);
+    flex:none}
+  .rule.good .cap{color:#15803D}
+  .rule.good .cap::before{background:#DCFCE7;background-image:linear-gradient(45deg,transparent 43%,#15803D 43%,#15803D 57%,transparent 57%),
+    linear-gradient(-45deg,transparent 43%,transparent 43%,#15803D 43%,#15803D 57%,transparent 57%)}
+  .rule.good .cap::before{background-image:linear-gradient(-45deg,transparent 40%,#15803D 40%,#15803D 46%,transparent 46%,transparent 54%,#15803D 54%,#15803D 60%,transparent 60%)}
+
+  table{width:100%;border-collapse:separate;border-spacing:0;font-size:13.5px;margin:6px 0 14px;
+    background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  th{background:var(--surface-2);text-align:left;padding:11px 14px;font-weight:700;border-bottom:1px solid var(--line);font-size:13px}
+  td{padding:11px 14px;border-bottom:1px solid var(--line-2);color:#334155;vertical-align:top}
+  tr:last-child td{border-bottom:none}
+  code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px;background:#F1F5F5;
+    padding:1px 6px;border-radius:5px;color:#0F766E}
+
+  .callout{border-left:3px solid var(--primary);background:linear-gradient(90deg,#F0FDFA,#FFFFFF);
+    padding:14px 18px;border-radius:0 12px 12px 0;margin:16px 0;font-size:14px;color:#134E4A}
+  .footer{margin-top:64px;padding-top:22px;border-top:1px solid var(--line);
+    display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;font-size:12.5px;color:var(--muted)}
+</style>
+</head>
+<body>
+
+<!-- 符号库 -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient id="gInk" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#222B38"/><stop offset="1" stop-color="#05070A"/>
+    </linearGradient>
+    <linearGradient id="gEyeRed" x1="0.1" y1="0" x2="0.9" y2="1">
+      <stop offset="0" stop-color="#FF7A45"/><stop offset="0.45" stop-color="#F5340F"/><stop offset="1" stop-color="#C41C05"/>
+    </linearGradient>
+    <linearGradient id="gEyeTeal" x1="0.1" y1="0" x2="0.9" y2="1">
+      <stop offset="0" stop-color="#5EEAD4"/><stop offset="0.5" stop-color="#14B8A6"/><stop offset="1" stop-color="#0F766E"/>
+    </linearGradient>
+    <linearGradient id="gWord" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#0EA5A4"/><stop offset="1" stop-color="#22C55E"/>
+    </linearGradient>
+    <linearGradient id="gBgDark" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1E2836"/><stop offset="1" stop-color="#070A0F"/>
+    </linearGradient>
+    <linearGradient id="gBgLight" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#EAF3F2"/>
+    </linearGradient>
+    <mask id="mCutD">
+      <rect width="1000" height="1000" fill="#fff"/>
+      <path d="M190 520 Q358 520 415 675 Q247 675 190 520 Z" fill="#000"/>
+      <path d="M810 520 Q642 520 585 675 Q753 675 810 520 Z" fill="#000"/>
+    </mask>
+  </defs>
+
+  <symbol id="sMark" viewBox="0 0 1000 1000">
+    <g fill="none" stroke="url(#gInk)" stroke-width="74" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M180 190 L300 320 L500 400 L700 320 L820 190"/>
+      <path d="M132 208 C95 300 70 430 82 545 C98 690 200 815 370 878 L500 915 L630 878 C800 815 902 690 918 545 C930 430 905 300 868 208"/>
+    </g>
+    <circle cx="130" cy="140" r="72" fill="url(#gInk)"/><circle cx="870" cy="140" r="72" fill="url(#gInk)"/>
+    <path d="M190 520 Q358 520 415 675 Q247 675 190 520 Z" fill="url(#gEyeRed)"/>
+    <path d="M810 520 Q642 520 585 675 Q753 675 810 520 Z" fill="url(#gEyeRed)"/>
+  </symbol>
+
+  <symbol id="sMarkBrand" viewBox="0 0 1000 1000">
+    <g fill="none" stroke="url(#gInk)" stroke-width="74" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M180 190 L300 320 L500 400 L700 320 L820 190"/>
+      <path d="M132 208 C95 300 70 430 82 545 C98 690 200 815 370 878 L500 915 L630 878 C800 815 902 690 918 545 C930 430 905 300 868 208"/>
+    </g>
+    <circle cx="130" cy="140" r="72" fill="url(#gInk)"/><circle cx="870" cy="140" r="72" fill="url(#gInk)"/>
+    <path d="M190 520 Q358 520 415 675 Q247 675 190 520 Z" fill="url(#gEyeTeal)"/>
+    <path d="M810 520 Q642 520 585 675 Q753 675 810 520 Z" fill="url(#gEyeTeal)"/>
+  </symbol>
+
+  <symbol id="sMarkMonoD" viewBox="0 0 1000 1000">
+    <g mask="url(#mCutD)">
+      <g fill="none" stroke="#0E1116" stroke-width="74" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M180 190 L300 320 L500 400 L700 320 L820 190"/>
+        <path d="M132 208 C95 300 70 430 82 545 C98 690 200 815 370 878 L500 915 L630 878 C800 815 902 690 918 545 C930 430 905 300 868 208"/>
+      </g>
+      <circle cx="130" cy="140" r="72" fill="#0E1116"/><circle cx="870" cy="140" r="72" fill="#0E1116"/>
+    </g>
+  </symbol>
+
+  <symbol id="sMarkMonoL" viewBox="0 0 1000 1000">
+    <g mask="url(#mCutD)">
+      <g fill="none" stroke="#FFFFFF" stroke-width="74" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M180 190 L300 320 L500 400 L700 320 L820 190"/>
+        <path d="M132 208 C95 300 70 430 82 545 C98 690 200 815 370 878 L500 915 L630 878 C800 815 902 690 918 545 C930 430 905 300 868 208"/>
+      </g>
+      <circle cx="130" cy="140" r="72" fill="#FFFFFF"/><circle cx="870" cy="140" r="72" fill="#FFFFFF"/>
+    </g>
+  </symbol>
+
+  <symbol id="sLkH" viewBox="0 0 1180 600">
+    <g transform="translate(60,76) scale(0.48)">
+      <g fill="none" stroke="url(#gInk)" stroke-width="74" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M180 190 L300 320 L500 400 L700 320 L820 190"/>
+        <path d="M132 208 C95 300 70 430 82 545 C98 690 200 815 370 878 L500 915 L630 878 C800 815 902 690 918 545 C930 430 905 300 868 208"/>
+      </g>
+      <circle cx="130" cy="140" r="72" fill="url(#gInk)"/><circle cx="870" cy="140" r="72" fill="url(#gInk)"/>
+      <path d="M190 520 Q358 520 415 675 Q247 675 190 520 Z" fill="url(#gEyeRed)"/>
+      <path d="M810 520 Q642 520 585 675 Q753 675 810 520 Z" fill="url(#gEyeRed)"/>
+    </g>
+    <text x="600" y="320" font-family="'Microsoft YaHei','PingFang SC','Noto Sans SC',sans-serif"
+          font-size="120" font-weight="800" fill="#0E1116" letter-spacing="6">老六清净</text>
+    <text x="604" y="414" font-family="'Segoe UI',Arial,sans-serif"
+          font-size="58" font-weight="600" fill="url(#gWord)" letter-spacing="3.5">old666</text>
+  </symbol>
+
+  <symbol id="sLkV" viewBox="0 0 800 920">
+    <g transform="translate(90,30) scale(0.62)">
+      <g fill="none" stroke="url(#gInk)" stroke-width="74" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M180 190 L300 320 L500 400 L700 320 L820 190"/>
+        <path d="M132 208 C95 300 70 430 82 545 C98 690 200 815 370 878 L500 915 L630 878 C800 815 902 690 918 545 C930 430 905 300 868 208"/>
+      </g>
+      <circle cx="130" cy="140" r="72" fill="url(#gInk)"/><circle cx="870" cy="140" r="72" fill="url(#gInk)"/>
+      <path d="M190 520 Q358 520 415 675 Q247 675 190 520 Z" fill="url(#gEyeRed)"/>
+      <path d="M810 520 Q642 520 585 675 Q753 675 810 520 Z" fill="url(#gEyeRed)"/>
+    </g>
+    <text x="400" y="786" text-anchor="middle" font-family="'Microsoft YaHei','PingFang SC','Noto Sans SC',sans-serif"
+          font-size="112" font-weight="800" fill="#0E1116" letter-spacing="8">老六清净</text>
+    <text x="400" y="868" text-anchor="middle" font-family="'Segoe UI',Arial,sans-serif"
+          font-size="52" font-weight="600" fill="url(#gWord)" letter-spacing="4">old666</text>
+  </symbol>
+
+  <symbol id="sAppDark" viewBox="0 0 1024 1024">
+    <rect width="1024" height="1024" rx="228" fill="url(#gBgDark)"/>
+    <g transform="translate(512,512) scale(0.8) translate(-500,-500)">
+      <g fill="none" stroke="#FFFFFF" stroke-width="74" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M180 190 L300 320 L500 400 L700 320 L820 190"/>
+        <path d="M132 208 C95 300 70 430 82 545 C98 690 200 815 370 878 L500 915 L630 878 C800 815 902 690 918 545 C930 430 905 300 868 208"/>
+      </g>
+      <circle cx="130" cy="140" r="72" fill="#FFFFFF"/><circle cx="870" cy="140" r="72" fill="#FFFFFF"/>
+      <path d="M190 520 Q358 520 415 675 Q247 675 190 520 Z" fill="url(#gEyeRed)"/>
+      <path d="M810 520 Q642 520 585 675 Q753 675 810 520 Z" fill="url(#gEyeRed)"/>
+    </g>
+  </symbol>
+
+  <symbol id="sAppLight" viewBox="0 0 1024 1024">
+    <rect width="1024" height="1024" rx="228" fill="url(#gBgLight)"/>
+    <rect x="1" y="1" width="1022" height="1022" rx="227" fill="none" stroke="#DCE6E6" stroke-width="2"/>
+    <g transform="translate(512,512) scale(0.8) translate(-500,-500)">
+      <g fill="none" stroke="url(#gInk)" stroke-width="74" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M180 190 L300 320 L500 400 L700 320 L820 190"/>
+        <path d="M132 208 C95 300 70 430 82 545 C98 690 200 815 370 878 L500 915 L630 878 C800 815 902 690 918 545 C930 430 905 300 868 208"/>
+      </g>
+      <circle cx="130" cy="140" r="72" fill="url(#gInk)"/><circle cx="870" cy="140" r="72" fill="url(#gInk)"/>
+      <path d="M190 520 Q358 520 415 675 Q247 675 190 520 Z" fill="url(#gEyeRed)"/>
+      <path d="M810 520 Q642 520 585 675 Q753 675 810 520 Z" fill="url(#gEyeRed)"/>
+    </g>
+  </symbol>
+</svg>
+
+<div class="wrap">
+
+  <header class="top">
+    <div class="kicker">Brand Identity · v1.0</div>
+    <h1>老六清净 <span class="hl">old666</span> 品牌标志规范</h1>
+    <p class="lede">以你的商标（兽首轮廓 + 赤红双眼）为唯一图形资产，重建为可无限缩放的矢量标志，
+      并延展出组合标、单色标、应用图标与完整使用规范。</p>
+    <div class="meta">
+      <span class="tag on">商标形状 100% 保留</span>
+      <span class="tag">矢量 SVG</span>
+      <span class="tag">4 种配色</span>
+      <span class="tag">2 种组合</span>
+      <span class="tag">应用图标已就绪</span>
+    </div>
+  </header>
+
+  <section>
+    <div class="sec-head"><span class="sec-num">01</span><h2>主标志</h2></div>
+    <p class="sec-desc">横版组合标是产品中最常用的形态：左侧图形标，右侧中文名与英文名。用于启动页、关于页、官网首屏、文档页眉。</p>
+    <div class="panel tint" style="padding:44px 30px">
+      <svg class="lk" style="max-width:600px"><use href="#sLkH"/></svg>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="sec-num">02</span><h2>图形标 · 四种配色</h2></div>
+    <p class="sec-desc">形状完全沿用你的商标，不做任何变形。仅提供眼睛配色的替换版本，以适配不同场景与背景。</p>
+    <div class="grid4">
+      <div class="vcard">
+        <div class="stage"><svg class="mk"><use href="#sMark"/></svg></div>
+        <div class="cap"><b>原版 · 墨黑 + 赤红</b><code>mark.svg</code>
+          <span class="use">推荐主用 · 商标原貌</span></div>
+      </div>
+      <div class="vcard">
+        <div class="stage"><svg class="mk"><use href="#sMarkBrand"/></svg></div>
+        <div class="cap"><b>品牌版 · 墨黑 + 青绿</b><code>mark-brand.svg</code>
+          <span class="use">与产品界面同色系时用</span></div>
+      </div>
+      <div class="vcard">
+        <div class="stage"><svg class="mk"><use href="#sMarkMonoD"/></svg></div>
+        <div class="cap"><b>单色 · 墨黑</b><code>mark-mono-dark.svg</code>
+          <span class="use">印章 / 水印 / 单色印刷</span></div>
+      </div>
+      <div class="vcard">
+        <div class="stage dark"><svg class="mk"><use href="#sMarkMonoL"/></svg></div>
+        <div class="cap"><b>单色 · 纯白</b><code>mark-mono-light.svg</code>
+          <span class="use">深色背景 / 深色界面</span></div>
+      </div>
+    </div>
+    <div class="callout">
+      <strong>为什么保留赤红？</strong> 双眼是商标辨识度最高的部分，也是整套识别里唯一的暖色。把它留作小面积点缀，
+      界面主色青绿留给 UI——形成「标志黑红、界面青绿」的清晰分工，既有商标记忆点，又保持产品的清新调性。
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="sec-num">03</span><h2>组合标</h2></div>
+    <p class="sec-desc">横版用于宽幅场景，竖版用于方形场景（启动闪屏、安装向导、方形海报）。</p>
+    <div class="grid2">
+      <div class="panel tint" style="padding:34px 24px">
+        <svg class="lk"><use href="#sLkH"/></svg>
+      </div>
+      <div class="panel tint" style="padding:30px 24px">
+        <svg class="lkv"><use href="#sLkV"/></svg>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="sec-num">04</span><h2>应用图标</h2></div>
+    <p class="sec-desc">深色底版本为主（延续商标的黑），在桌面、任务栏、开始菜单里对比度最好；浅色底版本用于浅色主题系统与浅色官网。</p>
+    <div class="panel tint" style="padding:40px 30px">
+      <div class="icons">
+        <div class="icon-demo"><svg class="app128"><use href="#sAppDark"/></svg><div class="lab">128 px</div></div>
+        <div class="icon-demo"><svg class="app64"><use href="#sAppDark"/></svg><div class="lab">64 px</div></div>
+        <div class="icon-demo"><svg class="app32"><use href="#sAppDark"/></svg><div class="lab">32 px</div></div>
+        <div class="icon-demo"><svg class="app16"><use href="#sAppDark"/></svg><div class="lab">16 px</div></div>
+        <div style="width:1px;height:96px;background:var(--line);margin:0 6px"></div>
+        <div class="icon-demo"><svg class="app128"><use href="#sAppLight"/></svg><div class="lab">128 px · 浅色</div></div>
+        <div class="icon-demo"><svg class="app64"><use href="#sAppLight"/></svg><div class="lab">64 px</div></div>
+        <div class="icon-demo"><svg class="app32"><use href="#sAppLight"/></svg><div class="lab">32 px</div></div>
+      </div>
+    </div>
+    <div class="callout">
+      小尺寸下双眼会变糊，属正常现象——此时轮廓（双耳 + 下颌）仍在承担识别作用。若需更清晰，可导出
+      <code>16/32/48/64/128/256</code> 多尺寸 <code>.ico</code>，由系统按场景挑选。
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="sec-num">05</span><h2>品牌配色</h2></div>
+    <p class="sec-desc">标志用色与产品界面用色各司其职，互不侵占。</p>
+    <div class="swatches">
+      <div class="sw"><div class="c" style="background:#0E1116"></div><div class="l">墨黑<code>#0E1116 · 标志主色</code></div></div>
+      <div class="sw"><div class="c" style="background:linear-gradient(135deg,#FF7A45,#F5340F 50%,#C41C05)"></div><div class="l">赤红<code>#F5340F · 标志点睛</code></div></div>
+      <div class="sw"><div class="c" style="background:#0EA5A4"></div><div class="l">主青绿<code>#0EA5A4 · 界面主色</code></div></div>
+      <div class="sw"><div class="c" style="background:#22C55E"></div><div class="l">强调绿<code>#22C55E · 成功/渐变</code></div></div>
+      <div class="sw"><div class="c" style="background:#F4F8F8;border-bottom:1px solid #E2E8F0"></div><div class="l">界面底<code>#F4F8F8</code></div></div>
+      <div class="sw"><div class="c" style="background:#FFFFFF;border-bottom:1px solid #E2E8F0"></div><div class="l">卡片白<code>#FFFFFF</code></div></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="sec-num">06</span><h2>使用规范</h2></div>
+    <p class="sec-desc">三条硬规则：留够边距、别缩太小、别改形状。</p>
+
+    <h3>安全边距</h3>
+    <div class="panel" style="padding:34px">
+      <div class="clearspace">
+        <div class="box">
+          <div class="inner"><svg style="width:132px;height:132px;display:block"><use href="#sMark"/></svg></div>
+          <span class="xlab" style="left:8px;top:8px">X</span>
+        </div>
+      </div>
+      <div style="margin-left:34px;font-size:13.5px;color:#475569;max-width:300px">
+        四周留白 <strong>≥ X</strong>，X 取图形标中耳部圆球的直径。
+        任何文字、边框、其他元素都不得进入该区域。
+      </div>
+    </div>
+
+    <h3>最小尺寸</h3>
+    <div class="panel" style="padding:30px;gap:36px;flex-wrap:wrap">
+      <div style="text-align:center"><svg style="width:48px;height:48px;display:block"><use href="#sMark"/></svg><div style="font-size:11.5px;color:#64748B;margin-top:6px">48 px 最小</div></div>
+      <div style="text-align:center"><svg style="width:32px;height:32px;display:block"><use href="#sMark"/></svg><div style="font-size:11.5px;color:#64748B;margin-top:6px">32 px 临界</div></div>
+      <div style="text-align:center"><svg style="width:24px;height:24px;display:block"><use href="#sMarkMonoD"/></svg><div style="font-size:11.5px;color:#64748B;margin-top:6px">24 px 改用单色</div></div>
+    </div>
+
+    <h3>正确 / 错误用法</h3>
+    <div class="rules">
+      <div class="rule"><div class="stage"><svg style="width:96px;height:96px;display:block"><use href="#sMark"/></svg></div><div class="cap">不要拉伸或压扁</div></div>
+      <div class="rule"><div class="stage"><svg style="width:96px;height:96px;display:block;filter:hue-rotate(200deg)"><use href="#sMark"/></svg></div><div class="cap">不要随意改眼睛颜色</div></div>
+      <div class="rule"><div class="stage"><svg style="width:96px;height:96px;display:block;transform:rotate(-18deg)"><use href="#sMark"/></svg></div><div class="cap">不要旋转或倾斜</div></div>
+      <div class="rule"><div class="stage"><svg style="width:96px;height:96px;display:block;filter:drop-shadow(0 0 8px #0EA5A4)"><use href="#sMark"/></svg></div><div class="cap">不要加投影 / 发光</div></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="sec-num">07</span><h2>文件清单</h2></div>
+    <table>
+      <thead><tr><th style="width:38%">文件</th><th style="width:62%">用途</th></tr></thead>
+      <tbody>
+        <tr><td><code>mark.svg</code></td><td>图形标 · 墨黑 + 赤红（主用）</td></tr>
+        <tr><td><code>mark-brand.svg</code></td><td>图形标 · 墨黑 + 青绿（品牌同色系）</td></tr>
+        <tr><td><code>mark-mono-dark.svg</code></td><td>单色墨黑 · 印章 / 水印 / 单色印刷</td></tr>
+        <tr><td><code>mark-mono-light.svg</code></td><td>单色纯白 · 深色背景</td></tr>
+        <tr><td><code>lockup-horizontal.svg</code></td><td>横版组合标 · 图形 + 中英文名</td></tr>
+        <tr><td><code>lockup-vertical.svg</code></td><td>竖版组合标 · 方形场景</td></tr>
+        <tr><td><code>app-icon.svg</code></td><td>应用图标 · 深色底（桌面 / 任务栏）</td></tr>
+        <tr><td><code>app-icon-light.svg</code></td><td>应用图标 · 浅色底</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <div class="footer">
+    <span>老六清净 old666 · 品牌标志规范 v1.0</span>
+    <span>商标形状 100% 保留 · 仅做矢量化与配色延展</span>
+  </div>
+</div>
+</body>
+</html>

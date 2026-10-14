@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000" width="1000" height="1000" role="img" aria-label="轻净 LightClean 图形标（单色·墨黑）">
+  <title>轻净 LightClean 图形标（单色·墨黑）</title>
+  <desc>单色版本，双眼镂空，适用于印章、水印、单色印刷等场景。</desc>
+  <defs>
+    <mask id="lcEyeCutDark">
+      <rect width="1000" height="1000" fill="#fff"/>
+      <path d="M190 520 Q358 520 415 675 Q247 675 190 520 Z" fill="#000"/>
+      <path d="M810 520 Q642 520 585 675 Q753 675 810 520 Z" fill="#000"/>
+    </mask>
+  </defs>
+  <g mask="url(#lcEyeCutDark)">
+    <g fill="none" stroke="#0E1116" stroke-width="74" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M180 190 L300 320 L500 400 L700 320 L820 190"/>
+      <path d="M132 208 C95 300 70 430 82 545 C98 690 200 815 370 878 L500 915 L630 878 C800 815 902 690 918 545 C930 430 905 300 868 208"/>
+    </g>
+    <circle cx="130" cy="140" r="72" fill="#0E1116"/>
+    <circle cx="870" cy="140" r="72" fill="#0E1116"/>
+  </g>
+</svg>

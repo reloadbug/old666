@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 600" width="1180" height="600" role="img" aria-label="老六清净 old666 横版组合标">
+  <title>老六清净 old666 横版组合标</title>
+  <desc>图形标在左，中文名与英文标识在右。</desc>
+  <defs>
+    <linearGradient id="lkhInk" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#222B38"/>
+      <stop offset="1" stop-color="#05070A"/>
+    </linearGradient>
+    <linearGradient id="lkhEye" x1="0.1" y1="0" x2="0.9" y2="1">
+      <stop offset="0" stop-color="#FF7A45"/>
+      <stop offset="0.45" stop-color="#F5340F"/>
+      <stop offset="1" stop-color="#C41C05"/>
+    </linearGradient>
+    <linearGradient id="lkhWord" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#0EA5A4"/>
+      <stop offset="1" stop-color="#22C55E"/>
+    </linearGradient>
+  </defs>
+
+  <g transform="translate(60,76) scale(0.48)">
+    <g fill="none" stroke="url(#lkhInk)" stroke-width="74" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M180 190 L300 320 L500 400 L700 320 L820 190"/>
+      <path d="M132 208 C95 300 70 430 82 545 C98 690 200 815 370 878 L500 915 L630 878 C800 815 902 690 918 545 C930 430 905 300 868 208"/>
+    </g>
+    <circle cx="130" cy="140" r="72" fill="url(#lkhInk)"/>
+    <circle cx="870" cy="140" r="72" fill="url(#lkhInk)"/>
+    <path d="M190 520 Q358 520 415 675 Q247 675 190 520 Z" fill="url(#lkhEye)"/>
+    <path d="M810 520 Q642 520 585 675 Q753 675 810 520 Z" fill="url(#lkhEye)"/>
+  </g>
+
+  <text x="600" y="320" font-family="'Microsoft YaHei','PingFang SC','Hiragino Sans GB','Noto Sans SC',sans-serif"
+        font-size="120" font-weight="800" fill="#0E1116" letter-spacing="6">老六清净</text>
+  <text x="604" y="414" font-family="'Segoe UI','Helvetica Neue',Arial,sans-serif"
+        font-size="58" font-weight="600" fill="url(#lkhWord)" letter-spacing="3.5">old666</text>
+</svg>

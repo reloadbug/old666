@@ -1,0 +1,39 @@
+# ---- 依赖与构建产物 ----
+node_modules/
+dist/
+build/
+out/
+target/
+src-tauri/target/
+*.exe
+*.msi
+*.dll
+*.pdb
+
+# ---- 本地环境与凭据（严禁提交）----
+.env
+.env.*
+*.pem
+*.key
+*.token
+*.pat
+.lc_gh_token
+credentials.json
+
+# ---- 编辑器与系统 ----
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---- 日志与临时文件 ----
+*.log
+npm-debug.log*
+yarn-error.log*
+*.tmp
+*.bak
+
+# ---- 工作区代理状态（非交付物）----
+.workbuddy-ai/

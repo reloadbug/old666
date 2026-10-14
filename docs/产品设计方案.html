@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>老六清净 old666 · 产品设计方案 v0.1</title>
+<style>
+  :root{
+    --bg:#F4F8F8;
+    --bg-2:#EAF3F2;
+    --surface:#FFFFFF;
+    --surface-2:#F7FBFA;
+    --primary:#0EA5A4;
+    --primary-d:#0F766E;
+    --primary-l:#CCFBF1;
+    --green:#22C55E;
+    --blue:#3B82F6;
+    --violet:#8B5CF6;
+    --amber:#F59E0B;
+    --danger:#EF4444;
+    --text:#0F172A;
+    --muted:#64748B;
+    --line:#E2E8F0;
+    --line-2:#EFF3F4;
+    --shadow:0 1px 2px rgba(15,23,42,.04), 0 8px 24px rgba(15,23,42,.06);
+    --shadow-lg:0 4px 12px rgba(15,23,42,.06), 0 24px 60px rgba(15,23,42,.10);
+    --radius:16px;
+    --radius-s:10px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei","PingFang SC",sans-serif;
+    background:
+      radial-gradient(1200px 600px at 10% -10%, #D9F5F1 0%, transparent 55%),
+      radial-gradient(1000px 500px at 100% 0%, #E4EEFF 0%, transparent 50%),
+      var(--bg);
+    color:var(--text);
+    line-height:1.7;
+    font-size:15px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px 100px}
+
+  /* ---------- Hero ---------- */
+  .hero{
+    padding:64px 0 40px;
+    position:relative;
+  }
+  .brand-row{display:flex;align-items:center;gap:12px;margin-bottom:22px}
+  .logo{
+    width:54px;height:54px;border-radius:15px;
+    background:#fff;border:1px solid var(--line);
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 6px 18px rgba(15,23,42,.10);
+    flex:none;
+  }
+  .logo svg{width:38px;height:38px;display:block}
+  .brand-name{font-size:19px;font-weight:700;letter-spacing:.2px}
+  .brand-sub{font-size:12.5px;color:var(--muted);letter-spacing:1.4px;text-transform:uppercase}
+  h1{
+    font-size:clamp(30px,4.6vw,46px);
+    line-height:1.22;
+    font-weight:800;
+    letter-spacing:-.6px;
+    margin-bottom:18px;
+  }
+  h1 .hl{
+    background:linear-gradient(120deg,#0EA5A4,#22C55E 70%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .lede{font-size:17px;color:#334155;max-width:760px;margin-bottom:26px}
+  .tags{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:34px}
+  .tag{
+    font-size:13px;padding:6px 14px;border-radius:999px;
+    background:#fff;border:1px solid var(--line);color:#334155;
+    box-shadow:0 1px 2px rgba(15,23,42,.03);
+  }
+  .tag.on{background:linear-gradient(135deg,#0EA5A4,#14B8A6);color:#fff;border-color:transparent}
+
+  .hero-stats{
+    display:grid;grid-template-columns:repeat(4,1fr);gap:14px;
+    margin-top:8px;
+  }
+  .hstat{
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+    padding:18px 18px;box-shadow:var(--shadow);
+  }
+  .hstat b{display:block;font-size:24px;font-weight:800;letter-spacing:-.5px;
+    background:linear-gradient(120deg,#0EA5A4,#22C55E);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hstat span{font-size:12.5px;color:var(--muted)}
+
+  /* ---------- Section ---------- */
+  section{margin-top:72px;scroll-margin-top:20px}
+  .sec-head{display:flex;align-items:center;gap:14px;margin-bottom:8px}
+  .sec-num{
+    font-size:12px;font-weight:800;letter-spacing:1px;color:#fff;
+    background:linear-gradient(135deg,#0EA5A4,#14B8A6);
+    padding:5px 11px;border-radius:8px;flex:none;
+  }
+  h2{font-size:26px;font-weight:800;letter-spacing:-.4px}
+  .sec-desc{color:var(--muted);font-size:14.5px;margin:6px 0 28px;max-width:820px}
+  h3{font-size:18px;font-weight:700;margin:34px 0 14px;letter-spacing:-.2px}
+  h4{font-size:15px;font-weight:700;margin:0 0 8px}
+  p{margin-bottom:12px;color:#334155}
+  ul{margin:0 0 14px 0;padding-left:0;list-style:none}
+  li{position:relative;padding-left:20px;margin-bottom:7px;color:#334155}
+  li::before{
+    content:"";position:absolute;left:4px;top:9px;width:6px;height:6px;border-radius:50%;
+    background:var(--primary);opacity:.65;
+  }
+  .card{
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+    padding:24px;box-shadow:var(--shadow);margin-bottom:16px;
+  }
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  @media(max-width:860px){.grid2,.grid3,.grid4,.hero-stats{grid-template-columns:1fr 1fr}}
+  @media(max-width:560px){.grid2,.grid3,.grid4,.hero-stats{grid-template-columns:1fr}}
+
+  table{width:100%;border-collapse:separate;border-spacing:0;font-size:13.5px;margin:6px 0 16px;
+    background:#fff;border:1px solid var(--line);border-radius:var(--radius-s);overflow:hidden}
+  th{background:var(--surface-2);text-align:left;padding:11px 14px;font-weight:700;color:#0F172A;
+    border-bottom:1px solid var(--line);font-size:13px}
+  td{padding:11px 14px;border-bottom:1px solid var(--line-2);color:#334155;vertical-align:top}
+  tr:last-child td{border-bottom:none}
+  .ok{color:#15803D;font-weight:700}
+  .no{color:#B91C1C;font-weight:700}
+  .mid{color:#B45309;font-weight:700}
+
+  .pill{display:inline-block;font-size:11.5px;font-weight:700;padding:2px 9px;border-radius:999px;
+    background:var(--primary-l);color:var(--primary-d);margin-right:5px}
+  .pill.g{background:#DCFCE7;color:#15803D}
+  .pill.b{background:#DBEAFE;color:#1D4ED8}
+  .pill.a{background:#FEF3C7;color:#B45309}
+  .pill.v{background:#EDE9FE;color:#6D28D9}
+  .pill.r{background:#FEE2E2;color:#B91C1C}
+
+  .callout{
+    border-left:3px solid var(--primary);background:linear-gradient(90deg,#F0FDFA,#FFFFFF);
+    padding:14px 18px;border-radius:0 var(--radius-s) var(--radius-s) 0;margin:16px 0;
+    font-size:14px;color:#134E4A;
+  }
+  .callout.warn{border-color:var(--amber);background:linear-gradient(90deg,#FFFBEB,#FFFFFF);color:#78350F}
+
+  /* ---------- Architecture ---------- */
+  .arch{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:26px;
+    box-shadow:var(--shadow);margin:20px 0}
+  .layer{border-radius:12px;padding:14px 18px;margin-bottom:10px;border:1px solid transparent;position:relative}
+  .layer .lt{font-size:13px;font-weight:800;letter-spacing:.3px;margin-bottom:4px}
+  .layer .ld{font-size:12.5px;color:#475569;line-height:1.6}
+  .l-ui{background:linear-gradient(90deg,#E0F2FE,#F0F9FF);border-color:#BAE6FD}
+  .l-ui .lt{color:#0369A1}
+  .l-bridge{background:linear-gradient(90deg,#EDE9FE,#F5F3FF);border-color:#DDD6FE}
+  .l-bridge .lt{color:#6D28D9}
+  .l-core{background:linear-gradient(90deg,#CCFBF1,#F0FDFA);border-color:#99F6E4}
+  .l-core .lt{color:#0F766E}
+  .l-sys{background:linear-gradient(90deg,#FEF3C7,#FFFBEB);border-color:#FDE68A}
+  .l-sys .lt{color:#B45309}
+  .l-os{background:linear-gradient(90deg,#F1F5F9,#F8FAFC);border-color:#E2E8F0}
+  .l-os .lt{color:#475569}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+  .chip{font-size:11.5px;background:#fff;border:1px solid rgba(15,23,42,.08);border-radius:7px;
+    padding:3px 9px;color:#334155;font-weight:600}
+  .arrow{text-align:center;color:#94A3B8;font-size:14px;line-height:1;margin:-4px 0 6px}
+
+  /* ---------- Mockups ---------- */
+  .mock-stage{background:linear-gradient(160deg,#EAF3F2,#F6FAFF);
+    border:1px solid var(--line);border-radius:20px;padding:28px;box-shadow:var(--shadow-lg);margin:18px 0 8px}
+  .win{
+    background:#fff;border-radius:14px;overflow:hidden;border:1px solid #DCE6E6;
+    box-shadow:0 18px 50px rgba(15,23,42,.14);max-width:920px;margin:0 auto;
+  }
+  .titlebar{height:42px;display:flex;align-items:center;gap:8px;padding:0 16px;
+    background:#FBFDFD;border-bottom:1px solid var(--line-2)}
+  .dots{display:flex;gap:6px}
+  .dots i{width:11px;height:11px;border-radius:50%;display:block}
+  .dots i:nth-child(1){background:#FF5F57}.dots i:nth-child(2){background:#FEBC2E}.dots i:nth-child(3){background:#28C840}
+  .tb-title{font-size:12.5px;color:#94A3B8;margin-left:8px;font-weight:600;display:flex;align-items:center;gap:7px}
+  .tb-mk{width:17px;height:17px;display:block;flex:none}
+  .tb-right{margin-left:auto;display:flex;gap:8px;align-items:center}
+  .mode-switch{display:flex;background:#F1F5F5;border-radius:9px;padding:3px;gap:2px}
+  .mode-switch span{font-size:11.5px;padding:4px 12px;border-radius:7px;color:#64748B;font-weight:600;cursor:default}
+  .mode-switch span.on{background:#fff;color:var(--primary-d);box-shadow:0 1px 3px rgba(15,23,42,.12)}
+
+  .body-grid{display:grid;grid-template-columns:168px 1fr;min-height:430px}
+  .sidebar{background:#FAFCFC;border-right:1px solid var(--line-2);padding:14px 10px}
+  .nav-item{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:9px;font-size:13px;
+    color:#475569;font-weight:600;margin-bottom:3px}
+  .nav-item.on{background:linear-gradient(135deg,#0EA5A4,#14B8A6);color:#fff;box-shadow:0 6px 14px rgba(14,165,164,.25)}
+  .nav-ico{width:16px;height:16px;flex:none;opacity:.9}
+  .main{padding:24px 26px}
+
+  /* home mock */
+  .home-top{display:flex;gap:28px;align-items:center;margin-bottom:22px}
+  .ring{
+    width:150px;height:150px;border-radius:50%;flex:none;position:relative;
+    background:conic-gradient(#22C55E 0turn 0.88turn, #E8F1F0 0.88turn 1turn);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .ring::after{content:"";position:absolute;inset:11px;border-radius:50%;background:#fff}
+  .ring-in{position:relative;text-align:center;z-index:2}
+  .ring-in b{font-size:34px;font-weight:800;color:#0F172A;letter-spacing:-1px}
+  .ring-in small{display:block;font-size:11.5px;color:var(--muted);margin-top:-2px}
+  .home-cta h3{font-size:19px;margin:0 0 6px}
+  .home-cta p{font-size:13px;color:var(--muted);margin:0 0 14px}
+  .btn-primary{
+    display:inline-flex;align-items:center;gap:8px;
+    background:linear-gradient(135deg,#0EA5A4,#22C55E);color:#fff;font-weight:700;font-size:14.5px;
+    padding:12px 30px;border-radius:12px;box-shadow:0 10px 26px rgba(14,165,164,.32);border:none;cursor:default;
+  }
+  .btn-ghost{display:inline-flex;align-items:center;gap:7px;background:#fff;border:1px solid var(--line);
+    color:#334155;font-weight:600;font-size:13.5px;padding:11px 20px;border-radius:12px;margin-left:10px}
+
+  .stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  .stat{background:#FBFDFD;border:1px solid var(--line-2);border-radius:12px;padding:13px 14px}
+  .stat .k{font-size:11.5px;color:var(--muted);display:flex;align-items:center;gap:5px}
+  .stat .v{font-size:17px;font-weight:800;margin-top:3px;letter-spacing:-.3px}
+  .stat .v.good{color:#15803D}.stat .v.warn{color:#B45309}
+
+  /* process mock */
+  .p-toolbar{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  .p-toolbar .t{font-size:15px;font-weight:700}
+  .p-toolbar .sp{margin-left:auto;display:flex;gap:8px}
+  .mini-btn{font-size:12px;font-weight:600;padding:7px 14px;border-radius:9px;border:1px solid var(--line);
+    background:#fff;color:#475569}
+  .mini-btn.pri{background:linear-gradient(135deg,#0EA5A4,#22C55E);color:#fff;border-color:transparent}
+  .plist{border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .prow{display:grid;grid-template-columns:22px 1fr 74px 74px 92px;gap:10px;align-items:center;
+    padding:9px 14px;border-bottom:1px solid var(--line-2);font-size:12.5px}
+  .prow:last-child{border-bottom:none}
+  .prow.head{background:#F7FAFA;font-weight:700;color:#475569;font-size:11.5px;letter-spacing:.3px}
+  .prow .nm{display:flex;align-items:center;gap:8px;font-weight:600;color:#1E293B}
+  .prow .nm small{color:#94A3B8;font-weight:500}
+  .cbox{width:15px;height:15px;border-radius:4px;border:1.5px solid #CBD5E1;display:block}
+  .cbox.on{background:var(--primary);border-color:var(--primary);position:relative}
+  .cbox.on::after{content:"";position:absolute;left:4px;top:1px;width:5px;height:9px;
+    border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg)}
+  .bar{height:6px;border-radius:99px;background:#EDF2F2;overflow:hidden}
+  .bar i{display:block;height:100%;border-radius:99px}
+  .grouphd{padding:8px 14px;background:#FBFDFD;font-size:11.5px;font-weight:700;color:#64748B;
+    display:flex;align-items:center;gap:7px;border-bottom:1px solid var(--line-2)}
+
+  /* boot mock */
+  .timeline{display:flex;height:40px;border-radius:11px;overflow:hidden;margin-bottom:8px;
+    box-shadow:0 1px 3px rgba(15,23,42,.06)}
+  .tl-seg{display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff;font-weight:700}
+  .tl-legend{display:flex;gap:16px;font-size:12px;color:var(--muted);margin-bottom:18px;flex-wrap:wrap}
+  .tl-legend i{width:9px;height:9px;border-radius:3px;display:inline-block;margin-right:5px}
+
+  /* modes mock */
+  .mode-card{border:1.5px solid var(--line);border-radius:14px;padding:18px;position:relative;background:#fff}
+  .mode-card.on{border-color:var(--primary);box-shadow:0 10px 28px rgba(14,165,164,.16);
+    background:linear-gradient(180deg,#F0FDFA,#fff)}
+  .mode-ico{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;
+    font-size:20px;margin-bottom:10px}
+  .mode-card h4{margin-bottom:3px}
+  .mode-card .md{font-size:12.5px;color:var(--muted);margin-bottom:10px;min-height:34px}
+  .mode-card .rule{font-size:11.5px;color:#475569;display:flex;justify-content:space-between;padding:3px 0;
+    border-top:1px dashed var(--line)}
+  .badge-on{position:absolute;top:14px;right:14px;font-size:10.5px;font-weight:800;color:#fff;
+    background:linear-gradient(135deg,#0EA5A4,#22C55E);padding:3px 9px;border-radius:99px}
+
+  /* floating ball */
+  .ball-stage{display:flex;justify-content:center;gap:44px;align-items:center;padding:14px 0}
+  .ball{width:78px;height:78px;border-radius:50%;
+    background:radial-gradient(circle at 32% 28%,#5EEAD4,#0EA5A4 60%,#0F766E);
+    box-shadow:0 12px 30px rgba(14,165,164,.4),inset 0 2px 6px rgba(255,255,255,.5);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff}
+  .ball b{font-size:19px;font-weight:800;line-height:1}
+  .ball small{font-size:9.5px;opacity:.9}
+  .ball-legend{font-size:12.5px;color:#475569}
+
+  /* design tokens */
+  .swatches{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+  .sw{border-radius:11px;overflow:hidden;border:1px solid var(--line);background:#fff}
+  .sw .c{height:52px}
+  .sw .l{padding:7px 9px;font-size:11px;color:#475569;font-weight:600;line-height:1.4}
+  .sw .l code{display:block;color:#94A3B8;font-size:10px;font-weight:500}
+
+  /* roadmap */
+  .road{position:relative;padding-left:30px}
+  .road::before{content:"";position:absolute;left:9px;top:6px;bottom:6px;width:2px;
+    background:linear-gradient(#0EA5A4,#22C55E,#CBD5E1)}
+  .phase{position:relative;margin-bottom:16px}
+  .phase::before{content:"";position:absolute;left:-27px;top:16px;width:14px;height:14px;border-radius:50%;
+    background:#fff;border:3px solid var(--primary);box-shadow:0 0 0 4px #E6F7F5}
+  .phase .ph-card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px;box-shadow:var(--shadow)}
+  .phase .ph-top{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+  .phase .ph-tag{font-size:11px;font-weight:800;color:#fff;background:linear-gradient(135deg,#0EA5A4,#14B8A6);
+    padding:3px 9px;border-radius:7px}
+  .phase h4{margin:0}
+  .phase .out{font-size:12.5px;color:var(--primary-d);font-weight:700;margin-top:8px}
+
+  .footer{margin-top:70px;padding-top:24px;border-top:1px solid var(--line);
+    display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;
+    font-size:12.5px;color:var(--muted)}
+
+  .toc{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:26px}
+  .toc a{display:block;background:#fff;border:1px solid var(--line);border-radius:11px;padding:12px 15px;
+    text-decoration:none;color:#334155;font-size:13.5px;font-weight:600;box-shadow:0 1px 2px rgba(15,23,42,.03);
+    transition:.18s}
+  .toc a:hover{border-color:var(--primary);color:var(--primary-d);transform:translateY(-1px);
+    box-shadow:0 8px 20px rgba(14,165,164,.14)}
+  .toc a span{color:#94A3B8;font-weight:800;margin-right:8px;font-size:12px}
+  @media(max-width:860px){.toc{grid-template-columns:1fr 1fr}.swatches{grid-template-columns:repeat(3,1fr)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ================= HERO ================= -->
+  <header class="hero">
+    <div class="brand-row">
+      <div class="logo">
+        <svg viewBox="0 0 1000 1000" role="img" aria-label="老六清净 old666 图形标">
+          <defs>
+            <linearGradient id="docInk" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#222B38"/><stop offset="1" stop-color="#05070A"/>
+            </linearGradient>
+            <linearGradient id="docEye" x1="0.1" y1="0" x2="0.9" y2="1">
+              <stop offset="0" stop-color="#FF7A45"/><stop offset="0.45" stop-color="#F5340F"/><stop offset="1" stop-color="#C41C05"/>
+            </linearGradient>
+          </defs>
+          <g fill="none" stroke="url(#docInk)" stroke-width="74" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M180 190 L300 320 L500 400 L700 320 L820 190"/>
+            <path d="M132 208 C95 300 70 430 82 545 C98 690 200 815 370 878 L500 915 L630 878 C800 815 902 690 918 545 C930 430 905 300 868 208"/>
+          </g>
+          <circle cx="130" cy="140" r="72" fill="url(#docInk)"/>
+          <circle cx="870" cy="140" r="72" fill="url(#docInk)"/>
+          <path d="M190 520 Q358 520 415 675 Q247 675 190 520 Z" fill="url(#docEye)"/>
+          <path d="M810 520 Q642 520 585 675 Q753 675 810 520 Z" fill="url(#docEye)"/>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-name">老六清净 old666</div>
+        <div class="brand-sub">Product Design Spec</div>
+      </div>
+    </div>
+
+    <h1>一款<span class="hl">无广告 · 纯绿色</span>的<br>Windows 系统优化工具</h1>
+    <p class="lede">
+      不做全家桶、不弹广告、不偷跑后台。只解决用户真正在意的三件事：
+      <strong>开机更快</strong>、<strong>久用不卡</strong>、<strong>一键净化不常用进程</strong>。
+      以「日常 / 游戏 / 服务器」三套场景方案，把专业级系统调优变成一点就搞定。
+    </p>
+
+    <div class="tags">
+      <span class="tag on">零广告</span>
+      <span class="tag on">零弹窗</span>
+      <span class="tag on">绿色免安装</span>
+      <span class="tag">常驻内存 &lt; 40 MB</span>
+      <span class="tag">一屏一按钮</span>
+      <span class="tag">纯本地 · 不上传</span>
+    </div>
+
+    <div class="hero-stats">
+      <div class="hstat"><b>&lt;40MB</b><span>后台常驻内存预算</span></div>
+      <div class="hstat"><b>&lt;1s</b><span>冷启动到可操作</span></div>
+      <div class="hstat"><b>3 模式</b><span>日常 / 游戏 / 服务器</span></div>
+      <div class="hstat"><b>1 键</b><span>完成主要优化动作</span></div>
+    </div>
+
+    <nav class="toc">
+      <a href="#s1"><span>01</span>产品定位与痛点</a>
+      <a href="#s2"><span>02</span>核心功能规划</a>
+      <a href="#s3"><span>03</span>场景模式设计</a>
+      <a href="#s4"><span>04</span>UI / 交互设计方案</a>
+      <a href="#s5"><span>05</span>技术架构设计</a>
+      <a href="#s6"><span>06</span>开发顺序与路线图</a>
+    </nav>
+  </header>
+
+  <!-- ================= 01 ================= -->
+  <section id="s1">
+    <div class="sec-head"><span class="sec-num">01</span><h2>产品定位与痛点</h2></div>
+    <p class="sec-desc">先想清楚「不打谁、替谁解决什么」，再谈功能。老六清净的对标不是功能数量，而是「克制」。</p>
+
+    <h3>1.1 用户真实痛点</h3>
+    <div class="grid3">
+      <div class="card">
+        <h4>痛点 A · 开机慢</h4>
+        <p style="font-size:13.5px;color:#475569;margin:0">
+          装了太多软件后，开机项、计划任务、服务层层叠加，开机 1 分钟起步，却不知道到底是谁拖的。
+        </p>
+      </div>
+      <div class="card">
+        <h4>痛点 B · 久用卡顿</h4>
+        <p style="font-size:13.5px;color:#475569;margin:0">
+          开机几小时后内存被各种后台进程、缓存、更新程序吃掉，切窗口、开浏览器都发涩。
+        </p>
+      </div>
+      <div class="card">
+        <h4>痛点 C · 不知道该关谁</h4>
+        <p style="font-size:13.5px;color:#475569;margin:0">
+          任务管理器能看进程，但普通用户分不清哪个能关、哪个关了会出问题，不敢下手。
+        </p>
+      </div>
+    </div>
+
+    <h3>1.2 现有工具的「原罪」</h3>
+    <ul>
+      <li><strong>广告与营销</strong>：首页一半是推广位，清理完弹窗推软件，把工具做成流量入口。</li>
+      <li><strong>重后台</strong>：常驻进程 200–500 MB，安全模块、升级模块、推广模块全在跑，本身就制造卡顿。</li>
+      <li><strong>捆绑与全家桶</strong>：装一个带一串，卸载还留残留。</li>
+      <li><strong>黑箱操作</strong>：一键优化后改了哪些设置、能不能回滚，用户完全不知道。</li>
+      <li><strong>专业工具门槛高</strong>：Process Lasso / Process Explorer 能力很强，但界面面向工程师，普通用户看不懂。</li>
+    </ul>
+
+    <h3>1.3 差异化定位</h3>
+    <table>
+      <thead><tr><th style="width:22%">维度</th><th style="width:39%">传统安全卫士</th><th style="width:39%">老六清净 old666</th></tr></thead>
+      <tbody>
+        <tr><td>广告</td><td class="no">多（首页 + 弹窗 + 推送）</td><td class="ok">零广告、零弹窗、零推送</td></tr>
+        <tr><td>常驻占用</td><td class="no">200–500 MB，多进程常驻</td><td class="ok">&lt; 40 MB，可设「用完即退」零常驻</td></tr>
+        <tr><td>安装方式</td><td class="no">强安装 + 捆绑</td><td class="ok">绿色便携单目录，可直接删</td></tr>
+        <tr><td>操作路径</td><td class="no">多级营销页面</td><td class="ok">一屏一焦点，一键完成</td></tr>
+        <tr><td>数据隐私</td><td class="no">行为上报、云端规则</td><td class="ok">纯本地决策，默认不联网</td></tr>
+        <tr><td>可解释性</td><td class="no">黑箱优化</td><td class="ok">每步可解释、可回滚</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout">
+      <strong>一句话定位：</strong>把「开机加速 + 进程净化 + 场景调优」这三件事做到极致，其余全部砍掉。
+      做系统工具里的「极简主义」——功能少一点，但每一点都让人放心。
+    </div>
+  </section>
+
+  <!-- ================= 02 ================= -->
+  <section id="s2">
+    <div class="sec-head"><span class="sec-num">02</span><h2>核心功能规划</h2></div>
+    <p class="sec-desc">六大模块，其中 M2 进程净化与 M3 场景模式是产品护城河，其余为配套。</p>
+
+    <h3>2.1 功能全景</h3>
+    <div class="grid3">
+      <div class="card" style="border-top:3px solid #0EA5A4">
+        <span class="pill">M1</span><h4 style="display:inline">开机加速</h4>
+        <p style="font-size:13px;color:#64748B;margin:8px 0 10px">让开机时间可见、可解释、可缩短</p>
+        <ul style="font-size:13.5px;margin:0">
+          <li>开机耗时时间线分析（BIOS→系统→服务→启动项→桌面）</li>
+          <li>启动项 / 计划任务 / 服务 / 驱动 四类统一管理</li>
+          <li>风险分级建议：安全禁用 / 谨慎 / 不建议</li>
+          <li>延迟启动（开机 2 分钟后再拉起）</li>
+        </ul>
+      </div>
+      <div class="card" style="border-top:3px solid #22C55E">
+        <span class="pill g">M2 · 核心</span><h4 style="display:inline">进程净化</h4>
+        <p style="font-size:13px;color:#64748B;margin:8px 0 10px">找出「用不上却占资源」的进程并安全清理</p>
+        <ul style="font-size:13.5px;margin:0">
+          <li>实时进程资源视图（CPU / 内存 / 磁盘 / 网络 / GPU）</li>
+          <li>不常用进程识别（使用频率 + 活跃度 + 关联程序状态）</li>
+          <li>智能分组：可安全结束 / 建议保留 / 系统关键</li>
+          <li>一键净化 + 白名单守护，杜绝误杀</li>
+        </ul>
+      </div>
+      <div class="card" style="border-top:3px solid #8B5CF6">
+        <span class="pill v">M3 · 差异化</span><h4 style="display:inline">场景模式</h4>
+        <p style="font-size:13px;color:#64748B;margin:8px 0 10px">一套策略引擎，适配不同使用场景</p>
+        <ul style="font-size:13.5px;margin:0">
+          <li>日常模式：均衡，保留常用后台</li>
+          <li>游戏模式：极致释放，降干扰</li>
+          <li>服务器模式：稳定优先，保守回收</li>
+          <li>支持自定义模式与自动切换触发条件</li>
+        </ul>
+      </div>
+      <div class="card" style="border-top:3px solid #3B82F6">
+        <span class="pill b">M4</span><h4 style="display:inline">一键体检</h4>
+        <p style="font-size:13px;color:#64748B;margin:8px 0 10px">小白入口：扫描 → 评分 → 一键优化</p>
+        <ul style="font-size:13.5px;margin:0">
+          <li>30 秒快速体检，输出健康评分</li>
+          <li>按「影响大小」排序的问题清单</li>
+          <li>一键修复 + 修复前后对比</li>
+        </ul>
+      </div>
+      <div class="card" style="border-top:3px solid #F59E0B">
+        <span class="pill a">M5</span><h4 style="display:inline">内存与垃圾清理</h4>
+        <p style="font-size:13px;color:#64748B;margin:8px 0 10px">只清理真正能安全回收的东西</p>
+        <ul style="font-size:13.5px;margin:0">
+          <li>内存工作集裁剪（EmptyWorkingSet 策略化）</li>
+          <li>临时文件 / 缓存 / 日志 / 回收站 / 更新残留</li>
+          <li>大文件与重复文件扫描（可选）</li>
+        </ul>
+      </div>
+      <div class="card" style="border-top:3px solid #64748B">
+        <span class="pill">M6</span><h4 style="display:inline">实时监控</h4>
+        <p style="font-size:13px;color:#64748B;margin:8px 0 10px">轻量悬浮球，一眼看清机器状态</p>
+        <ul style="font-size:13.5px;margin:0">
+          <li>桌面悬浮球：CPU / 内存 / 温度 / 网速</li>
+          <li>点击展开极简面板，长按唤起主界面</li>
+          <li>阈值告警：资源异常时轻提示，不打扰</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>2.2 核心功能深挖 · 进程净化</h3>
+    <p>这是最需要「判断力」的模块。普通用户不敢关进程，是因为怕关错。老六清净的价值 = <strong>替用户做安全判断，并说清理由</strong>。</p>
+    <table>
+      <thead><tr><th style="width:20%">判定维度</th><th style="width:44%">信号</th><th style="width:36%">结论倾向</th></tr></thead>
+      <tbody>
+        <tr><td>活跃度</td><td>近 30 分钟无 CPU / IO / 网络活动</td><td>偏「可清理」</td></tr>
+        <tr><td>前台关联</td><td>不属于任何可见窗口 / 前台程序</td><td>偏「可清理」</td></tr>
+        <tr><td>使用频率</td><td>本地统计该进程近 7 天从未被用户主动使用</td><td>偏「可清理」</td></tr>
+        <tr><td>签名与来源</td><td>是否有有效数字签名、是否为已知系统组件</td><td>签名可信 → 偏「保留」</td></tr>
+        <tr><td>系统关键性</td><td>命中系统关键进程 / 服务 / 驱动清单</td><td class="no">强制「禁止结束」</td></tr>
+        <tr><td>用户白名单</td><td>用户曾标记保留</td><td class="no">强制「保留」</td></tr>
+      </tbody>
+    </table>
+    <div class="callout warn">
+      <strong>安全红线：</strong>系统关键进程、安全软件、杀软/EDR、正在写入的数据库、当前前台程序的子进程，
+      一律进「禁止结束」黑名单，永不参与一键净化。任何结束动作前先记录快照，支持一键回滚。
+    </div>
+
+    <h3>2.3 「一键净化」的执行策略</h3>
+    <ul>
+      <li><strong>两段式</strong>：先「温和结束」（发送关闭信号，给程序自己退出的机会），失败再「强制结束」。</li>
+      <li><strong>分组执行</strong>：按进程组（同属一个父进程 / 同一软件）整体处理，避免只关一半导致重启。</li>
+      <li><strong>可回滚</strong>：记录被结束进程的路径与启动命令，一键「恢复上次净化」。</li>
+      <li><strong>结果可读</strong>：净化后直接给出「释放内存 1.8 GB / 释放 12 个进程 / 预计降温 4℃」这类可感知结论。</li>
+    </ul>
+  </section>
+
+  <!-- ================= 03 ================= -->
+  <section id="s3">
+    <div class="sec-head"><span class="sec-num">03</span><h2>场景模式设计</h2></div>
+    <p class="sec-desc">模式 = 一组可解释、可编辑的策略。用户切换的是「意图」，系统翻译成「动作」。</p>
+
+    <h3>3.1 三套内置策略对比</h3>
+    <table>
+      <thead><tr><th style="width:22%">策略项</th><th style="width:26%">日常模式</th><th style="width:26%">游戏模式</th><th style="width:26%">服务器模式</th></tr></thead>
+      <tbody>
+        <tr><td>核心目标</td><td>均衡流畅</td><td>极致性能释放</td><td>稳定不间断</td></tr>
+        <tr><td>后台进程</td><td>清理明确闲置项</td><td>激进清理非必要后台</td><td class="mid">保守，仅清理明确无害项</td></tr>
+        <tr><td>内存回收</td><td>阈值 80% 触发</td><td>阈值 60% 触发，主动释放</td><td class="mid">阈值 90% 触发，避免抖动</td></tr>
+        <tr><td>电源计划</td><td>平衡</td><td>高性能 / 卓越性能</td><td>高性能（可锁定）</td></tr>
+        <tr><td>通知与弹窗</td><td>正常</td><td>免打扰 / 全屏抑制</td><td>正常（保留告警）</td></tr>
+        <tr><td>进程优先级</td><td>默认</td><td>提升前台游戏优先级</td><td>保障关键服务优先级</td></tr>
+        <tr><td>网络优化</td><td>默认</td><td>降低游戏延迟 / QoS 优先</td><td>保持长连接稳定</td></tr>
+        <tr><td>Windows 更新</td><td>正常</td><td>暂停（游戏期间）</td><td>可控窗口期更新</td></tr>
+        <tr><td>日志与监控</td><td>关闭</td><td>关闭</td><td class="ok">开启，资源与进程留痕</td></tr>
+        <tr><td>误杀风险</td><td>低</td><td>中（有白名单兜底）</td><td class="ok">极低（双确认）</td></tr>
+      </tbody>
+    </table>
+
+    <h3>3.2 模式引擎的关键设计</h3>
+    <div class="grid2">
+      <div class="card">
+        <h4>规则驱动，而非硬编码</h4>
+        <p style="font-size:13.5px;color:#475569;margin:0">
+          每个模式是一份 JSON/YAML 规则集（条件 → 动作），引擎统一执行。
+          新增模式 = 加一份规则，不改代码；用户也能在高级设置里微调。
+        </p>
+      </div>
+      <div class="card">
+        <h4>自动切换（可选）</h4>
+        <p style="font-size:13.5px;color:#475569;margin:0">
+          检测到全屏 3D / 游戏进程启动 → 自动切游戏模式；检测到服务器服务角色 → 建议切服务器模式。
+          默认关闭，避免「自作聪明」。
+        </p>
+      </div>
+      <div class="card">
+        <h4>服务器模式的双保险</h4>
+        <p style="font-size:13.5px;color:#475569;margin:0">
+          任何结束动作二次确认 + 关键服务白名单 + 变更留痕。宁可少优化，也绝不动到业务进程。
+          可选以 Windows 服务形式运行，实现无人值守守护。
+        </p>
+      </div>
+      <div class="card">
+        <h4>模式可解释</h4>
+        <p style="font-size:13.5px;color:#475569;margin:0">
+          每个模式页直接列出「会做哪些事、不会做哪些事」，用户一眼看懂切换的代价，不做黑箱。
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 04 ================= -->
+  <section id="s4">
+    <div class="sec-head"><span class="sec-num">04</span><h2>UI / 交互设计方案</h2></div>
+    <p class="sec-desc">设计目标：清新、克制、一看就懂。把「信息层级」做对，用户就只需要做决定，不需要做研究。</p>
+
+    <h3>4.1 四条交互原则</h3>
+    <div class="grid4">
+      <div class="card" style="padding:18px">
+        <h4>① 一屏一焦点</h4>
+        <p style="font-size:13px;color:#64748B;margin:0">每页只突出一个主操作按钮，其余降级为辅助信息。</p>
+      </div>
+      <div class="card" style="padding:18px">
+        <h4>② 一点就搞定</h4>
+        <p style="font-size:13px;color:#64748B;margin:0">主要优化都收敛为一个大按钮，默认参数即最佳实践。</p>
+      </div>
+      <div class="card" style="padding:18px">
+        <h4>③ 渐进披露</h4>
+        <p style="font-size:13px;color:#64748B;margin:0">默认只看结论，想深究再展开细节，不吓退小白。</p>
+      </div>
+      <div class="card" style="padding:18px">
+        <h4>④ 即时反馈</h4>
+        <p style="font-size:13px;color:#64748B;margin:0">每个动作都有过程动画 + 结果量化，让用户「感觉有效」。</p>
+      </div>
+    </div>
+
+    <h3>4.2 品牌标志（Brand Mark）</h3>
+    <div class="card" style="display:flex;align-items:center;gap:30px;flex-wrap:wrap;padding:26px 28px">
+      <svg style="width:380px;height:auto;flex:none" viewBox="0 0 1180 600" role="img" aria-label="老六清净 old666 横版组合标">
+        <defs>
+          <linearGradient id="docLkInk" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#222B38"/><stop offset="1" stop-color="#05070A"/>
+          </linearGradient>
+          <linearGradient id="docLkEye" x1="0.1" y1="0" x2="0.9" y2="1">
+            <stop offset="0" stop-color="#FF7A45"/><stop offset="0.45" stop-color="#F5340F"/><stop offset="1" stop-color="#C41C05"/>
+          </linearGradient>
+          <linearGradient id="docLkWord" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stop-color="#0EA5A4"/><stop offset="1" stop-color="#22C55E"/>
+          </linearGradient>
+        </defs>
+        <g transform="translate(60,76) scale(0.48)">
+          <g fill="none" stroke="url(#docLkInk)" stroke-width="74" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M180 190 L300 320 L500 400 L700 320 L820 190"/>
+            <path d="M132 208 C95 300 70 430 82 545 C98 690 200 815 370 878 L500 915 L630 878 C800 815 902 690 918 545 C930 430 905 300 868 208"/>
+          </g>
+          <circle cx="130" cy="140" r="72" fill="url(#docLkInk)"/>
+          <circle cx="870" cy="140" r="72" fill="url(#docLkInk)"/>
+          <path d="M190 520 Q358 520 415 675 Q247 675 190 520 Z" fill="url(#docLkEye)"/>
+          <path d="M810 520 Q642 520 585 675 Q753 675 810 520 Z" fill="url(#docLkEye)"/>
+        </g>
+        <text x="600" y="320" font-family="'Microsoft YaHei','PingFang SC',sans-serif" font-size="120" font-weight="800" fill="#0E1116" letter-spacing="6">老六清净</text>
+        <text x="604" y="414" font-family="'Segoe UI',Arial,sans-serif" font-size="58" font-weight="600" fill="url(#docLkWord)" letter-spacing="3.5">old666</text>
+      </svg>
+      <div style="flex:1;min-width:260px">
+        <p style="font-size:13.5px;color:#475569;margin:0 0 10px">
+          产品标志由用户商标（兽首轮廓 + 赤红双眼）矢量化重建，<strong>形状 100% 保留</strong>，
+          与青绿渐变英文名组成横版组合标。
+        </p>
+        <p style="font-size:13px;color:var(--muted);margin:0 0 10px">
+          <strong>配色分工：标志黑红 · 界面青绿。</strong>
+          双眼保留赤红作为全案唯一暖色点缀，界面主色青绿留给 UI，既有商标记忆点，又保持产品清新调性。
+        </p>
+        <p style="font-size:12.5px;color:var(--muted);margin:0">
+          完整规范（4 种配色 / 组合标 / 应用图标 / 使用禁区）见
+          <code style="font-family:ui-monospace,Consolas,monospace;background:#F1F5F5;padding:1px 6px;border-radius:5px;color:#0F766E">assets/logo/showcase.html</code>
+        </p>
+      </div>
+    </div>
+
+    <h3>4.3 视觉规范（Design Tokens）</h3>
+    <div class="swatches" style="margin-bottom:12px">
+      <div class="sw"><div class="c" style="background:#0EA5A4"></div><div class="l">主色<code>#0EA5A4</code></div></div>
+      <div class="sw"><div class="c" style="background:#22C55E"></div><div class="l">强调绿<code>#22C55E</code></div></div>
+      <div class="sw"><div class="c" style="background:#3B82F6"></div><div class="l">信息蓝<code>#3B82F6</code></div></div>
+      <div class="sw"><div class="c" style="background:#F59E0B"></div><div class="l">警示橙<code>#F59E0B</code></div></div>
+      <div class="sw"><div class="c" style="background:#EF4444"></div><div class="l">危险红<code>#EF4444</code></div></div>
+      <div class="sw"><div class="c" style="background:#F4F8F8;border-bottom:1px solid #E2E8F0"></div><div class="l">背景<code>#F4F8F8</code></div></div>
+    </div>
+    <div class="grid2">
+      <div class="card">
+        <h4>基础规范</h4>
+        <ul style="font-size:13.5px;margin:0">
+          <li><strong>主色调</strong>：青绿系（#0EA5A4 → #22C55E 渐变），传达「干净、健康、轻盈」</li>
+          <li><strong>字体</strong>：系统默认中文字体 + Segoe UI；正文 14–15px，标题 700–800 字重</li>
+          <li><strong>圆角</strong>：卡片 16px / 按钮 12px / 小控件 8–10px，统一圆润语言</li>
+          <li><strong>间距</strong>：4px 基准栅格，卡片内边距 16–24px，页面留白充足</li>
+          <li><strong>阴影</strong>：极浅双层阴影，制造「浮起」但不厚重</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>动效与反馈</h4>
+        <ul style="font-size:13.5px;margin:0">
+          <li>评分圆环：数字滚动 + 环形生长，200–600ms</li>
+          <li>一键优化：按钮内进度 + 光晕脉冲，完成后转「✓ 已完成」</li>
+          <li>列表项：悬浮轻抬升，操作结果用「淡出 + 数值跳动」表达</li>
+          <li>全局：所有动效 ≤ 300ms（扫描类除外），绝不拖慢操作</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>4.4 界面原型</h3>
+
+    <!-- 首页 -->
+    <h4 style="margin-top:18px;color:#475569">① 首页 · 健康评分 + 一键优化 + 模式切换</h4>
+    <div class="mock-stage">
+      <div class="win">
+        <div class="titlebar">
+          <div class="dots"><i></i><i></i><i></i></div>
+          <span class="tb-title"><svg class="tb-mk" viewBox="0 0 1000 1000" aria-hidden="true"><g fill="none" stroke="#0E1116" stroke-width="74" stroke-linecap="round" stroke-linejoin="round"><path d="M180 190 L300 320 L500 400 L700 320 L820 190"/><path d="M132 208 C95 300 70 430 82 545 C98 690 200 815 370 878 L500 915 L630 878 C800 815 902 690 918 545 C930 430 905 300 868 208"/></g><circle cx="130" cy="140" r="72" fill="#0E1116"/><circle cx="870" cy="140" r="72" fill="#0E1116"/><path d="M190 520 Q358 520 415 675 Q247 675 190 520 Z" fill="#F5340F"/><path d="M810 520 Q642 520 585 675 Q753 675 810 520 Z" fill="#F5340F"/></svg>老六清净 old666</span>
+          <div class="tb-right">
+            <div class="mode-switch"><span class="on">日常</span><span>游戏</span><span>服务器</span></div>
+          </div>
+        </div>
+        <div class="body-grid">
+          <div class="sidebar">
+            <div class="nav-item on">🏠 首页</div>
+            <div class="nav-item">⚡ 开机加速</div>
+            <div class="nav-item">🧹 进程净化</div>
+            <div class="nav-item">🎮 场景模式</div>
+            <div class="nav-item">🧽 垃圾清理</div>
+            <div class="nav-item">⚙️ 设置</div>
+          </div>
+          <div class="main">
+            <div class="home-top">
+              <div class="ring">
+                <div class="ring-in"><b>92</b><small>健康评分</small></div>
+              </div>
+              <div class="home-cta">
+                <h3>系统状态良好，还能再快一点</h3>
+                <p>发现 3 项可优化 · 预计可释放 2.1 GB 内存 · 缩短开机约 8 秒</p>
+                <button class="btn-primary">✦ 一键优化</button>
+                <button class="btn-ghost">查看详情</button>
+              </div>
+            </div>
+            <div class="stat-row">
+              <div class="stat"><div class="k">⏱ 开机时间</div><div class="v warn">38s</div></div>
+              <div class="stat"><div class="k">🧠 内存占用</div><div class="v good">46%</div></div>
+              <div class="stat"><div class="k">🖥 CPU</div><div class="v good">12%</div></div>
+              <div class="stat"><div class="k">🗑 可清理</div><div class="v warn">2.1 GB</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 进程净化 -->
+    <h4 style="margin-top:26px;color:#475569">② 进程净化 · 智能分组 + 一键净化</h4>
+    <div class="mock-stage">
+      <div class="win">
+        <div class="titlebar">
+          <div class="dots"><i></i><i></i><i></i></div>
+          <span class="tb-title"><svg class="tb-mk" viewBox="0 0 1000 1000" aria-hidden="true"><g fill="none" stroke="#0E1116" stroke-width="74" stroke-linecap="round" stroke-linejoin="round"><path d="M180 190 L300 320 L500 400 L700 320 L820 190"/><path d="M132 208 C95 300 70 430 82 545 C98 690 200 815 370 878 L500 915 L630 878 C800 815 902 690 918 545 C930 430 905 300 868 208"/></g><circle cx="130" cy="140" r="72" fill="#0E1116"/><circle cx="870" cy="140" r="72" fill="#0E1116"/><path d="M190 520 Q358 520 415 675 Q247 675 190 520 Z" fill="#F5340F"/><path d="M810 520 Q642 520 585 675 Q753 675 810 520 Z" fill="#F5340F"/></svg>老六清净 · 进程净化</span>
+        </div>
+        <div class="body-grid">
+          <div class="sidebar">
+            <div class="nav-item">🏠 首页</div>
+            <div class="nav-item">⚡ 开机加速</div>
+            <div class="nav-item on">🧹 进程净化</div>
+            <div class="nav-item">🎮 场景模式</div>
+            <div class="nav-item">🧽 垃圾清理</div>
+            <div class="nav-item">⚙️ 设置</div>
+          </div>
+          <div class="main">
+            <div class="p-toolbar">
+              <span class="t">可清理 12 个进程</span>
+              <span style="font-size:12px;color:#94A3B8">预计释放 1.8 GB 内存</span>
+              <span class="sp">
+                <button class="mini-btn">仅看闲置</button>
+                <button class="mini-btn pri">✦ 一键净化</button>
+              </span>
+            </div>
+            <div class="plist">
+              <div class="prow head">
+                <span></span><span>进程</span><span>CPU</span><span>内存</span><span>建议</span>
+              </div>
+              <div class="grouphd">🔓 可安全清理 · 12</div>
+              <div class="prow">
+                <span class="cbox on"></span>
+                <span class="nm">UpdateService <small>· 后台更新器</small></span>
+                <span>0.1%</span>
+                <span><span class="bar"><i style="width:62%;background:#0EA5A4"></i></span></span>
+                <span><span class="pill g">可清理</span></span>
+              </div>
+              <div class="prow">
+                <span class="cbox on"></span>
+                <span class="nm">VideoCache <small>· 播放器缓存</small></span>
+                <span>0.0%</span>
+                <span><span class="bar"><i style="width:44%;background:#0EA5A4"></i></span></span>
+                <span><span class="pill g">可清理</span></span>
+              </div>
+              <div class="prow">
+                <span class="cbox on"></span>
+                <span class="nm">CloudSync <small>· 网盘同步（已暂停）</small></span>
+                <span>0.0%</span>
+                <span><span class="bar"><i style="width:38%;background:#0EA5A4"></i></span></span>
+                <span><span class="pill g">可清理</span></span>
+              </div>
+              <div class="grouphd">⚠️ 建议保留 · 4</div>
+              <div class="prow">
+                <span class="cbox"></span>
+                <span class="nm">WeChat <small>· 微信</small></span>
+                <span>1.2%</span>
+                <span><span class="bar"><i style="width:52%;background:#F59E0B"></i></span></span>
+                <span><span class="pill a">常用</span></span>
+              </div>
+              <div class="grouphd">🔒 系统关键 · 禁止结束</div>
+              <div class="prow">
+                <span class="cbox"></span>
+                <span class="nm">svchost.exe <small>· 系统服务宿主</small></span>
+                <span>0.3%</span>
+                <span><span class="bar"><i style="width:30%;background:#94A3B8"></i></span></span>
+                <span><span class="pill r">禁止</span></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 开机加速 -->
+    <h4 style="margin-top:26px;color:#475569">③ 开机加速 · 时间线 + 启动项管理</h4>
+    <div class="mock-stage">
+      <div class="win">
+        <div class="titlebar">
+          <div class="dots"><i></i><i></i><i></i></div>
+          <span class="tb-title"><svg class="tb-mk" viewBox="0 0 1000 1000" aria-hidden="true"><g fill="none" stroke="#0E1116" stroke-width="74" stroke-linecap="round" stroke-linejoin="round"><path d="M180 190 L300 320 L500 400 L700 320 L820 190"/><path d="M132 208 C95 300 70 430 82 545 C98 690 200 815 370 878 L500 915 L630 878 C800 815 902 690 918 545 C930 430 905 300 868 208"/></g><circle cx="130" cy="140" r="72" fill="#0E1116"/><circle cx="870" cy="140" r="72" fill="#0E1116"/><path d="M190 520 Q358 520 415 675 Q247 675 190 520 Z" fill="#F5340F"/><path d="M810 520 Q642 520 585 675 Q753 675 810 520 Z" fill="#F5340F"/></svg>老六清净 · 开机加速</span>
+        </div>
+        <div class="body-grid">
+          <div class="sidebar">
+            <div class="nav-item">🏠 首页</div>
+            <div class="nav-item on">⚡ 开机加速</div>
+            <div class="nav-item">🧹 进程净化</div>
+            <div class="nav-item">🎮 场景模式</div>
+            <div class="nav-item">🧽 垃圾清理</div>
+            <div class="nav-item">⚙️ 设置</div>
+          </div>
+          <div class="main">
+            <div class="p-toolbar">
+              <span class="t">本次开机 38.2 秒</span>
+              <span style="font-size:12px;color:#15803D">比上次快 4.1 秒</span>
+              <span class="sp"><button class="mini-btn pri">⚡ 一键加速</button></span>
+            </div>
+            <div class="timeline">
+              <div class="tl-seg" style="background:#64748B;flex:2">固件 3s</div>
+              <div class="tl-seg" style="background:#3B82F6;flex:5">系统内核 9s</div>
+              <div class="tl-seg" style="background:#0EA5A4;flex:6">服务 11s</div>
+              <div class="tl-seg" style="background:#F59E0B;flex:9">启动项 15s</div>
+              <div class="tl-seg" style="background:#94A3B8;flex:1">.2</div>
+            </div>
+            <div class="tl-legend">
+              <span><i style="background:#64748B"></i>固件</span>
+              <span><i style="background:#3B82F6"></i>系统内核</span>
+              <span><i style="background:#0EA5A4"></i>服务</span>
+              <span><i style="background:#F59E0B"></i>启动项（可优化 9.4s）</span>
+            </div>
+            <div class="plist">
+              <div class="prow head"><span></span><span>启动项</span><span>类型</span><span>影响</span><span>建议</span></div>
+              <div class="prow">
+                <span class="cbox on"></span>
+                <span class="nm">CloudDrive <small>· 网盘客户端</small></span>
+                <span style="color:#64748B">启动项</span>
+                <span>5.2s</span>
+                <span><span class="pill a">延迟启动</span></span>
+              </div>
+              <div class="prow">
+                <span class="cbox on"></span>
+                <span class="nm">PrinterHelper <small>· 打印助手</small></span>
+                <span style="color:#64748B">计划任务</span>
+                <span>2.8s</span>
+                <span><span class="pill g">可禁用</span></span>
+              </div>
+              <div class="prow">
+                <span class="cbox"></span>
+                <span class="nm">SecurityAgent <small>· 安全软件</small></span>
+                <span style="color:#64748B">服务</span>
+                <span>1.4s</span>
+                <span><span class="pill r">不建议</span></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 场景模式 -->
+    <h4 style="margin-top:26px;color:#475569">④ 场景模式 · 三套预设方案</h4>
+    <div class="mock-stage">
+      <div class="win">
+        <div class="titlebar">
+          <div class="dots"><i></i><i></i><i></i></div>
+          <span class="tb-title"><svg class="tb-mk" viewBox="0 0 1000 1000" aria-hidden="true"><g fill="none" stroke="#0E1116" stroke-width="74" stroke-linecap="round" stroke-linejoin="round"><path d="M180 190 L300 320 L500 400 L700 320 L820 190"/><path d="M132 208 C95 300 70 430 82 545 C98 690 200 815 370 878 L500 915 L630 878 C800 815 902 690 918 545 C930 430 905 300 868 208"/></g><circle cx="130" cy="140" r="72" fill="#0E1116"/><circle cx="870" cy="140" r="72" fill="#0E1116"/><path d="M190 520 Q358 520 415 675 Q247 675 190 520 Z" fill="#F5340F"/><path d="M810 520 Q642 520 585 675 Q753 675 810 520 Z" fill="#F5340F"/></svg>老六清净 · 场景模式</span>
+        </div>
+        <div class="body-grid">
+          <div class="sidebar">
+            <div class="nav-item">🏠 首页</div>
+            <div class="nav-item">⚡ 开机加速</div>
+            <div class="nav-item">🧹 进程净化</div>
+            <div class="nav-item on">🎮 场景模式</div>
+            <div class="nav-item">🧽 垃圾清理</div>
+            <div class="nav-item">⚙️ 设置</div>
+          </div>
+          <div class="main">
+            <div class="grid3" style="gap:12px">
+              <div class="mode-card on">
+                <span class="badge-on">当前</span>
+                <div class="mode-ico" style="background:#CCFBF1">💻</div>
+                <h4>日常模式</h4>
+                <div class="md">均衡流畅，保留常用后台程序</div>
+                <div class="rule"><span>后台清理</span><span>温和</span></div>
+                <div class="rule"><span>内存回收</span><span>80% 触发</span></div>
+                <div class="rule"><span>电源计划</span><span>平衡</span></div>
+              </div>
+              <div class="mode-card">
+                <div class="mode-ico" style="background:#EDE9FE">🎮</div>
+                <h4>游戏模式</h4>
+                <div class="md">极致释放性能，屏蔽一切干扰</div>
+                <div class="rule"><span>后台清理</span><span>激进</span></div>
+                <div class="rule"><span>内存回收</span><span>60% 触发</span></div>
+                <div class="rule"><span>电源计划</span><span>高性能</span></div>
+              </div>
+              <div class="mode-card">
+                <div class="mode-ico" style="background:#DBEAFE">🖧</div>
+                <h4>服务器模式</h4>
+                <div class="md">稳定优先，绝不误动业务进程</div>
+                <div class="rule"><span>后台清理</span><span>保守</span></div>
+                <div class="rule"><span>内存回收</span><span>90% 触发</span></div>
+                <div class="rule"><span>变更留痕</span><span>开启</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 悬浮球 -->
+    <h4 style="margin-top:26px;color:#475569">⑤ 桌面悬浮球 · 零打扰监控</h4>
+    <div class="mock-stage">
+      <div class="ball-stage">
+        <div class="ball"><b>46%</b><small>内存</small></div>
+        <div class="ball-legend">
+          <p style="margin:0 0 6px"><strong>形态：</strong>半透明圆形悬浮球，可贴边收起，可调透明度 / 大小。</p>
+          <p style="margin:0 0 6px"><strong>单击：</strong>展开极简面板（CPU / 内存 / 温度 / 网速）。</p>
+          <p style="margin:0"><strong>双击：</strong>唤起主界面；<strong>右键：</strong>快捷切换场景模式。</p>
+        </div>
+      </div>
+    </div>
+
+    <h3>4.5 关键交互细节</h3>
+    <ul>
+      <li><strong>首启引导 3 步内完成</strong>：选模式 → 一次体检 → 完成，不注册、不登录、不填问卷。</li>
+      <li><strong>危险操作二次确认</strong>：结束进程 / 禁用服务前，弹「影响说明」而非简单的「确定吗？」。</li>
+      <li><strong>结果页永远有对比</strong>：优化前后数值并排展示，让「有效」可被看见。</li>
+      <li><strong>空状态有温度</strong>：没有可优化项时显示「系统很干净」，而不是硬凑几个问题。</li>
+      <li><strong>键盘与触屏兼顾</strong>：支持快捷键（Ctrl+1..5 切页），按钮命中区域 ≥ 36px。</li>
+    </ul>
+  </section>
+
+  <!-- ================= 05 ================= -->
+  <section id="s5">
+    <div class="sec-head"><span class="sec-num">05</span><h2>技术架构设计</h2></div>
+    <p class="sec-desc">技术选型的第一原则是「轻」：体积小、启动快、常驻低。第二原则是「安全」：所有系统操作可控可回滚。</p>
+
+    <h3>5.1 技术选型对比</h3>
+    <table>
+      <thead><tr><th style="width:16%">方案</th><th style="width:11%">体积</th><th style="width:11%">启动</th><th style="width:11%">内存</th><th style="width:14%">开发效率</th><th style="width:37%">评价</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>Rust + Tauri 2</strong></td><td class="ok">~8 MB</td><td class="ok">极快</td><td class="ok">低</td><td class="mid">中</td>
+          <td class="ok">推荐。Rust 直调 Win32 性能最好，WebView2 做 UI 易出好界面，产物极小、天然便携。</td>
+        </tr>
+        <tr>
+          <td>C# .NET 8 + WinUI 3</td><td class="mid">~40 MB</td><td class="mid">快</td><td class="mid">中</td><td class="ok">高</td>
+          <td>备选。Windows API / WMI 生态最成熟，开发最快；体积与内存略大，AOT 可优化。</td>
+        </tr>
+        <tr>
+          <td>C++ / Qt</td><td class="ok">~15 MB</td><td class="ok">快</td><td class="ok">低</td><td class="no">低</td>
+          <td>性能最优但 UI 开发慢、迭代成本高，适合后期对性能极致压榨时局部替换。</td>
+        </tr>
+        <tr>
+          <td>Electron</td><td class="no">&gt;120 MB</td><td class="no">慢</td><td class="no">高</td><td class="ok">高</td>
+          <td class="no">不满足「轻量化」定位，排除。</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="callout">
+      <strong>结论：</strong>采用 <strong>Rust 核心 + Tauri 2（前端 WebView2）</strong>。
+      前端用 HTML/CSS/TS（可配 Svelte/Vue 轻量框架）负责「好看好改」，Rust 负责「所有系统级动作」，两者通过 Tauri IPC 通信。
+    </div>
+
+    <h3>5.2 分层架构</h3>
+    <div class="arch">
+      <div class="layer l-ui">
+        <div class="lt">① UI 表现层 · WebView2</div>
+        <div class="ld">界面渲染、交互、动效。零系统权限，纯展示与指令发起。</div>
+        <div class="chips"><span class="chip">首页 / 体检</span><span class="chip">进程净化</span><span class="chip">开机加速</span><span class="chip">场景模式</span><span class="chip">悬浮球</span><span class="chip">设置</span></div>
+      </div>
+      <div class="arrow">▼ Tauri IPC（command / event）</div>
+      <div class="layer l-bridge">
+        <div class="lt">② 桥接层 · Tauri Commands</div>
+        <div class="ld">前端调用入口，做参数校验、权限检查、限流；统一错误码与进度事件回推。</div>
+        <div class="chips"><span class="chip">命令路由</span><span class="chip">参数校验</span><span class="chip">进度事件</span><span class="chip">权限网关</span></div>
+      </div>
+      <div class="arrow">▼</div>
+      <div class="layer l-core">
+        <div class="lt">③ 核心服务层 · Rust Modules</div>
+        <div class="ld">业务逻辑与策略引擎，不含具体平台细节，可单测。</div>
+        <div class="chips">
+          <span class="chip">boot_manager</span><span class="chip">process_manager</span><span class="chip">scenario_engine</span>
+          <span class="chip">cleaner</span><span class="chip">monitor</span><span class="chip">rule_store</span><span class="chip">rollback</span>
+        </div>
+      </div>
+      <div class="arrow">▼</div>
+      <div class="layer l-sys">
+        <div class="lt">④ 系统抽象层 · windows-rs 封装</div>
+        <div class="ld">把 Win32 / PDH / WMI / 注册表 / SCM / 任务计划 全部封装成安全 trait，隔离 unsafe。</div>
+        <div class="chips">
+          <span class="chip">Process API</span><span class="chip">PDH 性能计数</span><span class="chip">Registry</span>
+          <span class="chip">SCM 服务控制</span><span class="chip">Task Scheduler</span><span class="chip">WinVerifyTrust</span>
+        </div>
+      </div>
+      <div class="arrow">▼</div>
+      <div class="layer l-os">
+        <div class="lt">⑤ 操作系统层 · Windows 10 / 11 / Server</div>
+        <div class="ld">Win32 API、内核对象、驱动、性能计数器。</div>
+      </div>
+    </div>
+
+    <h3>5.3 模块职责与关键技术点</h3>
+    <table>
+      <thead><tr><th style="width:20%">模块</th><th style="width:44%">职责</th><th style="width:36%">关键 API / 技术</th></tr></thead>
+      <tbody>
+        <tr><td>boot_manager</td><td>采集开机各阶段耗时、枚举启动项/服务/计划任务、执行禁用与延迟</td><td>注册表 Run 键、SCM、Task Scheduler COM、ETW 启动事件、Win32_StartupCommand</td></tr>
+        <tr><td>process_manager</td><td>进程枚举、资源采集、闲置判定、分组、安全结束</td><td>NtQuerySystemInformation、EnumProcesses、GetProcessMemoryInfo、TerminateProcess、OpenProcess</td></tr>
+        <tr><td>scenario_engine</td><td>加载模式规则、匹配条件、编排动作、冲突处理</td><td>规则 DSL（JSON/YAML）、状态机、幂等执行</td></tr>
+        <tr><td>cleaner</td><td>内存工作集裁剪、垃圾文件扫描与删除</td><td>EmptyWorkingSet、SetProcessWorkingSetSize、文件系统遍历、Shell API（回收站）</td></tr>
+        <tr><td>monitor</td><td>采样 CPU/内存/磁盘/网络/温度，驱动悬浮球</td><td>PDH、GetSystemTimes、GlobalMemoryStatusEx、IP Helper API、WMI 温度</td></tr>
+        <tr><td>rule_store</td><td>规则、白名单、用户偏好、历史记录持久化</td><td>本地 SQLite / JSON 文件（免安装目录内）</td></tr>
+        <tr><td>rollback</td><td>记录变更快照，支持一键恢复</td><td>操作日志 + 反向操作表</td></tr>
+      </tbody>
+    </table>
+
+    <h3>5.4 安全设计</h3>
+    <div class="grid2">
+      <div class="card">
+        <h4>权限模型</h4>
+        <ul style="font-size:13.5px;margin:0">
+          <li>主程序以普通权限运行，仅在需要时通过 UAC 提权执行特定动作</li>
+          <li>提权动作单独进程执行，主 UI 不被污染</li>
+          <li>服务器模式可选注册为 Windows 服务，实现无人值守</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>防误杀</h4>
+        <ul style="font-size:13.5px;margin:0">
+          <li>系统关键进程/服务硬编码黑名单，永不参与清理</li>
+          <li>数字签名校验（WinVerifyTrust）辅助判定可信度</li>
+          <li>前台程序及其子进程自动豁免</li>
+          <li>所有结束动作先记录快照，可一键回滚</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>隐私</h4>
+        <ul style="font-size:13.5px;margin:0">
+          <li>默认不联网，规则与统计全部本地化</li>
+          <li>如需更新规则，采用匿名、可关闭的拉取</li>
+          <li>不采集用户文件内容、不记录浏览行为</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>稳定性</h4>
+        <ul style="font-size:13.5px;margin:0">
+          <li>所有系统调用错误可恢复，不因单点失败崩溃</li>
+          <li>看门狗线程保障监控不中断</li>
+          <li>资源采样采用增量与缓存，避免高频轮询拖慢系统</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>5.5 性能预算（硬指标）</h3>
+    <table>
+      <thead><tr><th style="width:34%">指标</th><th style="width:22%">目标</th><th style="width:44%">说明</th></tr></thead>
+      <tbody>
+        <tr><td>安装包 / 便携包体积</td><td class="ok">≤ 12 MB</td><td>不含运行时依赖，WebView2 走系统自带</td></tr>
+        <tr><td>冷启动到可操作</td><td class="ok">≤ 1.0 s</td><td>懒加载非首屏模块</td></tr>
+        <tr><td>后台常驻内存</td><td class="ok">≤ 40 MB</td><td>悬浮球模式；「用完即退」模式为 0</td></tr>
+        <tr><td>常驻 CPU 占用</td><td class="ok">≤ 0.5%</td><td>采样间隔自适应（1–5s）</td></tr>
+        <tr><td>一键净化耗时</td><td class="ok">≤ 3 s</td><td>并发处理 + 两段式结束</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ================= 06 ================= -->
+  <section id="s6">
+    <div class="sec-head"><span class="sec-num">06</span><h2>开发顺序与路线图</h2></div>
+    <p class="sec-desc">原则：先把最核心、最难、最能验证定位的能力做出来，再堆外围。宁可少功能，不可晚交付价值。</p>
+
+    <div class="road">
+      <div class="phase"><div class="ph-card">
+        <div class="ph-top"><span class="ph-tag">P0</span><h4>技术验证（PoC）</h4></div>
+        <p style="font-size:13.5px;color:#475569;margin:0">验证 Rust 直调 Win32 的可行性：进程枚举 + 资源采集 + 安全结束 + Tauri 打包体积/启动耗时。</p>
+        <div class="out">交付：可运行的最小壳 + 性能达标结论（决定是否继续 Tauri 路线）</div>
+      </div></div>
+
+      <div class="phase"><div class="ph-card">
+        <div class="ph-top"><span class="ph-tag">P1</span><h4>MVP · 进程净化</h4></div>
+        <p style="font-size:13.5px;color:#475569;margin:0">进程列表 + 资源视图 + 智能分组 + 一键净化 + 白名单 + 回滚。这是产品价值的核心验证点。</p>
+        <div class="out">交付：能用「一键净化」真实释放内存的可体验版本</div>
+      </div></div>
+
+      <div class="phase"><div class="ph-card">
+        <div class="ph-top"><span class="ph-tag">P2</span><h4>开机加速</h4></div>
+        <p style="font-size:13.5px;color:#475569;margin:0">开机时间线采集、启动项/服务/计划任务管理、风险分级、延迟启动。</p>
+        <div class="out">交付：开机耗时可视化 + 可安全缩短开机的优化项</div>
+      </div></div>
+
+      <div class="phase"><div class="ph-card">
+        <div class="ph-top"><span class="ph-tag">P3</span><h4>场景模式引擎</h4></div>
+        <p style="font-size:13.5px;color:#475569;margin:0">规则引擎 + 日常/游戏/服务器三套预设 + 模式切换与自动触发（可选）。差异化能力落地。</p>
+        <div class="out">交付：可一键切换的完整场景方案</div>
+      </div></div>
+
+      <div class="phase"><div class="ph-card">
+        <div class="ph-top"><span class="ph-tag">P4</span><h4>一键体检 + 垃圾清理</h4></div>
+        <p style="font-size:13.5px;color:#475569;margin:0">健康评分、问题清单、一键修复；内存裁剪与垃圾文件清理。</p>
+        <div class="out">交付：小白用户可独立完成的完整优化闭环</div>
+      </div></div>
+
+      <div class="phase"><div class="ph-card">
+        <div class="ph-top"><span class="ph-tag">P5</span><h4>监控悬浮球 + 打磨</h4></div>
+        <p style="font-size:13.5px;color:#475569;margin:0">悬浮球、告警、动效打磨、性能压榨、绿色便携版打包。</p>
+        <div class="out">交付：体验完整、体积与性能达标的 Beta 版</div>
+      </div></div>
+
+      <div class="phase"><div class="ph-card">
+        <div class="ph-top"><span class="ph-tag">P6</span><h4>发布与加固</h4></div>
+        <p style="font-size:13.5px;color:#475569;margin:0">代码签名、自动更新（可关）、服务器模式服务化、崩溃收集（本地）、正式版发布。</p>
+        <div class="out">交付：可正式对外分发的 1.0</div>
+      </div></div>
+    </div>
+
+    <h3>6.1 优先级判断依据</h3>
+    <table>
+      <thead><tr><th style="width:30%">排序依据</th><th style="width:70%">说明</th></tr></thead>
+      <tbody>
+        <tr><td>用户感知强度</td><td>「一键净化」和「开机加速」是用户最直观能感受到价值的，优先做。</td></tr>
+        <tr><td>技术风险前置</td><td>Win32 调用与 Tauri 打包体积是最不确定的部分，必须在 P0 验证，避免后期返工。</td></tr>
+        <tr><td>差异化能力</td><td>场景模式是区别于传统卫士的关键，但依赖进程与服务的控制能力，故排在 P3。</td></tr>
+        <tr><td>可交付性</td><td>每个阶段都能独立出可体验版本，便于尽早验证和收集反馈。</td></tr>
+      </tbody>
+    </table>
+
+    <h3>6.2 后续可扩展方向（非首版）</h3>
+    <ul>
+      <li>进程级网络流量监控与限速</li>
+      <li>驱动/固件更新提醒（只提醒，不代装）</li>
+      <li>多机批量管理（面向小团队 / 网吧 / 服务器群）</li>
+      <li>可选的规则市场（用户分享场景规则，纯社区、无广告）</li>
+    </ul>
+  </section>
+
+  <div class="footer">
+    <span>老六清净 old666 · 产品设计方案 v0.1</span>
+    <span>零广告 · 纯绿色 · 只做优化</span>
+  </div>
+</div>
+</body>
+</html>
