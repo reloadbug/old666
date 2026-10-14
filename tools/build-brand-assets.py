@@ -50,7 +50,7 @@ def write(fn, body):
 
 
 # ---------- 横版组合标 ----------
-g = fit('mark-flat.svg', 50, 60, 470, 480)
+g = fit('mark.svg', 50, 60, 470, 480)
 write('lockup-horizontal.svg',
       '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 600" width="1180" height="600" '
       'role="img" aria-label="老六清净 old666 横版组合标"><title>老六清净 old666 横版组合标</title>'
@@ -62,7 +62,7 @@ write('lockup-horizontal.svg',
       % (WORD_GRAD, g, FONT_CN, FONT_EN))
 
 # ---------- 竖版组合标 ----------
-g = fit('mark-flat.svg', 150, 20, 500, 520)
+g = fit('mark.svg', 150, 20, 500, 520)
 write('lockup-vertical.svg',
       '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 920" width="800" height="920" '
       'role="img" aria-label="老六清净 old666 竖版组合标"><title>老六清净 old666 竖版组合标</title>'

@@ -1,5 +1,6 @@
 """把真实图形标注入 docs/产品设计方案.html（替换早期手绘占位标）
 
+可重复运行：会更新已存在的 symbol 与各处 <use> 引用。
 用法: python tools/inject-brand-into-doc.py
 """
 
@@ -7,31 +8,35 @@ import re
 import os
 
 DOC = r'D:\AI game\old666\docs\产品设计方案.html'
-MARK = r'D:\AI game\old666\assets\logo\mark-flat.svg'
+MARK = r'D:\AI game\old666\assets\logo\mark.svg'
 
 svg = open(MARK, encoding='utf-8').read()
 inner = re.search(r'<svg[^>]*>(.*)</svg>', svg, re.S).group(1)
+vb = re.search(r'viewBox="([^"]+)"', svg).group(1)
 inner = re.sub(r'id="([^"]+)"', r'id="bm_\1"', inner)
 inner = re.sub(r'url\(#([^)]+)\)', r'url(#bm_\1)', inner)
 
-SYMBOL = ('<svg width="0" height="0" style="position:absolute" aria-hidden="true">'
-          '<defs><symbol id="brandMark" viewBox="0 0 1000 1000">%s</symbol></defs></svg>' % inner)
-
 doc = open(DOC, encoding='utf-8').read()
 
-# 1) 注入 symbol（紧跟 <body> 之后）
-if 'id="brandMark"' not in doc:
-    doc = doc.replace('<body>', '<body>\n' + SYMBOL, 1)
+SYMBOL = '<symbol id="brandMark" viewBox="%s">%s</symbol>' % (vb, inner)
+WRAP = ('<svg width="0" height="0" style="position:absolute" aria-hidden="true">'
+        '<defs>%s</defs></svg>' % SYMBOL)
 
-# 2) 页眉 logo
+# 1) symbol：已存在则替换，否则注入
+if 'id="brandMark"' in doc:
+    doc = re.sub(r'<symbol id="brandMark" viewBox="[^"]*">.*?</symbol>', SYMBOL, doc, count=1, flags=re.S)
+else:
+    doc = doc.replace('<body>', '<body>\n' + WRAP, 1)
+
+# 2) 页眉 logo（统一到当前 viewBox）
 doc = re.sub(r'<div class="logo">\s*<svg.*?</svg>\s*</div>',
-             '<div class="logo"><svg viewBox="0 0 1000 1000" role="img" aria-label="老六清净 图形标">'
-             '<use href="#brandMark"/></svg></div>',
+             '<div class="logo"><svg viewBox="%s" role="img" aria-label="老六清净 图形标">'
+             '<use href="#brandMark"/></svg></div>' % vb,
              doc, count=1, flags=re.S)
 
 # 3) 界面原型标题栏小标志
-doc = re.sub(r'<svg class="tb-mk".*?</svg>',
-             '<svg class="tb-mk" viewBox="0 0 1000 1000" aria-hidden="true"><use href="#brandMark"/></svg>',
+doc = re.sub(r'<svg class="tb-mk"[^>]*>.*?</svg>',
+             '<svg class="tb-mk" viewBox="%s" aria-hidden="true"><use href="#brandMark"/></svg>' % vb,
              doc, flags=re.S)
 
 # 4) 4.2 品牌标志区块里的组合标
@@ -48,5 +53,5 @@ lockup = ('<svg style="width:380px;height:auto;flex:none" viewBox="0 0 1180 600"
 doc = re.sub(r'<svg style="width:380px;height:auto;flex:none".*?</svg>', lockup, doc, count=1, flags=re.S)
 
 open(DOC, 'w', encoding='utf-8').write(doc)
-print('注入完成，文档 %.1f KB' % (os.path.getsize(DOC) / 1024))
-print('brandMark 引用数:', len(re.findall(r'href="#brandMark"', doc)))
+print('注入完成，文档 %.1f KB，brandMark 引用 %d 处'
+      % (os.path.getsize(DOC) / 1024, len(re.findall(r'href="#brandMark"', doc))))

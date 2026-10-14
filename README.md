@@ -55,24 +55,32 @@
 
 ## 品牌标志
 
-图形标源自商标原始 SVG（`assets/logo/source/reloadbug.svg`，925 KB / 1319 路径），
-经路径抽稀、背景剔除与配色延展后产出产品用资源，**形状完全保留**。
+图形标源自商标原始矢量文件（`assets/logo/source/reloadbug-flat.svg`，黑 + 赤红双色）。
+原始文件实为「内嵌位图 + 分层引用」的伪 SVG，经**位图合成 → vtracer 矢量重绘 → 空路径清理 → 坐标烘焙**四步，
+产出纯路径、单文档、可无限缩放的图形标：**925 KB → 8.8 KB，体积下降 105 倍**，形状完全保留。
 
 | 文件 | 用途 | 体积 |
 |---|---|---|
-| `mark.svg` | 图形标 · 高保真（浅色背景） | 96 KB |
-| `mark-dark.svg` | 图形标 · 深色背景版（灰阶反转） | 96 KB |
-| `mark-flat.svg` | 图形标 · 扁平版（UI 内嵌 / 小尺寸） | 36 KB |
-| `mark-mono-dark.svg` / `mark-mono-light.svg` | 单色版（印章 / 水印 / 深底） | 36 KB |
-| `lockup-horizontal.svg` / `lockup-vertical.svg` | 组合标 | 36 KB |
-| `app-icon.svg` / `app-icon-light.svg` | 应用图标（深色 / 浅色底） | 96 KB |
+| `mark.svg` | 图形标 · 主用（浅色背景，墨黑 + 赤红双色） | 8.8 KB |
+| `mark-dark.svg` | 图形标 · 深色背景版（白描边 + 赤红眼） | 8.8 KB |
+| `mark-mono-dark.svg` / `mark-mono-light.svg` | 单色版（印章 / 水印 / 深底） | 8.8 KB |
+| `mark-glossy.svg` | 光泽版 · 35 色高保真（大尺寸 / 启动页） | 95 KB |
+| `lockup-horizontal.svg` / `lockup-vertical.svg` | 组合标（横版 / 竖版） | 9.5 KB |
+| `app-icon.svg` / `app-icon-light.svg` | 应用图标（深色底 / 浅色底，1024²） | 9.3 KB |
+
+配色：墨黑 `#0E1116`、赤红 `#F5340F`；`viewBox="285 326 931 847"`。
 
 所有资源由 `tools/` 下的脚本自动生成，可随时重跑复现：
 
 ```bash
-python tools/simplify-logo.py source/reloadbug.svg 0.6 1.2 mark.svg color
-python tools/build-brand-assets.py      # 组合标 + 应用图标
-python tools/build-brand-pages.py       # 品牌规范页
+# 1. 位图合成 + 矢量重绘 → mark.svg（主标志）
+python tools/vectorize-logo.py
+# 2. 组合标 + 应用图标
+python tools/build-brand-assets.py
+# 3. 品牌规范页 showcase.html
+python tools/build-brand-pages.py
+# 4. 把图形标注入产品设计方案
+python tools/inject-brand-into-doc.py
 ```
 
 ## 目录结构

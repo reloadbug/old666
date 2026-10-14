@@ -13,7 +13,7 @@ OUT = os.path.join(LOGO, 'showcase.html')
 ASSETS = [
     ('mark', 'mark.svg'),
     ('markDark', 'mark-dark.svg'),
-    ('markFlat', 'mark-flat.svg'),
+    ('markGlossy', 'mark-glossy.svg'),
     ('monoDark', 'mark-mono-dark.svg'),
     ('monoLight', 'mark-mono-light.svg'),
     ('lkH', 'lockup-horizontal.svg'),
@@ -51,9 +51,9 @@ SYMDEF = '<svg width="0" height="0" style="position:absolute" aria-hidden="true"
 size_rows = '\n'.join(
     '        <tr><td><code>%s</code></td><td>%s</td><td>%.1f KB</td></tr>' % (fn, desc, meta[key])
     for key, fn, desc in [
-        ('mark', 'mark.svg', '图形标 · 高保真（原 SVG 优化版，35 色光泽保留）'),
-        ('markDark', 'mark-dark.svg', '图形标 · 深色背景版（灰阶反转）'),
-        ('markFlat', 'mark-flat.svg', '图形标 · 扁平版（墨黑 + 赤红，2 色）'),
+        ('mark', 'mark.svg', '图形标 · 主用（黑 + 赤红，矢量化自 黑红logo.svg）'),
+        ('markDark', 'mark-dark.svg', '图形标 · 深色背景版（白 + 赤红）'),
+        ('markGlossy', 'mark-glossy.svg', '图形标 · 光泽版（大尺寸展示可选）'),
         ('monoDark', 'mark-mono-dark.svg', '图形标 · 单色墨黑（印章 / 水印）'),
         ('monoLight', 'mark-mono-light.svg', '图形标 · 单色纯白（深底）'),
         ('lkH', 'lockup-horizontal.svg', '横版组合标'),
@@ -151,13 +151,13 @@ __SYMDEF__
   <header class="top">
     <div class="kicker">Brand Identity · v1.0</div>
     <h1>老六清净 <span class="hl">old666</span> 品牌标志规范</h1>
-    <p class="lede">图形标由商标原始 SVG（<code>assets/logo/source/reloadbug.svg</code>）经路径抽稀、背景剔除与配色延展而来。
-      <strong>形状完全保留</strong>，仅做矢量化优化与背景适配。</p>
+    <p class="lede">图形标矢量化自商标文件 <code>assets/logo/source/reloadbug-flat.svg</code>（黑 + 赤红扁平标），
+      <strong>形状完全保留</strong>。原始描摹件与扁平件均归档于 <code>assets/logo/source/</code>。</p>
     <div class="meta">
-      <span class="tag on">源自商标原始 SVG</span>
-      <span class="tag">925 KB → 35 KB</span>
+      <span class="tag on">矢量化自商标</span>
+      <span class="tag">925 KB → 8.8 KB</span>
       <span class="tag">透明背景</span>
-      <span class="tag">4 种配色</span>
+      <span class="tag">2 色 + 单色</span>
       <span class="tag">含深色背景版</span>
     </div>
   </header>
@@ -173,17 +173,21 @@ __SYMDEF__
     <p class="sec-desc">形状完全一致，按背景与尺寸选择配色。</p>
     <div class="grid4">
       <div class="vcard"><div class="stage"><svg class="mk"><use href="#mark"/></svg></div>
-        <div class="cap"><b>高保真</b><code>mark.svg</code><span class="use">大尺寸 · 浅色背景</span></div></div>
+        <div class="cap"><b>主用 · 黑 + 赤红</b><code>mark.svg</code><span class="use">浅色背景 · 默认</span></div></div>
       <div class="vcard"><div class="stage dark"><svg class="mk"><use href="#markDark"/></svg></div>
         <div class="cap"><b>深色背景版</b><code>mark-dark.svg</code><span class="use">深色界面 / 深色底</span></div></div>
-      <div class="vcard"><div class="stage"><svg class="mk"><use href="#markFlat"/></svg></div>
-        <div class="cap"><b>扁平版</b><code>mark-flat.svg</code><span class="use">小尺寸 · UI 内嵌</span></div></div>
       <div class="vcard"><div class="stage"><svg class="mk"><use href="#monoDark"/></svg></div>
         <div class="cap"><b>单色 · 墨黑</b><code>mark-mono-dark.svg</code><span class="use">印章 / 水印 / 单色印刷</span></div></div>
-    </div>
-    <div class="grid4" style="margin-top:16px">
       <div class="vcard"><div class="stage dark"><svg class="mk"><use href="#monoLight"/></svg></div>
         <div class="cap"><b>单色 · 纯白</b><code>mark-mono-light.svg</code><span class="use">深色底单色场景</span></div></div>
+    </div>
+    <h3>光泽版（可选 · 大尺寸展示）</h3>
+    <div class="panel tint" style="padding:34px">
+      <svg style="width:230px;height:230px;display:block"><use href="#markGlossy"/></svg>
+      <div style="margin-left:30px;font-size:13.5px;color:#475569;max-width:360px">
+        源自商标原始渲染图，保留高光与质感。<strong>仅用于大尺寸场合</strong>（启动页、官网首屏、宣传物料），
+        界面内嵌请使用主用扁平版。
+      </div>
     </div>
   </section>
 
@@ -231,7 +235,7 @@ __SYMDEF__
     <h3>安全边距</h3>
     <div class="panel" style="padding:34px">
       <div style="border:1.5px dashed #CBD5E1;border-radius:12px;padding:32px;display:inline-block">
-        <svg style="width:130px;height:130px;display:block"><use href="#markFlat"/></svg>
+        <svg style="width:130px;height:130px;display:block"><use href="#mark"/></svg>
       </div>
       <div style="margin-left:34px;font-size:13.5px;color:#475569;max-width:320px">
         四周留白 <strong>≥ X</strong>，X 取耳部圆球直径。任何文字、边框、其他元素不得进入该区域。
@@ -239,16 +243,16 @@ __SYMDEF__
     </div>
     <h3>最小尺寸</h3>
     <div class="panel" style="padding:30px;gap:40px;flex-wrap:wrap">
-      <div style="text-align:center"><svg style="width:48px;height:48px;display:block"><use href="#markFlat"/></svg><div style="font-size:11.5px;color:#64748B;margin-top:6px">48 px</div></div>
-      <div style="text-align:center"><svg style="width:32px;height:32px;display:block"><use href="#markFlat"/></svg><div style="font-size:11.5px;color:#64748B;margin-top:6px">32 px</div></div>
+      <div style="text-align:center"><svg style="width:48px;height:48px;display:block"><use href="#mark"/></svg><div style="font-size:11.5px;color:#64748B;margin-top:6px">48 px</div></div>
+      <div style="text-align:center"><svg style="width:32px;height:32px;display:block"><use href="#mark"/></svg><div style="font-size:11.5px;color:#64748B;margin-top:6px">32 px</div></div>
       <div style="text-align:center"><svg style="width:24px;height:24px;display:block"><use href="#monoDark"/></svg><div style="font-size:11.5px;color:#64748B;margin-top:6px">24 px 改用单色</div></div>
     </div>
     <h3>禁止用法</h3>
     <div class="rules">
-      <div class="rule"><div class="stage"><svg style="width:100px;height:100px;display:block"><use href="#markFlat"/></svg></div><div class="cap">不要拉伸或压扁</div></div>
-      <div class="rule"><div class="stage"><svg style="width:100px;height:100px;display:block;filter:hue-rotate(200deg)"><use href="#markFlat"/></svg></div><div class="cap">不要随意改眼睛颜色</div></div>
-      <div class="rule"><div class="stage"><svg style="width:100px;height:100px;display:block;transform:rotate(-18deg)"><use href="#markFlat"/></svg></div><div class="cap">不要旋转或倾斜</div></div>
-      <div class="rule"><div class="stage"><svg style="width:100px;height:100px;display:block;filter:drop-shadow(0 0 8px #0EA5A4)"><use href="#markFlat"/></svg></div><div class="cap">不要加投影 / 发光</div></div>
+      <div class="rule"><div class="stage"><svg style="width:100px;height:100px;display:block"><use href="#mark"/></svg></div><div class="cap">不要拉伸或压扁</div></div>
+      <div class="rule"><div class="stage"><svg style="width:100px;height:100px;display:block;filter:hue-rotate(200deg)"><use href="#mark"/></svg></div><div class="cap">不要随意改眼睛颜色</div></div>
+      <div class="rule"><div class="stage"><svg style="width:100px;height:100px;display:block;transform:rotate(-18deg)"><use href="#mark"/></svg></div><div class="cap">不要旋转或倾斜</div></div>
+      <div class="rule"><div class="stage"><svg style="width:100px;height:100px;display:block;filter:drop-shadow(0 0 8px #0EA5A4)"><use href="#mark"/></svg></div><div class="cap">不要加投影 / 发光</div></div>
     </div>
   </section>
 
@@ -261,9 +265,10 @@ __ROWS__
       </tbody>
     </table>
     <div class="callout">
-      <strong>关于原始文件：</strong>商标原始 SVG（925 KB / 1319 路径 / 6 位小数坐标）保留在
-      <code>assets/logo/source/reloadbug.svg</code> 作为唯一真源。产品用资源由
-      <code>tools/simplify-logo.py</code> 自动生成，可随时重跑复现。
+      <strong>关于原始文件：</strong>商标原始矢量件（黑 + 赤红扁平标，内嵌位图 + 分层引用）
+      归档于 <code>assets/logo/source/reloadbug-flat.svg</code>；早期自动描摹件
+      <code>assets/logo/source/reloadbug.svg</code>（925 KB / 1319 路径）一并保留备查。
+      产品用资源由 <code>tools/vectorize-logo.py</code> 自动生成，可随时重跑复现。
     </div>
   </section>
 
