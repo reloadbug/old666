@@ -53,14 +53,35 @@
 | [`docs/实施计划.md`](docs/实施计划.md) | 分阶段实施计划 P0–P6、仓库结构、验收标准 |
 | [`assets/logo/showcase.html`](assets/logo/showcase.html) | 品牌标志规范：图形标、组合标、应用图标、使用禁区 |
 
----
+## 品牌标志
+
+图形标源自商标原始 SVG（`assets/logo/source/reloadbug.svg`，925 KB / 1319 路径），
+经路径抽稀、背景剔除与配色延展后产出产品用资源，**形状完全保留**。
+
+| 文件 | 用途 | 体积 |
+|---|---|---|
+| `mark.svg` | 图形标 · 高保真（浅色背景） | 96 KB |
+| `mark-dark.svg` | 图形标 · 深色背景版（灰阶反转） | 96 KB |
+| `mark-flat.svg` | 图形标 · 扁平版（UI 内嵌 / 小尺寸） | 36 KB |
+| `mark-mono-dark.svg` / `mark-mono-light.svg` | 单色版（印章 / 水印 / 深底） | 36 KB |
+| `lockup-horizontal.svg` / `lockup-vertical.svg` | 组合标 | 36 KB |
+| `app-icon.svg` / `app-icon-light.svg` | 应用图标（深色 / 浅色底） | 96 KB |
+
+所有资源由 `tools/` 下的脚本自动生成，可随时重跑复现：
+
+```bash
+python tools/simplify-logo.py source/reloadbug.svg 0.6 1.2 mark.svg color
+python tools/build-brand-assets.py      # 组合标 + 应用图标
+python tools/build-brand-pages.py       # 品牌规范页
+```
 
 ## 目录结构
 
 ```
 old666/
 ├── docs/                # 设计与计划文档
-├── assets/logo/         # 品牌标志矢量资源
+├── assets/logo/         # 品牌标志（source/ 为商标原始文件）
+├── tools/               # 标志优化与组装脚本
 ├── src/                 # 前端（P0 后创建）
 ├── src-tauri/           # Rust 后端（P0 后创建）
 └── .github/workflows/   # CI（P5 后创建）
