@@ -1,0 +1,64 @@
+{
+  "id": "daily",
+  "name": "日常模式",
+  "tagline": "温和、平衡、随时可回",
+  "desc": "默认模式。只做低风险的事：结束明显闲置的进程、按需裁剪工作集、保持平衡电源。适合办公、浏览网页这类日常负载。",
+  "icon": "sun",
+  "builtin": true,
+  "mutually_exclusive_with": ["game", "server"],
+  "settings": {
+    "mem_threshold_pct": 80,
+    "power_plan": "balanced"
+  },
+  "rules": [
+    {
+      "id": "daily.purge.gentle",
+      "title": "温和清理闲置进程",
+      "desc": "只结束「连续多轮完全闲置」且不在你白名单里的进程。占用 CPU 的、系统关键的、你手动留着的，一律不碰。",
+      "priority": 10,
+      "when": { "kind": "mem_usage_above", "pct": 80 },
+      "then": {
+        "action": "purge_processes",
+        "scope": "safe_only",
+        "trim": false
+      },
+      "explain": "内存占用超过 80% 时触发。判定沿用 P1 的六维闲置引擎：CPU <1%、无任何窗口、不在白名单。结束时先尝试温和关闭，800 毫秒内不退再强制结束。"
+    },
+    {
+      "id": "daily.trim",
+      "title": "按需裁剪工作集",
+      "desc": "内存吃紧时把无人访问的物理页换出到页面文件。进程下次访问会自动换回，**不终止任何进程**。",
+      "priority": 20,
+      "when": { "kind": "mem_usage_above", "pct": 80 },
+      "then": {
+        "action": "trim_memory",
+        "min_working_set_mb": 64
+      },
+      "explain": "只裁剪「有窗口的无关进程」之外的对象，且不碰系统关键进程。Windows 自身在内存压力下也是这么做的。"
+    },
+    {
+      "id": "daily.power.balanced",
+      "title": "电源计划：平衡",
+      "desc": "把电源计划设为「平衡」，CPU 不会满载空转，也不会因为省电而降频卡顿。",
+      "priority": 30,
+      "when": { "kind": "always" },
+      "then": {
+        "action": "set_power_plan",
+        "plan": "balanced"
+      },
+      "explain": "切到游戏模式会自动被覆盖；服务器模式会改用「高性能」。"
+    },
+    {
+      "id": "daily.startup.delay",
+      "title": "非必要启动项改为延迟启动",
+      "desc": "把「可安全禁用、但你可能想留着」的启动项改成延迟启动：程序本身不丢，只是等桌面出来两分钟后再跑。",
+      "priority": 40,
+      "when": { "kind": "always" },
+      "then": {
+        "action": "delay_startup",
+        "names": ["onedrive", "dropbox", "googledrive", "steamservice", "steamwebhelper", "sunloginclient", "nutstore", "wps", "qqpcmgr", "360safe"]
+      },
+      "explain": "延迟启动只对**自动启动的服务**有效；注册表与计划任务会被跳过并如实告知原因。"
+    }
+  ]
+}

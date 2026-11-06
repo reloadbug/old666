@@ -648,11 +648,16 @@ const VIEW_META = {
     sub: '看清开机时间花在哪，关掉不必要的自启动项',
     refresh: false,
   },
+  mode: {
+    title: '场景模式',
+    sub: '一套规则一个场景：日常、游戏、服务器，一键切换',
+    refresh: false,
+  },
 };
 
 function switchView(name) {
   const meta = VIEW_META[name] || VIEW_META.purge;
-  ['purge', 'boot'].forEach((v) => {
+  ['purge', 'boot', 'mode'].forEach((v) => {
     const el = document.getElementById('view' + v[0].toUpperCase() + v.slice(1));
     if (el) el.hidden = v !== name;
   });
@@ -660,7 +665,7 @@ function switchView(name) {
   $('#viewSub').textContent = meta.sub;
   $('#btnRefresh').hidden = !meta.refresh;
 
-  // 进程页才需要持续采样；开机加速页没有实时数据要看
+  // 进程页才需要持续采样；开机加速页与场景模式页没有实时数据要看
   if (!meta.refresh) {
     clearTimeout(state.timer);
     state.timer = null;
@@ -668,6 +673,8 @@ function switchView(name) {
 
   if (name === 'boot' && typeof enterBootView === 'function') {
     enterBootView();
+  } else if (name === 'mode' && typeof enterModeView === 'function') {
+    enterModeView();
   } else if (name === 'purge' && !state.timer) {
     scan(true);
   }

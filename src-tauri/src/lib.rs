@@ -100,6 +100,16 @@ pub fn run() {
             ipc::startup_lists,
             ipc::startup_list_add,
             ipc::startup_list_remove,
+            // P3 · 场景模式
+            ipc::mode_list,
+            ipc::mode_plan,
+            ipc::mode_apply,
+            ipc::mode_set_active,
+            ipc::mode_auto_get,
+            ipc::mode_auto_check,
+            ipc::mode_auto_set,
+            ipc::mode_custom_save,
+            ipc::mode_custom_delete,
         ])
         .run(tauri::generate_context!())
         .expect("启动 Tauri 应用失败");

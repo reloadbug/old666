@@ -112,6 +112,45 @@ fn trim_eligible(p: &RawProc, env: &Env) -> bool {
         && !part_of_interactive_app(p, env)
 }
 
+/// 净化的作用范围。
+///
+/// * `SafeOnly` —— 只处理「完全闲置」的目标（P1 的安全口径）。
+/// * `SafeAndBackground` —— 在安全口径之上，额外纳入「有窗口但当前不在前台、
+///   且几乎不占 CPU」的后台程序（游戏模式用）。这类进程有窗口 → 在 P1 的
+///   判定里会被封顶为 Keep，所以必须由这里显式放宽。
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum PurgeScope {
+    SafeOnly,
+    SafeAndBackground,
+}
+
+/// 「游戏模式」下的后台裁剪资格。
+///
+/// 条件：**有可见窗口**、**不是当前前台**、CPU 占用很低、工作集够大。
+///
+/// 这条比 [`trim_eligible`] 宽松 —— 它允许动「用户看得见的窗口程序」。
+/// 之所以敢放宽：裁剪**不结束进程**，只是把物理页换出，用户切回时系统
+/// 会自动换回；而且只对「不在前台 + 几乎不耗 CPU」的程序动手，
+/// 不影响正在玩的那一局。
+///
+/// 仍然排除的：当前前台进程、CPU 正在忙的程序、祖先链上有窗口的子进程
+/// （浏览器渲染进程这类不能动）。
+fn background_trim_eligible(p: &RawProc, env: &Env) -> bool {
+    if p.pid == env.foreground_pid {
+        return false;
+    }
+    if !env.visible_windows.contains(&p.pid) {
+        return false;
+    }
+    if env.window_ancestors.contains(&p.pid) {
+        return false;
+    }
+    if p.cpu_percent >= TRIM_MAX_CPU {
+        return false;
+    }
+    p.working_set >= TRIM_MIN_BYTES
+}
+
 /// 净化执行模式。
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum PurgeMode {
@@ -287,6 +326,27 @@ impl PurgeEngine {
     ///
     /// 演练模式（[`PurgeMode::DryRun`]）下只产出计划，不碰系统。
     pub fn purge(&mut self, targets: Option<Vec<u32>>, grace_ms: u64) -> PurgeResult {
+        self.purge_scoped(targets, grace_ms, PurgeScope::SafeOnly, true, true)
+    }
+
+    /// 带作用域与裁剪开关的净化。
+    ///
+    /// * `scope` —— [`PurgeScope::SafeOnly`] 是 P1 的安全口径；`SafeAndBackground`
+    ///   额外允许裁剪「有窗口但当前不在前台」的后台程序（**只裁剪，不结束**）。
+    /// * `trim_enabled` —— 是否做工作集裁剪。
+    /// * `kill_enabled` —— 是否结束进程。关掉它就是「只裁剪不结束」。
+    ///
+    /// 注意作用域**只放宽裁剪范围，不放宽结束范围**：结束的候选永远只来自
+    /// 判定为 `Safe` 的进程，窗口类程序永远不会因为「切到游戏模式」而被结束。
+    /// 红线是「结束」，不是「裁剪」。
+    pub fn purge_scoped(
+        &mut self,
+        targets: Option<Vec<u32>>,
+        grace_ms: u64,
+        scope: PurgeScope,
+        trim_enabled: bool,
+        kill_enabled: bool,
+    ) -> PurgeResult {
         let t0 = std::time::Instant::now();
         let dry = self.mode.is_dry();
 
@@ -338,24 +398,58 @@ impl PurgeEngine {
                 // 注意：这段必须在 `continue` **之前** —— 早期版本把它写在了
                 // 下面的 match 里，结果因为这里先 continue 而成了死代码，
                 // 裁剪收益永远是 0。
-                if is_trim_ok_service_host(&p.name) && trim_eligible(p, &env) {
+                if trim_enabled
+                    && is_trim_ok_service_host(&p.name)
+                    && trim_eligible(p, &env)
+                {
                     to_trim.push((p.pid, p.name.clone(), p.exe_path.clone(), p.working_set));
                 }
                 continue;
             }
 
             match j.verdict {
-                Verdict::Safe => to_kill.push((
-                    p.pid,
-                    p.name.clone(),
-                    p.exe_path.clone(),
-                    p.working_set,
-                )),
+                Verdict::Safe => {
+                    if kill_enabled {
+                        to_kill.push((
+                            p.pid,
+                            p.name.clone(),
+                            p.exe_path.clone(),
+                            p.working_set,
+                        ));
+                    } else if trim_enabled && trim_eligible(p, &env) {
+                        // 「只裁剪不结束」模式：Safe 的目标降级为裁剪对象。
+                        // 用户要的是「省内存」而不是「关程序」。
+                        to_trim.push((
+                            p.pid,
+                            p.name.clone(),
+                            p.exe_path.clone(),
+                            p.working_set,
+                        ));
+                    }
+                }
                 Verdict::Keep => {
                     // 不结束，但如果是「不属于任何交互式程序 + 几乎不占 CPU +
                     // 内存占用可观」，顺手裁一下工作集 —— 这是「释放内存」的
                     // 主要来源，也是对用户完全无感的那部分收益
-                    if trim_eligible(p, &env) {
+                    if trim_enabled && trim_eligible(p, &env) {
+                        to_trim.push((
+                            p.pid,
+                            p.name.clone(),
+                            p.exe_path.clone(),
+                            p.working_set,
+                        ));
+                    }
+                    // 「游戏模式」的口径：在安全口径之上，允许裁剪「有可见窗口
+                    // 但当前不在前台、且几乎不占 CPU」的后台程序。
+                    //
+                    // 这类进程在 P1 的判定里会被「有可见窗口」封顶成 Keep，
+                    // 所以要由这里显式放宽 —— 但**只放宽裁剪**：
+                    // 它们有窗口，可能随时被用户切回来，结束掉是误杀。
+                    if trim_enabled
+                        && scope == PurgeScope::SafeAndBackground
+                        && j.verdict == Verdict::Keep
+                        && background_trim_eligible(p, &env)
+                    {
                         to_trim.push((
                             p.pid,
                             p.name.clone(),

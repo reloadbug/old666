@@ -7,6 +7,10 @@
 //! process    NtQuerySystemInformation 进程枚举 + 采样器
 //! perf       PDH 性能计数器（CPU/磁盘/网络）
 //! memory     GlobalMemoryStatusEx / GetProcessMemoryInfo
+//! modes      P3 场景模式引擎（规则 DSL → 编排 → 可解释计划）
+//! mode_actions 模式动作的系统实现（电源计划 / 优先级 / 免打扰）
+//! mode_runner  模式执行器（编排动作 + 逐次确认红线闸）
+//! mode_auto   自动切换的触发判定（只判定，不执行动作）
 //! signature  WinVerifyTrust 数字签名校验
 //! idle       六维闲置判定引擎（核心智力）
 //! safety     全局安全闸（熔断 / PID 白名单 / 红线校验）
@@ -27,6 +31,10 @@ pub mod idle;
 pub mod killer;
 pub mod knowledge;
 pub mod memory;
+pub mod modes;
+pub mod mode_actions;
+pub mod mode_runner;
+pub mod mode_auto;
 pub mod perf;
 pub mod process;
 pub mod purge;

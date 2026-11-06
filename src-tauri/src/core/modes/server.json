@@ -1,0 +1,64 @@
+{
+  "id": "server",
+  "name": "服务器模式",
+  "tagline": "零误杀、双确认、全留痕",
+  "desc": "给长期不关机的机器准备：只做最保守的清理，所有变更都要二次确认并留痕，关键服务与服务进程一个都不碰。",
+  "icon": "server",
+  "builtin": true,
+  "mutually_exclusive_with": ["daily", "game"],
+  "settings": {
+    "mem_threshold_pct": 90,
+    "power_plan": "high_performance",
+    "require_double_confirm": true,
+    "protect_critical_services": true
+  },
+  "rules": [
+    {
+      "id": "server.purge.conservative",
+      "title": "保守清理闲置进程",
+      "desc": "只结束「长时间完全闲置、无窗口、已签名为可信厂商」的普通应用进程。系统服务、驱动宿主、系统关键进程一律不碰。",
+      "priority": 10,
+      "when": { "kind": "mem_usage_above", "pct": 90 },
+      "then": {
+        "action": "purge_processes",
+        "scope": "safe_only",
+        "trim": false
+      },
+      "explain": "阈值 90% —— 服务器上宁可内存紧张一点，也不误杀一个业务进程。所有结束动作都会写进变更留痕，可逐条还原。"
+    },
+    {
+      "id": "server.protect.critical",
+      "title": "关键服务保护",
+      "desc": "启用额外保护：除硬黑名单外，把系统默认启动的服务也纳入保护范围，不允许被任何规则禁用或延迟。",
+      "priority": 20,
+      "when": { "kind": "always" },
+      "then": {
+        "action": "protect_critical_services"
+      },
+      "explain": "启用后，147 个自动启动服务里默认 72 个可改的服务会被收窄；需要临时改单个服务时，请在启动项页面单独操作并留痕。"
+    },
+    {
+      "id": "server.confirm.double",
+      "title": "变更双确认",
+      "desc": "任何会改变系统状态的变更（禁用、延迟、删除启动项）都需要二次确认，并完整记录操作人、时间、目标与结果。",
+      "priority": 30,
+      "when": { "kind": "always" },
+      "then": {
+        "action": "require_double_confirm"
+      },
+      "explain": "服务器模式下界面上所有变更按钮都会多一次确认弹窗；批量操作会额外列出每一条的目标。"
+    },
+    {
+      "id": "server.power.high",
+      "title": "电源计划：高性能",
+      "desc": "服务器不应因为省电而出现业务抖动，设为「高性能」。",
+      "priority": 40,
+      "when": { "kind": "always" },
+      "then": {
+        "action": "set_power_plan",
+        "plan": "high_performance"
+      },
+      "explain": "如果是笔记本工作站且接电运行，高性能同样合适；离线时系统会自行降频以保续航。"
+    }
+  ]
+}

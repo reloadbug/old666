@@ -538,6 +538,211 @@ pub fn startup_list_remove(kind: String, name: String) -> Reply<ListsPayload> {
 }
 
 // ===========================================================================
+// P3 · 场景模式
+// ===========================================================================
+
+/// 模式列表（内置 + 用户自定义），附当前生效模式与自动切换配置。
+#[derive(Serialize)]
+pub struct ModesPayload {
+    pub modes: Vec<crate::core::modes::Mode>,
+    /// 当前生效的模式 id。
+    pub active: String,
+    /// 自动切换配置（默认关闭）。
+    pub auto_switch: crate::core::mode_actions::AutoSwitch,
+    /// 当前电源计划 GUID（读不到就空字符串）。
+    pub power_plan: String,
+    /// 当前内存占用百分比。
+    pub mem_usage_pct: u32,
+    /// 免打扰是否开启。
+    pub focus_assist: bool,
+}
+
+/// 列出全部场景模式。
+#[tauri::command]
+pub fn mode_list() -> Reply<ModesPayload> {
+    let pct = crate::core::memory::memory_percent().round().max(0.0) as u32;
+    Reply::ok(ModesPayload {
+        modes: crate::core::modes::load_all(),
+        active: crate::core::mode_actions::active_mode_id(),
+        auto_switch: crate::core::mode_actions::auto_switch(),
+        power_plan: crate::core::mode_actions::current_power_plan().unwrap_or_default(),
+        mem_usage_pct: pct,
+        focus_assist: crate::core::mode_actions::focus_assist().unwrap_or(false),
+    })
+}
+
+/// 编排一个模式，得到「会做什么、不做什么」的可解释计划。
+///
+/// **这个命令零副作用** —— 只出计划，不动系统。UI 必须先把计划给用户看，
+/// 拿到确认后才调用 [`mode_apply`]。
+#[tauri::command]
+pub fn mode_plan(mode_id: String) -> Reply<crate::core::modes::ModePlan> {
+    let Some(mode) = crate::core::modes::find(&mode_id) else {
+        return Reply::err(format!("没有找到模式「{mode_id}」"));
+    };
+    let pct = crate::core::memory::memory_percent().round().max(0.0) as u32;
+    let scan = crate::core::startup::scan();
+    Reply::ok(crate::core::modes::plan(&mode, pct, &scan.items))
+}
+
+/// 执行一个模式。
+///
+/// * `rule_ids` —— 只执行这些规则（空 = 全部命中的规则）。
+/// * `kill_confirmed` —— 用户是否已**逐次确认**「会结束进程」的动作。
+///   为 false 时，任何会终止进程的动作都会被跳过并在结果里说明原因。
+///
+/// 这是「所有清除测试都要用户确认」这条红线在产品层的落点：
+/// 前端必须先调 [`mode_plan`] 把要结束的东西列给用户看，用户点头之后
+/// 才把 `kill_confirmed` 置为 true 调本命令。
+#[tauri::command]
+pub fn mode_apply(
+    state: State<'_, AppState>,
+    mode_id: String,
+    rule_ids: Option<Vec<String>>,
+    kill_confirmed: Option<bool>,
+    grace_ms: Option<u64>,
+) -> Reply<crate::core::mode_runner::ApplyResult> {
+    let Some(mode) = crate::core::modes::find(&mode_id) else {
+        return Reply::err(format!("没有找到模式「{mode_id}」"));
+    };
+    let pct = crate::core::memory::memory_percent().round().max(0.0) as u32;
+    let scan = crate::core::startup::scan();
+    let plan = crate::core::modes::plan(&mode, pct, &scan.items);
+
+    let opts = crate::core::mode_runner::ApplyOptions {
+        rule_ids: rule_ids.unwrap_or_default(),
+        kill_confirmed: kill_confirmed.unwrap_or(false),
+        grace_ms: grace_ms.unwrap_or(800),
+    };
+
+    let mut e = match state.engine.lock() {
+        Ok(g) => g,
+        Err(p) => p.into_inner(),
+    };
+    let r = crate::core::mode_runner::apply(&mode, &plan, &mut e, &opts);
+
+    // 模式生效后记住它，UI 下次打开时知道当前处于哪个模式
+    let _ = crate::core::mode_actions::set_active_mode_id(&mode.id);
+
+    Reply::ok(r)
+}
+
+/// 只切换「当前生效的模式」标记（不执行任何动作）。
+///
+/// 用于「我只想记住我处于哪个场景」这种轻量切换。
+#[tauri::command]
+pub fn mode_set_active(mode_id: String) -> Reply<String> {
+    if crate::core::modes::find(&mode_id).is_none() {
+        return Reply::err(format!("没有找到模式「{mode_id}」"));
+    }
+    match crate::core::mode_actions::set_active_mode_id(&mode_id) {
+        Ok(()) => Reply::ok(mode_id),
+        Err(e) => Reply::err(e),
+    }
+}
+
+/// 读自动切换配置。
+#[tauri::command]
+pub fn mode_auto_get() -> Reply<crate::core::mode_actions::AutoSwitch> {
+    Reply::ok(crate::core::mode_actions::auto_switch())
+}
+
+/// 判定「现在该不该自动切模式」。
+///
+/// **这个命令零副作用** —— 它只回答「该不该切、切到哪个」，
+/// 连「当前生效模式」这个标记都不改。让 UI 决定怎么提示用户。
+///
+/// 这是有意为之：自动切换如果顺手把动作做了，
+/// 「所有结束进程都要用户逐次确认」那条红线就被绕过去了。
+#[tauri::command]
+pub fn mode_auto_check() -> Reply<AutoCheck> {
+    let d = crate::core::mode_auto::evaluate();
+    match d {
+        crate::core::mode_auto::Decision::None => Reply::ok(AutoCheck {
+            should_switch: false,
+            target_mode: None,
+            current_mode: crate::core::mode_actions::active_mode_id(),
+        }),
+        crate::core::mode_auto::Decision::Switch(t) => Reply::ok(AutoCheck {
+            should_switch: true,
+            target_mode: Some(t),
+            current_mode: crate::core::mode_actions::active_mode_id(),
+        }),
+    }
+}
+
+/// 自动切换判定结果。
+#[derive(Serialize)]
+pub struct AutoCheck {
+    pub should_switch: bool,
+    pub target_mode: Option<String>,
+    pub current_mode: String,
+}
+
+/// 写自动切换配置。
+///
+/// `enabled` 默认 false —— 自动切换必须由用户显式打开。
+#[tauri::command]
+pub fn mode_auto_set(
+    enabled: Option<bool>,
+    mem_above_pct: Option<u32>,
+    mem_above_mode: Option<String>,
+    foreground_process: Option<String>,
+    foreground_mode: Option<String>,
+) -> Reply<crate::core::mode_actions::AutoSwitch> {
+    let mut v = crate::core::mode_actions::auto_switch();
+    if let Some(b) = enabled {
+        v.enabled = b;
+    }
+    if mem_above_pct.is_some() {
+        v.mem_above_pct = mem_above_pct;
+    }
+    if mem_above_mode.is_some() {
+        v.mem_above_mode = mem_above_mode;
+    }
+    if foreground_process.is_some() {
+        v.foreground_process = foreground_process;
+    }
+    if foreground_mode.is_some() {
+        v.foreground_mode = foreground_mode;
+    }
+    // 打开时必须至少有一个触发条件，否则是「开了但永远不切」
+    if v.enabled && v.mem_above_mode.is_none() && v.foreground_mode.is_none() {
+        return Reply::err("自动切换至少要配置一个触发条件（内存阈值或前台程序）");
+    }
+    match crate::core::mode_actions::set_auto_switch(&v) {
+        Ok(()) => Reply::ok(v),
+        Err(e) => Reply::err(e),
+    }
+}
+
+/// 保存一个自定义模式（JSON 文本）。
+///
+/// 前端把编辑器里的 JSON 原样传上来，后端走**同一套**解析与校验
+/// （[`crate::core::modes::parse_mode`]），内置模式不允许被覆盖。
+#[tauri::command]
+pub fn mode_custom_save(json: String) -> Reply<String> {
+    let mode = match crate::core::modes::parse_mode(&json) {
+        Ok(m) => m,
+        Err(e) => return Reply::err(e),
+    };
+    let id = mode.id.clone();
+    match crate::core::modes::save_custom(&mode) {
+        Ok(()) => Reply::ok(id),
+        Err(e) => Reply::err(e),
+    }
+}
+
+/// 删除一个自定义模式。
+#[tauri::command]
+pub fn mode_custom_delete(mode_id: String) -> Reply<String> {
+    match crate::core::modes::delete_custom(&mode_id) {
+        Ok(()) => Reply::ok(mode_id),
+        Err(e) => Reply::err(e),
+    }
+}
+
+// ===========================================================================
 // 测试
 // ===========================================================================
 #[cfg(test)]

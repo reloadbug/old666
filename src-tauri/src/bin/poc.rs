@@ -179,6 +179,95 @@ fn startup_restore_main(batch: &str) -> i32 {
     }
 }
 
+// ---------------------------------------------------------------------------
+// P3 · 场景模式（只读）
+// ---------------------------------------------------------------------------
+
+/// `--modes` / `--mode-plan <id>` 的实现：**只读**，不执行任何动作。
+///
+/// 输出的 JSON 形状与 IPC 的 `mode_list` / `mode_plan` 完全一致 ——
+/// 这样前端的无头测试可以直接用真机导出的 payload，
+/// 测的是真实契约，而不是手写的假数据。
+fn modes_main(json: bool, plan_id: Option<String>, mem_pct_override: Option<u32>) -> i32 {
+    use old666_lib::core::{memory, mode_actions, modes, startup};
+
+    let modes_all = modes::load_all();
+    let pct = mem_pct_override
+        .unwrap_or_else(|| memory::memory_percent().round().max(0.0) as u32);
+
+    if let Some(id) = plan_id {
+        let Some(m) = modes::find(&id) else {
+            eprintln!("没有找到模式：{id}");
+            eprintln!("（先用 --modes 看清单）");
+            return 2;
+        };
+        let scan = startup::scan();
+        let plan = modes::plan(&m, pct, &scan.items);
+        if json {
+            println!(
+                "{}",
+                serde_json::to_string_pretty(&plan).unwrap_or_else(|_| "{}".into())
+            );
+        } else {
+            println!("模式：{}", plan.mode_name);
+            println!("内存占用 {}%，互斥：{:?}", plan.mem_usage_pct, plan.excludes);
+            for r in &plan.rules {
+                println!(
+                    "  [{}] {:<28} {}  {}",
+                    if r.triggered { "命中" } else { "未中" },
+                    r.title,
+                    r.action,
+                    if r.needs_confirm { "（需确认）" } else { "" }
+                );
+                if !r.targets.is_empty() {
+                    for t in r.targets.iter().take(10) {
+                        println!("        · {t}");
+                    }
+                }
+            }
+        }
+        return 0;
+    }
+
+    let payload = serde_json::json!({
+        "modes": modes_all,
+        "active": mode_actions::active_mode_id(),
+        "auto_switch": mode_actions::auto_switch(),
+        "power_plan": mode_actions::current_power_plan().unwrap_or_default(),
+        "mem_usage_pct": pct,
+        "focus_assist": mode_actions::focus_assist().unwrap_or(false),
+    });
+
+    if json {
+        println!(
+            "{}",
+            serde_json::to_string_pretty(&payload).unwrap_or_else(|_| "{}".into())
+        );
+        return 0;
+    }
+
+    let line = "─".repeat(64);
+    println!("\n{line}");
+    println!("  老六清净 old666 · P3 场景模式（只读，未做任何改动）");
+    println!("{line}");
+    println!("  当前生效：{}", mode_actions::active_mode_id());
+    println!("  内存占用  : {pct}%");
+    for m in &modes_all {
+        println!(
+            "\n【{}】{}（{} 条规则）{}",
+            m.id,
+            m.name,
+            m.rules.len(),
+            if m.builtin { "内置" } else { "自定义" }
+        );
+        for r in &m.rules {
+            println!("    · {:<28} {}", r.title, r.then.name());
+        }
+    }
+    println!("\n{line}\n");
+    0
+}
+
 fn main() {
     let args: Vec<String> = std::env::args().skip(1).collect();
     if args.iter().any(|a| a == "--child") {
@@ -206,6 +295,18 @@ fn main() {
     //   用途：解释「为什么点了禁用却报拒绝访问」，并统计受保护服务的比例。
     if args.iter().any(|a| a == "--svc-probe") {
         std::process::exit(svc_probe_main(args.iter().any(|a| a == "--json")));
+    }
+
+    // --modes：列出全部场景模式（只读，绝不改动系统）
+    // --mode-plan <id>：输出某个模式的编排计划（只读，零副作用）
+    // --mem-pct <n>：编排时假定内存占用为 n%（用来构造「条件命中」的计划，
+    //   否则本机内存低于阈值时永远编不出会结束进程的计划，测不到确认闸）
+    if args.iter().any(|a| a == "--modes") {
+        std::process::exit(modes_main(
+            args.iter().any(|a| a == "--json"),
+            value_of(&args, "--mode-plan"),
+            value_of(&args, "--mem-pct").and_then(|v| v.parse::<u32>().ok()),
+        ));
     }
 
     // --startup：打印启动项清单（只读，绝不改动系统）

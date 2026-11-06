@@ -28,9 +28,9 @@
       <svg viewBox="0 0 24 24" class="ic"><path d="M12 3v9"/><path d="M6.5 6.5a8 8 0 1 0 11 0"/></svg>
       <span>开机加速</span>
     </button>
-    <button class="nav-item" data-view="mode" disabled>
+    <button class="nav-item" data-view="mode">
       <svg viewBox="0 0 24 24" class="ic"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
-      <span>场景模式</span><em class="soon">P3</em>
+      <span>场景模式</span>
     </button>
     <button class="nav-item" data-view="checkup" disabled>
       <svg viewBox="0 0 24 24" class="ic"><path d="M12 21s-7-4.5-7-10a7 7 0 0 1 14 0c0 5.5-7 10-7 10z"/><path d="M12 8v4l2 2"/></svg>
@@ -274,6 +274,95 @@
     </section>
   </div><!-- /#viewBoot -->
 
+  <!-- ===================== 视图三：场景模式（P3） ===================== -->
+  <div class="view" id="viewMode" hidden>
+
+    <!-- 当前状态 -->
+    <section class="card">
+      <div class="card-head">
+        <div>
+          <h2 class="card-title">当前状态</h2>
+          <p class="card-sub" id="modeStateSub">正在读取…</p>
+        </div>
+        <div class="card-head-right">
+          <div class="big-num" id="modeActiveName">—</div>
+          <div class="big-num-sub" id="modeMemPct">—</div>
+        </div>
+      </div>
+      <!-- 自动切换的提示条：只提示，不自作主张地执行 -->
+      <div class="mode-notice" id="modeAutoNotice" hidden>
+        <span id="modeAutoNoticeText"></span>
+        <button class="btn soft sm" id="btnModeSwitch">切过去</button>
+        <button class="btn soft sm" id="btnModeSwitchDismiss">忽略</button>
+      </div>
+    </section>
+
+    <!-- 模式选择 -->
+    <section class="card">
+      <div class="card-head">
+        <div>
+          <h2 class="card-title">场景模式</h2>
+          <p class="card-sub">每套模式是一组规则；应用前会先把「会做什么」列给你看</p>
+        </div>
+        <div class="card-head-right">
+          <button class="btn soft sm" id="btnModeAuto">自动切换：关</button>
+          <button class="btn soft sm" id="btnModeCustom">自定义模式</button>
+        </div>
+      </div>
+      <div class="mode-grid" id="modeGrid"></div>
+    </section>
+
+    <!-- 计划详情 -->
+    <section class="card" id="modePlanCard" hidden>
+      <div class="card-head">
+        <div>
+          <h2 class="card-title" id="modePlanTitle">计划</h2>
+          <p class="card-sub" id="modePlanSub"></p>
+        </div>
+        <div class="card-head-right">
+          <button class="btn soft" id="btnModePlanRefresh">重新编排</button>
+          <button class="btn primary" id="btnModeApply">按计划执行</button>
+        </div>
+      </div>
+      <ul class="mode-rule-list" id="modeRuleList"></ul>
+    </section>
+
+    <!-- 自动切换设置 -->
+    <section class="card" id="modeAutoCard" hidden>
+      <div class="card-head">
+        <div>
+          <h2 class="card-title">自动切换</h2>
+          <p class="card-sub">默认关闭。开启后，满足条件时自动切到对应模式（只切换标记，不自动结束任何进程）</p>
+        </div>
+      </div>
+      <div class="mode-auto-grid">
+        <label class="mode-field">
+          <span>总开关</span>
+          <select id="modeAutoEnabled">
+            <option value="0">关闭</option>
+            <option value="1">开启</option>
+          </select>
+        </label>
+        <label class="mode-field">
+          <span>内存占用超过（%）时切到</span>
+          <select id="modeAutoMemMode"></select>
+        </label>
+        <label class="mode-field">
+          <span>前台程序为（exe 名）时切到</span>
+          <input id="modeAutoFgProc" placeholder="如 game.exe" spellcheck="false">
+        </label>
+        <label class="mode-field">
+          <span>前台程序切到</span>
+          <select id="modeAutoFgMode"></select>
+        </label>
+      </div>
+      <div class="card-head-right mode-auto-save">
+        <button class="btn primary" id="btnModeAutoSave">保存自动切换设置</button>
+      </div>
+    </section>
+
+  </div><!-- /#viewMode -->
+
 </main>
 
 <!-- ===================== 确认对话框（启动项变更专用）===================== -->
@@ -350,6 +439,34 @@
   </div>
 </div>
 
+<!-- ===================== 自定义模式编辑器 ===================== -->
+<div class="modal-mask" id="modeMask" hidden>
+  <div class="modal wide" role="dialog" aria-modal="true" aria-labelledby="modeModalTitle">
+    <header class="modal-head">
+      <h2 id="modeModalTitle">自定义模式</h2>
+      <button class="x" id="modeModalX" aria-label="关闭">×</button>
+    </header>
+    <div class="modal-body">
+      <p class="modal-lead">
+        自定义模式是一份 JSON 文件，放在数据目录的 <code>modes\</code> 下。
+        新增一个模式<b>只需加一个文件，不用改代码</b> —— 内置模式与自定义模式走同一套校验。
+      </p>
+      <label class="mode-field mode-editor-field">
+        <span>模式 JSON</span>
+        <textarea id="modeJson" rows="16" spellcheck="false"></textarea>
+      </label>
+      <p class="modal-hint" id="modeModalHint">
+        必须包含 <code>id</code> / <code>name</code> / <code>rules</code>；
+        每条规则需要 <code>id</code> / <code>title</code> / <code>when</code> / <code>then</code>。
+      </p>
+    </div>
+    <footer class="modal-foot info-foot">
+      <button class="btn ghost sm" id="modeModalClose">关闭</button>
+      <button class="btn primary sm" id="modeModalSave">保存</button>
+    </footer>
+  </div>
+</div>
+
 <!-- ===================== 设置抽屉 ===================== -->
 <div class="drawer-mask" id="drawerMask" hidden></div>
 <aside class="drawer" id="drawer" hidden>
@@ -393,5 +510,6 @@
 
 <script src="main.js"></script>
 <script src="boot.js"></script>
+<script src="mode.js"></script>
 </body>
 </html>

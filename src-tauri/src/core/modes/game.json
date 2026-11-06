@@ -1,0 +1,75 @@
+{
+  "id": "game",
+  "name": "游戏模式",
+  "tagline": "激进清理、榨性能",
+  "desc": "为游戏准备的激进档：内存阈值降到 60%，电源切高性能，前台进程提优先级，并尽量减少后台干扰。适合开黑、剪辑、大型游戏。",
+  "icon": "game",
+  "builtin": true,
+  "mutually_exclusive_with": ["daily", "server"],
+  "settings": {
+    "mem_threshold_pct": 60,
+    "power_plan": "high_performance"
+  },
+  "rules": [
+    {
+      "id": "game.purge.aggressive",
+      "title": "激进清理后台进程",
+      "desc": "把内存占用降下来，为游戏腾地方。除了明确闲置的，还会顺带清理「有窗口但当前不在前台」的无关程序。",
+      "priority": 10,
+      "when": { "kind": "mem_usage_above", "pct": 60 },
+      "then": {
+        "action": "purge_processes",
+        "scope": "safe_and_background",
+        "trim": true
+      },
+      "explain": "「后台」= 持有窗口但不是当前前台进程，且不是白名单里的。你的前台程序永远不会被这条规则碰到。"
+    },
+    {
+      "id": "game.power.high",
+      "title": "电源计划：高性能",
+      "desc": "切到「高性能」电源计划，CPU 不降频、显卡不掉速。",
+      "priority": 20,
+      "when": { "kind": "always" },
+      "then": {
+        "action": "set_power_plan",
+        "plan": "high_performance"
+      },
+      "explain": "高性能计划会让待机功耗略高。对笔记本电脑可以改成「卓越性能」之外的中庸方案。"
+    },
+    {
+      "id": "game.priority.foreground",
+      "title": "提升前台程序优先级",
+      "desc": "把当前前台窗口所属进程提到「高于标准」优先级，让它更早拿到 CPU 时间片。",
+      "priority": 30,
+      "when": { "kind": "always" },
+      "then": {
+        "action": "boost_foreground_priority"
+      },
+      "explain": "只提升**当前前台**进程，不会去动后台服务；改完会回到原优先级，游戏退出即恢复。"
+    },
+    {
+      "id": "game.dnd",
+      "title": "开启免打扰（关闭通知）",
+      "desc": "打开「通知免打扰」，避免弹窗抢占注意力。",
+      "priority": 40,
+      "when": { "kind": "always" },
+      "then": {
+        "action": "set_focus_assist",
+        "on": true
+      },
+      "explain": "Windows 10 叫「专注助手」，11 叫「勿扰」。这只是一项通知设置，不影响系统功能。"
+    },
+    {
+      "id": "game.startup.delay",
+      "title": "游戏相关启动项延迟启动",
+      "desc": "把 Steam 助手、网盘同步、办公软件等启动项改成延迟启动，游戏前不抢资源。",
+      "priority": 50,
+      "when": { "kind": "always" },
+      "then": {
+        "action": "delay_startup",
+        "names": ["onedrive", "dropbox", "googledrive", "nutstore", "wps", "qqpcmgr", "360safe", "sunloginclient", "adobe", "spotify", "discord"]
+      },
+      "explain": "**不会**禁用游戏本体或游戏平台，只处理非游戏必需的后台常驻。"
+    }
+  ]
+}
