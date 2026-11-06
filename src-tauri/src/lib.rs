@@ -8,6 +8,8 @@
 //! 之所以把核心逻辑放在 lib 而不是 main，是为了让 `cargo test` 能直接
 //! 覆盖系统调用路径 —— P1 的「零误杀」验收就是靠 `core::purge` 的测试跑的。
 
+use tauri::Manager;
+
 pub mod core;
 pub mod ipc;
 
@@ -36,6 +38,20 @@ pub fn run() {
     let bench = std::env::args().any(|a| a == "--bench-startup");
 
     tauri::Builder::default()
+        // 单实例保护：第二个实例不再静默退出（退出码 0，看起来像"点了没反应"），
+        // 而是把已有窗口拉到前台。必须最先注册。
+        .plugin(tauri_plugin_single_instance::init(|app, _argv, _cwd| {
+            eprintln!("[old666] 检测到第二实例，尝试激活已有窗口");
+            match app.get_webview_window("main") {
+                Some(w) => {
+                    let _ = w.unminimize();
+                    let _ = w.show();
+                    let _ = w.set_focus();
+                    eprintln!("[old666] 已有窗口已激活");
+                }
+                None => eprintln!("[old666] 警告：未找到 main 窗口"),
+            }
+        }))
         .manage(ipc::AppState::default())
         .setup(move |app| {
             // 尽早拿到 SeDebugPrivilege，后续结束高权限进程才不会失败
