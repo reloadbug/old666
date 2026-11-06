@@ -707,3 +707,84 @@ tr.proc.forbidden{opacity:.62}
   padding:14px 20px;border-top:1px solid var(--line-2);
   display:flex;justify-content:flex-end;gap:10px;
 }
+
+/* ============================================================
+   一键体检 + 垃圾清理（P4）
+   ============================================================ */
+.checkup-list{
+  list-style:none;display:grid;gap:9px;margin-top:14px;
+}
+.checkup-item{
+  border:1px solid var(--line-2);border-radius:var(--radius-s);
+  background:var(--surface-2);padding:11px 13px;
+  border-left-width:3px;
+}
+.checkup-item.good{border-left-color:#16A34A}
+.checkup-item.notice{border-left-color:#0EA5E9}
+.checkup-item.warn{border-left-color:#D97706}
+.checkup-item.bad{border-left-color:#DC2626}
+.checkup-item.unknown{border-left-color:#94A3B8}
+.checkup-item-head{
+  display:flex;justify-content:space-between;align-items:baseline;gap:10px;
+}
+.checkup-item-title{font-size:13.5px;font-weight:600}
+.checkup-item-sev{font-size:11.5px;color:var(--muted);flex:0 0 auto}
+.checkup-item.bad .checkup-item-sev{color:#B91C1C;font-weight:600}
+.checkup-item.warn .checkup-item-sev{color:#B45309;font-weight:600}
+.checkup-item-reason{font-size:12.5px;color:var(--muted);margin-top:5px;line-height:1.55}
+.checkup-item-metric{font-size:12px;margin-top:4px;font-variant-numeric:tabular-nums}
+.checkup-item-advice{font-size:12px;margin-top:5px;color:#92400E;line-height:1.55}
+
+.junk-groups{display:grid;gap:8px;margin-top:14px}
+.junk-group{
+  display:flex;align-items:center;gap:12px;
+  border:1px solid var(--line-2);border-radius:var(--radius-s);
+  background:var(--surface-2);padding:9px 12px;font-size:12.5px;
+}
+.junk-group.readonly{opacity:.75}
+.junk-group-name{flex:1 1 auto;font-weight:600}
+.junk-group-count{color:var(--muted);font-variant-numeric:tabular-nums}
+.junk-group-size{font-variant-numeric:tabular-nums;font-weight:600;min-width:70px;text-align:right}
+.junk-empty{
+  font-size:12.5px;color:var(--muted);
+  border:1px dashed var(--line-2);border-radius:var(--radius-s);
+  padding:14px;text-align:center;
+}
+.junk-detail{margin-top:12px}
+.junk-all{
+  display:flex;align-items:center;gap:7px;font-size:12.5px;
+  color:var(--muted);margin-bottom:8px;cursor:pointer;
+}
+.junk-items{
+  display:grid;gap:5px;max-height:300px;overflow:auto;
+  border:1px solid var(--line-2);border-radius:var(--radius-s);padding:8px;
+  background:var(--surface-2);
+}
+.junk-item{
+  display:flex;align-items:center;gap:10px;font-size:12px;
+  padding:5px 7px;border-radius:6px;cursor:pointer;
+}
+.junk-item:hover{background:var(--bg-2)}
+.junk-item.on{background:#EFF6FF}
+.junk-item-name{
+  flex:1 1 auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.junk-item-kind{color:var(--muted);flex:0 0 auto;font-size:11px}
+.junk-item-size{flex:0 0 auto;font-variant-numeric:tabular-nums;min-width:62px;text-align:right}
+.junk-foot{font-size:11.5px;color:var(--muted);margin-top:10px}
+
+.checkup-actions{margin-top:14px}
+.fix-compare{display:grid;gap:8px;margin-top:12px}
+.fix-row{
+  display:flex;align-items:center;gap:12px;font-size:12.5px;
+  border:1px solid var(--line-2);border-radius:var(--radius-s);
+  background:var(--surface-2);padding:9px 12px;
+}
+.fix-row.skipped{opacity:.72;border-style:dashed}
+.fix-row-kind{flex:0 0 96px;font-weight:600}
+.fix-row-detail{flex:1 1 auto;color:var(--muted);line-height:1.5}
+.fix-row-bytes{flex:0 0 auto;font-variant-numeric:tabular-nums;font-weight:600}
+.fix-note{
+  font-size:11.5px;color:var(--muted);line-height:1.6;
+  border-top:1px dashed var(--line-2);padding-top:9px;margin-top:3px;
+}

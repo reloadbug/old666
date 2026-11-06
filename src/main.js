@@ -653,11 +653,16 @@ const VIEW_META = {
     sub: '一套规则一个场景：日常、游戏、服务器，一键切换',
     refresh: false,
   },
+  checkup: {
+    title: '一键体检',
+    sub: '给系统做一次体检，看看哪里拖后腿，顺手清掉能清的垃圾',
+    refresh: false,
+  },
 };
 
 function switchView(name) {
   const meta = VIEW_META[name] || VIEW_META.purge;
-  ['purge', 'boot', 'mode'].forEach((v) => {
+  ['purge', 'boot', 'mode', 'checkup'].forEach((v) => {
     const el = document.getElementById('view' + v[0].toUpperCase() + v.slice(1));
     if (el) el.hidden = v !== name;
   });
@@ -675,6 +680,8 @@ function switchView(name) {
     enterBootView();
   } else if (name === 'mode' && typeof enterModeView === 'function') {
     enterModeView();
+  } else if (name === 'checkup' && typeof enterCheckupView === 'function') {
+    enterCheckupView();
   } else if (name === 'purge' && !state.timer) {
     scan(true);
   }

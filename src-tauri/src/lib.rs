@@ -110,6 +110,11 @@ pub fn run() {
             ipc::mode_auto_set,
             ipc::mode_custom_save,
             ipc::mode_custom_delete,
+            // P4 · 一键体检 + 垃圾清理
+            ipc::checkup_run,
+            ipc::junk_scan,
+            ipc::junk_delete,
+            ipc::checkup_fix,
         ])
         .run(tauri::generate_context!())
         .expect("启动 Tauri 应用失败");

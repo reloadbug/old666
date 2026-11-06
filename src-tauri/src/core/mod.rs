@@ -11,6 +11,9 @@
 //! mode_actions 模式动作的系统实现（电源计划 / 优先级 / 免打扰）
 //! mode_runner  模式执行器（编排动作 + 逐次确认红线闸）
 //! mode_auto   自动切换的触发判定（只判定，不执行动作）
+//! checkup     P4 一键体检（体检项定义 + 0–100 评分模型，纯只读）
+//! checkup_fix P4 一键修复执行器 + 修复前后量化对比（**不结束任何进程**）
+//! junk        P4 垃圾扫描与安全删除（只扫白名单目录 + 走回收站）
 //! signature  WinVerifyTrust 数字签名校验
 //! idle       六维闲置判定引擎（核心智力）
 //! safety     全局安全闸（熔断 / PID 白名单 / 红线校验）
@@ -27,7 +30,10 @@
 
 pub mod blacklist;
 pub mod boot;
+pub mod checkup;
+pub mod checkup_fix;
 pub mod idle;
+pub mod junk;
 pub mod killer;
 pub mod knowledge;
 pub mod memory;

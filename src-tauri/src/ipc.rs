@@ -743,6 +743,54 @@ pub fn mode_custom_delete(mode_id: String) -> Reply<String> {
 }
 
 // ===========================================================================
+// P4 · 一键体检 + 垃圾清理
+// ===========================================================================
+
+/// 跑一次体检（纯只读，不改系统任何东西）。
+#[tauri::command]
+pub fn checkup_run() -> Reply<crate::core::checkup::CheckReport> {
+    Reply::ok(crate::core::checkup::run())
+}
+
+/// 扫描垃圾文件（纯只读）。
+#[tauri::command]
+pub fn junk_scan() -> Reply<crate::core::junk::JunkScan> {
+    Reply::ok(crate::core::junk::scan())
+}
+
+/// 把指定的垃圾文件送进回收站。
+///
+/// **不会物理删除** —— 走 `SHFileOperationW` 的 `FO_DELETE` + `FOF_ALLOWUNDO`，
+/// 用户可以从回收站自己恢复。
+///
+/// 后端会再查一遍白名单：不在允许清理的目录里的路径一律拒绝，
+/// 防止前端或 IPC 被构造成任意路径删除。
+#[tauri::command]
+pub fn junk_delete(paths: Vec<String>) -> Reply<crate::core::junk::JunkDeleteResult> {
+    if paths.len() > 20000 {
+        return Reply::err("一次最多清理 20000 项，请分批处理");
+    }
+    Reply::ok(crate::core::junk::delete_to_recycle_bin(&paths))
+}
+
+/// 执行一键修复，并返回修复前后的量化对比。
+///
+/// **本命令不会结束任何进程。** 只做工作集裁剪与「送进回收站」这两类
+/// 可逆动作；结束进程仍然只在「净化」页、经过用户逐次确认之后才可能发生。
+#[tauri::command]
+pub fn checkup_fix(
+    state: State<'_, AppState>,
+    requests: Vec<crate::core::checkup_fix::FixRequest>,
+) -> Reply<crate::core::checkup_fix::FixSummary> {
+    let mut e = match state.engine.lock() {
+        Ok(g) => g,
+        Err(p) => p.into_inner(),
+    };
+    let before = crate::core::checkup::run();
+    Reply::ok(crate::core::checkup_fix::run(&mut e, &requests, &before))
+}
+
+// ===========================================================================
 // 测试
 // ===========================================================================
 #[cfg(test)]

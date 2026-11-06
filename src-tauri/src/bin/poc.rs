@@ -268,6 +268,127 @@ fn modes_main(json: bool, plan_id: Option<String>, mem_pct_override: Option<u32>
     0
 }
 
+// ---------------------------------------------------------------------------
+// P4 · 一键体检 + 垃圾清理（只读）
+// ---------------------------------------------------------------------------
+
+/// `--checkup` / `--junk` 的实现：**只读**。
+///
+/// 输出 JSON 形状与 IPC 的 `checkup_run` / `junk_scan` 完全一致 ——
+/// 前端的无头测试直接复用真机导出的 payload。
+fn checkup_main(json: bool, want_junk: bool) -> i32 {
+    use old666_lib::core::{checkup, junk};
+
+    if want_junk {
+        let scan = junk::scan();
+        if json {
+            println!(
+                "{}",
+                serde_json::to_string_pretty(&scan).unwrap_or_else(|_| "{}".into())
+            );
+            return 0;
+        }
+        let line = "─".repeat(64);
+        println!("\n{line}");
+        println!("  老六清净 old666 · P4 垃圾扫描（只读，未删除任何东西）");
+        println!("{line}");
+        println!("  合计 {} 项 / {}", scan.items.len(), human_bytes(scan.total_bytes));
+        for (kind, n, bytes) in &scan.groups {
+            println!("  · {:<14} {:>5} 项  {:>10}", kind, n, human_bytes(*bytes));
+        }
+        if !scan.skipped.is_empty() {
+            println!("  跳过 {} 个目录（权限不足）", scan.skipped.len());
+        }
+        println!("{line}\n");
+        return 0;
+    }
+
+    let report = checkup::run();
+    if json {
+        println!(
+            "{}",
+            serde_json::to_string_pretty(&report).unwrap_or_else(|_| "{}".into())
+        );
+        return 0;
+    }
+    let line = "─".repeat(64);
+    println!("\n{line}");
+    println!("  老六清净 old666 · P4 一键体检（只读，未做任何改动）");
+    println!("{line}");
+    println!("  健康分：{}", report.score);
+    println!("  摘要  ：{}", report.summary);
+    for it in &report.items {
+        println!(
+            "  [{}] {:<16} {}",
+            it.severity.as_str(),
+            it.title,
+            it.reason
+        );
+    }
+    println!("{line}\n");
+    0
+}
+
+/// `--junk-clean <path>`：把一个路径送进回收站。
+///
+/// **这是写操作**，所以必须显式 `--allow-write`，默认只做演练（dry-run）。
+/// 与其它写入口一样：路径必须落在白名单目录里，否则后端会拒绝。
+fn junk_clean_main(path: Option<String>, allow_write: bool, json: bool) -> i32 {
+    use old666_lib::core::junk;
+
+    let Some(path) = path else {
+        eprintln!("用法：old666-poc --junk-clean <path> [--allow-write]");
+        return 2;
+    };
+
+    if !allow_write {
+        println!("演练模式（未加 --allow-write）：不会真的送进回收站。");
+        println!("目标：{path}");
+        // 仍然走一遍后端校验，好让演练也能看出「会不会被白名单拒绝」。
+        if junk::is_whitelisted(&path) {
+            println!("白名单校验：通过（该路径在允许清理的目录内）。");
+            0
+        } else {
+            println!("白名单校验：不通过（该路径不在允许清理的目录内，后端会拒绝）。");
+            1
+        }
+    } else {
+        let r = junk::delete_to_recycle_bin(&[path.clone()]);
+        if json {
+            println!(
+                "{}",
+                serde_json::to_string_pretty(&r).unwrap_or_else(|_| "{}".into())
+            );
+        } else {
+            println!("已处理 {} 项，失败 {} 项，耗时 {} ms", r.deleted, r.failed, r.elapsed_ms);
+            for d in &r.details {
+                println!(
+                    "  [{}] {} {}",
+                    if d.ok { "OK" } else { "FAIL" },
+                    d.path,
+                    d.error.as_deref().unwrap_or("")
+                );
+            }
+        }
+        if r.deleted > 0 { 0 } else { 1 }
+    }
+}
+
+/// 把字节数说成人话。
+fn human_bytes(b: u64) -> String {    const U: [&str; 5] = ["B", "KB", "MB", "GB", "TB"];
+    let mut n = b as f64;
+    let mut i = 0usize;
+    while n >= 1024.0 && i < U.len() - 1 {
+        n /= 1024.0;
+        i += 1;
+    }
+    if i == 0 {
+        format!("{} {}", b, U[0])
+    } else {
+        format!("{:.1} {}", n, U[i])
+    }
+}
+
 fn main() {
     let args: Vec<String> = std::env::args().skip(1).collect();
     if args.iter().any(|a| a == "--child") {
@@ -306,6 +427,23 @@ fn main() {
             args.iter().any(|a| a == "--json"),
             value_of(&args, "--mode-plan"),
             value_of(&args, "--mem-pct").and_then(|v| v.parse::<u32>().ok()),
+        ));
+    }
+
+    // --checkup：跑一次体检并打印结果（只读，绝不改动系统）
+    // --junk：扫描垃圾文件并打印清单（只读，绝不删除任何东西）
+    // --junk-clean <path>：把指定路径送进回收站（**写操作**，必须显式 --allow-write）
+    if args.iter().any(|a| a == "--junk-clean") {
+        std::process::exit(junk_clean_main(
+            value_of(&args, "--junk-clean"),
+            args.iter().any(|a| a == "--allow-write"),
+            args.iter().any(|a| a == "--json"),
+        ));
+    }
+    if args.iter().any(|a| a == "--checkup" || a == "--junk") {
+        std::process::exit(checkup_main(
+            args.iter().any(|a| a == "--json"),
+            args.iter().any(|a| a == "--junk"),
         ));
     }
 

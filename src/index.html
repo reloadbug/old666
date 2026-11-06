@@ -32,9 +32,9 @@
       <svg viewBox="0 0 24 24" class="ic"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
       <span>场景模式</span>
     </button>
-    <button class="nav-item" data-view="checkup" disabled>
+    <button class="nav-item" data-view="checkup">
       <svg viewBox="0 0 24 24" class="ic"><path d="M12 21s-7-4.5-7-10a7 7 0 0 1 14 0c0 5.5-7 10-7 10z"/><path d="M12 8v4l2 2"/></svg>
-      <span>一键体检</span><em class="soon">P4</em>
+      <span>一键体检</span>
     </button>
     <button class="nav-item" data-view="monitor" disabled>
       <svg viewBox="0 0 24 24" class="ic"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>
@@ -363,6 +363,63 @@
 
   </div><!-- /#viewMode -->
 
+  <div class="view" id="viewCheckup" hidden>
+
+    <!-- 体检结果 -->
+    <section class="card">
+      <div class="card-head">
+        <div>
+          <h2 class="card-title">系统体检</h2>
+          <p class="card-sub" id="checkupSub">体检只看不改，不会结束任何进程、不会删任何文件</p>
+        </div>
+        <div class="card-head-right">
+          <div class="big-num" id="checkupScore">—</div>
+          <div class="big-num-sub">健康分（满分 100）</div>
+        </div>
+      </div>
+      <ul class="checkup-list" id="checkupList"></ul>
+      <div class="card-head-right checkup-actions">
+        <button class="btn primary" id="btnCheckupFixAll">一键修复安全项</button>
+        <button class="btn soft" id="btnCheckupRun">重新体检</button>
+      </div>
+    </section>
+
+    <!-- 修复前后对比 -->
+    <section class="card" id="fixCompareCard" hidden>
+      <div class="card-head">
+        <div>
+          <h2 class="card-title">修复前后对比</h2>
+          <p class="card-sub" id="fixCompareSub"></p>
+        </div>
+      </div>
+      <div class="fix-compare" id="fixCompareBody"></div>
+    </section>
+
+    <!-- 垃圾清理 -->
+    <section class="card">
+      <div class="card-head">
+        <div>
+          <h2 class="card-title">垃圾清理</h2>
+          <p class="card-sub" id="junkSub">只扫描系统临时目录、缓存与更新残留；<b>绝不碰</b>桌面、文档、图片、下载</p>
+        </div>
+        <div class="card-head-right">
+          <button class="btn soft" id="btnJunkScan">扫描垃圾</button>
+          <button class="btn primary" id="btnJunkClean" disabled>送进回收站</button>
+        </div>
+      </div>
+      <div class="junk-groups" id="junkGroups"></div>
+      <div class="junk-detail" id="junkDetail" hidden>
+        <label class="junk-all">
+          <input type="checkbox" id="junkSelectAll">
+          <span>全选</span>
+        </label>
+        <div class="junk-items" id="junkItems"></div>
+      </div>
+      <p class="junk-foot" id="junkFoot">删除一律走系统回收站，可以自己恢复。</p>
+    </section>
+
+  </div><!-- /#viewCheckup -->
+
 </main>
 
 <!-- ===================== 确认对话框（启动项变更专用）===================== -->
@@ -511,5 +568,6 @@
 <script src="main.js"></script>
 <script src="boot.js"></script>
 <script src="mode.js"></script>
+<script src="checkup.js"></script>
 </body>
 </html>
