@@ -1,0 +1,7 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "老六清净主窗口的默认权限（只用 core 能力，不开放任何插件命令）",
+  "windows": ["main"],
+  "permissions": ["core:default"]
+}

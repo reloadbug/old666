@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>老六清净 old666</title>
+<link rel="icon" href="assets/mark.svg">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- ===================== 侧栏 ===================== -->
+<aside class="sidebar">
+  <div class="brand">
+    <img class="brand-mark" src="assets/mark.svg" alt="老六清净">
+    <div class="brand-text">
+      <strong>老六清净</strong>
+      <span>old666</span>
+    </div>
+  </div>
+
+  <nav class="nav">
+    <button class="nav-item active" data-view="purge">
+      <svg viewBox="0 0 24 24" class="ic"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12"/><path d="M10 11v6M14 11v6"/></svg>
+      <span>进程净化</span>
+    </button>
+    <button class="nav-item" data-view="boot">
+      <svg viewBox="0 0 24 24" class="ic"><path d="M12 3v9"/><path d="M6.5 6.5a8 8 0 1 0 11 0"/></svg>
+      <span>开机加速</span>
+    </button>
+    <button class="nav-item" data-view="mode" disabled>
+      <svg viewBox="0 0 24 24" class="ic"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+      <span>场景模式</span><em class="soon">P3</em>
+    </button>
+    <button class="nav-item" data-view="checkup" disabled>
+      <svg viewBox="0 0 24 24" class="ic"><path d="M12 21s-7-4.5-7-10a7 7 0 0 1 14 0c0 5.5-7 10-7 10z"/><path d="M12 8v4l2 2"/></svg>
+      <span>一键体检</span><em class="soon">P4</em>
+    </button>
+    <button class="nav-item" data-view="monitor" disabled>
+      <svg viewBox="0 0 24 24" class="ic"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>
+      <span>实时监控</span><em class="soon">P5</em>
+    </button>
+    <button class="nav-item" data-view="settings">
+      <svg viewBox="0 0 24 24" class="ic"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/></svg>
+      <span>设置</span>
+    </button>
+  </nav>
+
+  <div class="sidebar-foot">
+    <div class="pill" id="envPill">
+      <span class="dot" id="envDot"></span>
+      <span id="envText">检测中…</span>
+    </div>
+    <div class="ver">v<span id="verText">0.1.3</span> · 绿色便携</div>
+  </div>
+</aside>
+
+<!-- ===================== 主区 ===================== -->
+<main class="main">
+
+  <!-- 顶部状态条 -->
+  <header class="topbar">
+    <div class="topbar-title">
+      <h1 id="viewTitle">进程净化</h1>
+      <p id="viewSub">识别并结束闲置进程，释放被占用的内存</p>
+    </div>
+    <div class="topbar-right">
+      <button class="btn ghost" id="btnElevate" hidden>以管理员身份重启</button>
+      <button class="btn ghost" id="btnRefresh" title="立即刷新">
+        <svg viewBox="0 0 24 24" class="ic sm"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v5h-5"/></svg>
+        刷新
+      </button>
+    </div>
+  </header>
+
+  <!-- ===================== 视图一：进程净化 ===================== -->
+  <div class="view" id="viewPurge">
+
+  <!-- 概览卡片 -->
+  <section class="metrics">
+    <div class="metric">
+      <div class="metric-label">CPU</div>
+      <div class="metric-value" id="mCpu">—</div>
+      <div class="metric-bar"><i id="barCpu"></i></div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">内存</div>
+      <div class="metric-value" id="mMem">—</div>
+      <div class="metric-bar"><i id="barMem"></i></div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">磁盘</div>
+      <div class="metric-value" id="mDisk">—</div>
+      <div class="metric-bar"><i id="barDisk"></i></div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">网络</div>
+      <div class="metric-value" id="mNet">—</div>
+      <div class="metric-sub" id="mNetSub">↑ 0 B/s ↓ 0 B/s</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">进程</div>
+      <div class="metric-value" id="mProc">—</div>
+      <div class="metric-sub" id="mScanSub">扫描耗时 —</div>
+    </div>
+  </section>
+
+  <!-- 一键净化 主行动区 -->
+  <section class="action">
+    <button class="purge-btn" id="btnPurge">
+      <svg viewBox="0 0 24 24" class="ic lg"><path d="M13 2 4.5 13H11l-1 9 8.5-11H12l1-9z"/></svg>
+      <span class="purge-main">一键净化</span>
+      <span class="purge-sub" id="purgeHint">正在分析…</span>
+    </button>
+    <div class="action-side">
+      <button class="btn soft" id="btnTrimOnly">只释放内存</button>
+      <button class="btn soft" id="btnRollback">
+        <svg viewBox="0 0 24 24" class="ic sm"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>
+        撤销上次净化
+      </button>
+      <label class="switch">
+        <input type="checkbox" id="chkSafeMode" checked>
+        <span>保守模式（只结束明确闲置的）</span>
+      </label>
+    </div>
+  </section>
+
+  <!-- 结果横幅 -->
+  <section class="result" id="result" hidden>
+    <div class="result-head">
+      <svg viewBox="0 0 24 24" class="ic"><path d="M20 6 9 17l-5-5"/></svg>
+      <strong id="resultTitle">净化完成</strong>
+      <button class="x" id="resultClose" aria-label="关闭">×</button>
+    </div>
+    <div class="result-stats" id="resultStats"></div>
+    <div class="result-detail" id="resultDetail"></div>
+  </section>
+
+  <!-- 进程列表 -->
+  <section class="table-wrap">
+    <div class="table-head">
+      <label class="chk">
+        <input type="checkbox" id="chkAll">
+      </label>
+      <div class="filters">
+        <button class="chip active" data-filter="all">全部</button>
+        <button class="chip" data-filter="safe">可结束 <b id="cntSafe">0</b></button>
+        <button class="chip" data-filter="keep">建议保留 <b id="cntKeep">0</b></button>
+        <button class="chip" data-filter="forbidden">禁止结束 <b id="cntForbidden">0</b></button>
+      </div>
+      <input class="search" id="search" type="search" placeholder="搜索进程名…">
+    </div>
+
+    <div class="table-scroll">
+      <table class="ptable">
+        <thead>
+          <tr>
+            <th class="c-chk"></th>
+            <th class="c-name">进程</th>
+            <th class="c-cpu num">CPU</th>
+            <th class="c-mem num">内存</th>
+            <th class="c-io num">磁盘 I/O</th>
+            <th class="c-sig">签名</th>
+            <th class="c-verdict">结论</th>
+            <th class="c-act"></th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+      <div class="empty" id="empty" hidden>没有匹配的进程</div>
+    </div>
+  </section>
+
+  </div><!-- /#viewPurge -->
+
+  <!-- ===================== 视图二：开机加速 ===================== -->
+  <div class="view" id="viewBoot" hidden>
+
+    <!-- 开机时间线 -->
+    <section class="card timeline-card">
+      <div class="card-head">
+        <div>
+          <h2 class="card-title">开机耗时</h2>
+          <p class="card-sub" id="bootSub">数据来自系统自带的开机性能诊断日志</p>
+        </div>
+        <div class="card-head-right">
+          <div class="big-num" id="bootNow">—</div>
+          <div class="big-num-sub" id="bootCompare">—</div>
+        </div>
+      </div>
+
+      <div id="bootBar" class="boot-bar"></div>
+      <div id="bootLegend" class="boot-legend"></div>
+
+      <p class="boot-note" id="bootNote" hidden></p>
+
+      <div class="trend">
+        <div class="trend-title">最近 <span id="trendCount">8</span> 次开机</div>
+        <div class="trend-chart" id="trendChart"></div>
+      </div>
+    </section>
+
+    <!-- 拖慢开机的对象 -->
+    <section class="card" id="culpritCard" hidden>
+      <div class="card-head">
+        <div>
+          <h2 class="card-title">谁在拖慢开机</h2>
+          <p class="card-sub">系统标记的拖慢对象，按影响程度排序</p>
+        </div>
+      </div>
+      <ul class="culprit-list" id="culpritList"></ul>
+    </section>
+
+    <!-- 启动项管理 -->
+    <section class="card">
+      <div class="card-head">
+        <div>
+          <h2 class="card-title">启动项管理</h2>
+          <p class="card-sub" id="startupSub">正在扫描…</p>
+        </div>
+        <div class="card-head-right">
+          <button class="btn soft" id="btnStartupDelay" disabled>延迟选中项</button>
+          <button class="btn primary" id="btnStartupDisable" disabled>禁用选中项</button>
+        </div>
+      </div>
+
+      <div class="table-head startup-filter">
+        <label class="chk" title="勾选当前筛选出的、可禁用的启动项">
+          <input type="checkbox" id="chkStartupAll">
+          <span>全选</span>
+        </label>
+        <button class="btn soft sm" id="btnPickRecommended" disabled>一键选中推荐项</button>
+        <button class="btn ghost sm" id="btnClearPicked" disabled>清空选择</button>
+        <div class="filters" id="startupFilters">
+          <button class="chip active" data-src="all">全部 <b id="cntStartupAll">0</b></button>
+          <button class="chip" data-src="run_key">注册表 <b id="cntRunKey">0</b></button>
+          <button class="chip" data-src="startup_folder">启动文件夹 <b id="cntStartupFolder">0</b></button>
+          <button class="chip" data-src="service">服务 <b id="cntService">0</b></button>
+          <button class="chip" data-src="scheduled_task">计划任务 <b id="cntTask">0</b></button>
+        </div>
+        <label class="chk hide-off" title="已经在系统里关闭的启动项，不参与勾选也不影响开机">
+          <input type="checkbox" id="chkHideDisabled">
+          <span>隐藏已禁用</span>
+        </label>
+        <input class="search" id="startupSearch" type="search" placeholder="搜索启动项名称…">
+      </div>
+
+      <div class="table-scroll startup-scroll">
+        <table class="ptable stable">
+          <thead>
+            <tr>
+              <th class="c-chk"></th>
+              <th class="c-name">启动项</th>
+              <th class="c-src">来源</th>
+              <th class="c-risk">影响</th>
+              <th class="c-act"></th>
+            </tr>
+          </thead>
+          <tbody id="startupBody"></tbody>
+        </table>
+        <div class="empty" id="startupEmpty" hidden>没有匹配的启动项</div>
+      </div>
+    </section>
+
+    <!-- 还原入口 -->
+    <section class="card restore-card" id="restoreCard" hidden>
+      <div class="card-head">
+        <div>
+          <h2 class="card-title">变更记录</h2>
+          <p class="card-sub">每一条禁用都可以一键还原</p>
+        </div>
+      </div>
+      <ul class="batch-list" id="batchList"></ul>
+    </section>
+  </div><!-- /#viewBoot -->
+
+</main>
+
+<!-- ===================== 确认对话框（启动项变更专用）===================== -->
+<div class="modal-mask" id="confirmMask" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+    <header class="modal-head">
+      <h2 id="confirmTitle">确认禁用这些启动项？</h2>
+    </header>
+    <div class="modal-body">
+      <p class="modal-lead" id="confirmLead"></p>
+      <ul class="confirm-list" id="confirmList"></ul>
+      <p class="modal-hint" id="confirmHint">禁用后这些程序<b>不会</b>再随开机自动运行，你已经安装的程序本身不受影响，随时可以还原。</p>
+    </div>
+    <footer class="modal-foot">
+      <button class="btn ghost" id="confirmCancel">再想想</button>
+      <button class="btn primary" id="confirmOk">确认禁用</button>
+    </footer>
+  </div>
+</div>
+
+<!-- ===================== 启动项说明（知识库 + 名单 + 删除）===================== -->
+<div class="modal-mask" id="infoMask" hidden>
+  <div class="modal wide" role="dialog" aria-modal="true" aria-labelledby="infoTitle">
+    <header class="modal-head">
+      <h2 id="infoTitle">启动项说明</h2>
+      <span class="info-origin" id="infoOrigin"></span>
+      <button class="x" id="infoX" aria-label="关闭">×</button>
+    </header>
+    <div class="modal-body">
+      <div class="info-head">
+        <div class="info-name" id="infoName">—</div>
+        <div class="info-cmd selectable" id="infoCmd"></div>
+        <div class="info-tags" id="infoTags"></div>
+      </div>
+
+      <div class="info-kv" id="infoKv"></div>
+
+      <div class="info-advice" id="infoAdvice" hidden></div>
+
+      <div class="info-edit" id="infoEdit" hidden>
+        <label>匹配串（启动项名或 exe 名，命中即生效）
+          <input id="edKey" placeholder="如 onedrive">
+        </label>
+        <label>标题
+          <input id="edTitle" placeholder="如 OneDrive 云同步客户端">
+        </label>
+        <label>厂商 / 归属软件
+          <input id="edVendor" placeholder="如 Microsoft">
+        </label>
+        <label>综合描述（它是做什么的、禁用后会怎样）
+          <textarea id="edDesc" rows="4"></textarea>
+        </label>
+        <label>建议
+          <select id="edAdvice">
+            <option value="可以禁用">可以禁用</option>
+            <option value="谨慎处理">谨慎处理</option>
+            <option value="建议保留">建议保留</option>
+            <option value="建议禁用">建议禁用</option>
+          </select>
+        </label>
+      </div>
+
+      <p class="modal-hint" id="infoHint"></p>
+    </div>
+    <footer class="modal-foot info-foot">
+      <button class="btn ghost sm" id="infoReset" hidden>恢复内置说明</button>
+      <button class="btn ghost sm" id="infoClose">关闭</button>
+      <button class="btn soft sm" id="infoWhite">加入白名单</button>
+      <button class="btn soft sm" id="infoBlack">加入黑名单并禁用</button>
+      <button class="btn ghost sm danger" id="infoDelete">删除此启动项</button>
+      <button class="btn primary sm" id="infoEditBtn">编辑说明</button>
+      <button class="btn primary sm" id="infoSave" hidden>保存说明</button>
+    </footer>
+  </div>
+</div>
+
+<!-- ===================== 设置抽屉 ===================== -->
+<div class="drawer-mask" id="drawerMask" hidden></div>
+<aside class="drawer" id="drawer" hidden>
+  <header class="drawer-head">
+    <h2>设置</h2>
+    <button class="x" id="drawerClose" aria-label="关闭">×</button>
+  </header>
+
+  <div class="drawer-body">
+    <h3>白名单</h3>
+    <p class="hint">白名单里的进程<b>永远不会</b>被净化。系统关键进程出于安全不允许加入。</p>
+    <div class="wl-add">
+      <input id="wlInput" placeholder="输入进程名，如 notepad.exe">
+      <button class="btn primary sm" id="wlAdd">加入</button>
+    </div>
+    <ul class="wl-list" id="wlList"></ul>
+
+    <h3>启动项知识库</h3>
+    <p class="hint">
+      内置 <b id="kbBuiltin">—</b> 条说明，你补充或改写了 <b id="kbUser">0</b> 条。
+      这个文件可以直接用记事本编辑，升级程序不会覆盖你的补充。
+    </p>
+    <div class="kb-path selectable" id="kbPath"></div>
+    <ul class="wl-list" id="kbList"></ul>
+    <h3>启动项名单</h3>
+    <p class="hint">
+      白名单里的启动项不会被「一键选中推荐项」勾上；<b>黑名单</b>里的会被直接禁用，不再询问。
+    </p>
+    <div class="kb-path selectable" id="listPath"></div>
+    <ul class="wl-list" id="listRules"></ul>
+
+    <h3>运行环境</h3>
+    <dl class="env-dl" id="envDl"></dl>
+
+    <h3>净化历史</h3>
+    <ul class="snap-list" id="snapList"></ul>
+  </div>
+</aside>
+
+<div class="toast" id="toast" hidden></div>
+
+<script src="main.js"></script>
+<script src="boot.js"></script>
+</body>
+</html>

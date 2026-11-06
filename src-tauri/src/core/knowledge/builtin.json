@@ -1,0 +1,2016 @@
+[
+  {
+    "keys": [
+      "onedrive",
+      "onedrive.exe"
+    ],
+    "title": "OneDrive 云同步",
+    "vendor": "Microsoft",
+    "desc": "Windows 自带的云盘同步客户端。它负责把你指定的文件夹（桌面、文档、图片等）同步到微软云端，并显示托盘图标展示同步状态。禁用后本机照常使用，只是不再自动上传/下载改动，云端文件需要手动到网页版访问；已经同步下来的本地文件不会丢。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "microsoftedgeautolaunch",
+      "edge autolaunch"
+    ],
+    "title": "Edge 浏览器预启动",
+    "vendor": "Microsoft",
+    "desc": "让 Edge 在开机时提前加载核心进程，这样你点开浏览器时会快一点。它不打开任何窗口，但会常驻几个后台进程占用内存。禁用后只是首次打开 Edge 慢几百毫秒，其它没有任何影响。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "microsoftedgeupdate",
+      "edgeupdate",
+      "edgeupdatem"
+    ],
+    "title": "Edge 自动更新程序",
+    "vendor": "Microsoft",
+    "desc": "定时检查并安装 Edge 浏览器的新版本。禁用后浏览器版本会停留在当前，长期不更新会缺少安全补丁。如果你依赖 Edge，建议保留；平时用别的浏览器则可以禁用。",
+    "advice": "谨慎处理"
+  },
+  {
+    "keys": [
+      "securityhealth",
+      "securityhealthservice",
+      "windows security",
+      "sechealthui",
+      "mpdefendercoreservice",
+      "windefend",
+      "windowsdefender",
+      "msmpeng",
+      "msmpengnissrv",
+      "nissrv",
+      "antimalware"
+    ],
+    "title": "Windows 安全中心 / Defender",
+    "vendor": "Microsoft",
+    "desc": "系统自带的杀毒与实时防护组件，负责病毒扫描、实时监控和威胁拦截。禁用等于关掉本机的实时防护，除非你已经装了别的杀毒软件（如火绒、卡巴斯基），否则不要禁用。",
+    "advice": "建议保留"
+  },
+  {
+    "keys": [
+      "ctfmon",
+      "ctfmon.exe"
+    ],
+    "title": "输入法框架服务",
+    "vendor": "Microsoft",
+    "desc": "Windows 的文本服务框架（Text Services Framework）宿主进程，所有输入法、语音识别、手写都依赖它。禁用后会出现无法切换输入法、打不出中文等问题。属于系统必需组件。",
+    "advice": "建议保留"
+  },
+  {
+    "keys": [
+      "searchindexer",
+      "wsearch",
+      "windowss search",
+      "searchapp",
+      "searchhost"
+    ],
+    "title": "Windows 搜索索引",
+    "vendor": "Microsoft",
+    "desc": "为开始菜单、文件资源管理器和 Outlook 建立文件内容索引，让搜索能秒出结果。它会持续读取磁盘。禁用后搜索会变得很慢（退回逐文件扫描），但在机械硬盘或低配机器上能明显减少后台磁盘占用。",
+    "advice": "谨慎处理"
+  },
+  {
+    "keys": [
+      "sysmain",
+      "superfetch"
+    ],
+    "title": "SysMain（旧称 Superfetch）",
+    "vendor": "Microsoft",
+    "desc": "提前把常用程序的数据读进内存，让程序启动更快。在机械硬盘上效果明显，在固态硬盘上收益很小却会持续占用内存和磁盘。SSD 用户可以放心禁用。",
+    "advice": "谨慎处理"
+  },
+  {
+    "keys": [
+      "runtimebroker"
+    ],
+    "title": "RuntimeBroker（应用权限中转）",
+    "vendor": "Microsoft",
+    "desc": "为微软商店应用（UWP）做权限中转，比如让应用访问摄像头、文件时由它代劳。它会随商店应用的运行而批量出现，属于正常的系统行为，不是异常进程。",
+    "advice": "建议保留"
+  },
+  {
+    "keys": [
+      "explorer",
+      "explorer.exe"
+    ],
+    "title": "Windows 资源管理器 / 桌面",
+    "vendor": "Microsoft",
+    "desc": "这是你的桌面、任务栏和文件窗口本身。结束它等于桌面瞬间消失（虽然能自动重启）。绝对不要禁用或结束。",
+    "advice": "建议保留"
+  },
+  {
+    "keys": [
+      "sihost",
+      "shellexperiencehost",
+      "startmenuexperiencehost",
+      "textinputhost",
+      "applicationframehost"
+    ],
+    "title": "Windows Shell 体验组件",
+    "vendor": "Microsoft",
+    "desc": "支撑开始菜单、任务栏弹出面板、文本输入等界面外壳。结束会导致开始菜单打不开或界面闪烁。属于系统必需组件。",
+    "advice": "建议保留"
+  },
+  {
+    "keys": [
+      "yourphone",
+      "phoneexperiencehost",
+      "crossdevice"
+    ],
+    "title": "手机连接（你的手机）",
+    "vendor": "Microsoft",
+    "desc": "把安卓/iPhone 的短信、通知、照片投到电脑上。不用这个功能的话，它就是纯后台占用。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "teams",
+      "ms-teams",
+      "msteams"
+    ],
+    "title": "Microsoft Teams",
+    "vendor": "Microsoft",
+    "desc": "微软的团队协作与会议软件。开机自启是为了让你不漏掉消息和来电。不用 Teams 办公的话可以禁用，禁用后需要时手动打开即可。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "cortana"
+    ],
+    "title": "Cortana 语音助手",
+    "vendor": "Microsoft",
+    "desc": "微软的语音助手。Windows 11 已基本停用该功能，残留在旧系统上的自启项通常是升级遗留。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "gamebar",
+      "xboxgamebar",
+      "gamingservices",
+      "gamingservicesnet",
+      "xboxgip",
+      "gameinput",
+      "xblauthmanager",
+      "xblgamesave"
+    ],
+    "title": "Xbox 游戏服务组件",
+    "vendor": "Microsoft",
+    "desc": "为 Xbox 应用、游戏录制、手柄支持提供后台服务。如果你不用 Xbox 应用、不录制游戏、也不用 Xbox 手柄，禁用可以省下一点内存，但少数游戏（尤其微软商店版）可能因此无法启动。",
+    "advice": "谨慎处理"
+  },
+  {
+    "keys": [
+      "wuauserv",
+      "windows update",
+      "usosvc",
+      "wuauclt",
+      "mousocoreworker",
+      "trustedinstaller"
+    ],
+    "title": "Windows 更新服务",
+    "vendor": "Microsoft",
+    "desc": "负责下载和安装系统补丁、驱动更新。禁用后系统会长期拿不到安全修复，风险较高。建议保留服务本身，只在需要时手动暂停更新。",
+    "advice": "建议保留"
+  },
+  {
+    "keys": [
+      "spoolsv",
+      "printnotify",
+      "print spooler"
+    ],
+    "title": "打印后台处理程序",
+    "vendor": "Microsoft",
+    "desc": "管理打印队列和打印任务。没有打印机或不打印的话，这个服务历史上出过安全漏洞（PrintNightmare），禁用反而更安全。要用打印机时需重新打开。",
+    "advice": "谨慎处理"
+  },
+  {
+    "keys": [
+      "audiodg"
+    ],
+    "title": "Windows 音频设备图形隔离",
+    "vendor": "Microsoft",
+    "desc": "负责音频效果处理。结束它会导致当前播放的声音短暂中断。属于系统音频链路的正常组件。",
+    "advice": "建议保留"
+  },
+  {
+    "keys": [
+      "searchhighlights",
+      "tips",
+      "windowstips"
+    ],
+    "title": "Windows 使用提示",
+    "vendor": "Microsoft",
+    "desc": "推送 Windows 的功能介绍与使用建议，偶尔会弹出提示框。纯属推广性质，禁用没有任何副作用。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "widgets",
+      "widgetservice",
+      "windowswebexperience"
+    ],
+    "title": "Windows 小组件（资讯面板）",
+    "vendor": "Microsoft",
+    "desc": "任务栏左侧的小组件按钮，背后是资讯聚合面板，会持续联网拉取内容。禁用后组件按钮不再显示内容，可显著减少后台流量与内存占用。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "chat",
+      "windowscopilot",
+      "copilot"
+    ],
+    "title": "Windows Copilot / Chat",
+    "vendor": "Microsoft",
+    "desc": "微软的 AI 助手入口，常驻后台并联网。不用 AI 助手的话可以禁用，不影响系统其它功能。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "sogou",
+      "sgtool",
+      "sogouinput",
+      "sogoucloud",
+      "pinyinup",
+      "sogouimebroker"
+    ],
+    "title": "搜狗输入法组件",
+    "vendor": "搜狗",
+    "desc": "搜狗输入法的后台组件（云输入、升级、皮肤、推送等）。注意：输入法主程序（SogouInput.exe / SGTool.exe）不建议禁用，否则可能无法打字；但「SogouCloud」「升级」「推送」这类附属组件禁用后对打字无影响，还能去掉弹窗。",
+    "advice": "谨慎处理"
+  },
+  {
+    "keys": [
+      "iflyinput",
+      "iflyime",
+      "iflyinputmethod",
+      "xunfei"
+    ],
+    "title": "讯飞输入法",
+    "vendor": "科大讯飞",
+    "desc": "讯飞输入法的后台组件。如果你正在用它打字，禁用会导致输入法失效；只是装了没用过则可以直接禁用。",
+    "advice": "谨慎处理"
+  },
+  {
+    "keys": [
+      "qqpinyin",
+      "qqinput",
+      "qqime"
+    ],
+    "title": "QQ 输入法",
+    "vendor": "腾讯",
+    "desc": "腾讯 QQ 输入法的后台进程。正在使用它打字时不要禁用，否则会打不出字。",
+    "advice": "谨慎处理"
+  },
+  {
+    "keys": [
+      "baiduime",
+      "baidu input"
+    ],
+    "title": "百度输入法",
+    "vendor": "百度",
+    "desc": "百度输入法的后台组件。使用中禁用会导致输入法失效。",
+    "advice": "谨慎处理"
+  },
+  {
+    "keys": [
+      "weaselserver",
+      "rime"
+    ],
+    "title": "小狼毫（Rime）输入法",
+    "vendor": "Rime 开源项目",
+    "desc": "开源输入法 Rime 的后台服务，负责词库与方案加载。禁用后输入法无法工作。",
+    "advice": "谨慎处理"
+  },
+  {
+    "keys": [
+      "qqprotect",
+      "qqprotect.exe",
+      "txplatform",
+      "qqexternal",
+      "qqsafe"
+    ],
+    "title": "QQ 安全防护组件",
+    "vendor": "腾讯",
+    "desc": "QQ 自带的安全防护模块（QQProtect），用于拦截盗号木马。禁用不影响 QQ 的聊天、收发文件等核心功能，但会失去 QQ 自身的一层保护。属于典型的「可以禁掉、影响极小」项。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "qq",
+      "qq.exe",
+      "qqnt"
+    ],
+    "title": "腾讯 QQ",
+    "vendor": "腾讯",
+    "desc": "QQ 主程序。自启是为了让你一开机就能收到消息。禁用后需要手动打开 QQ，不会丢失任何聊天记录。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "wechat",
+      "weixin",
+      "wechat.exe",
+      "wechatappex"
+    ],
+    "title": "微信 / WeChat",
+    "vendor": "腾讯",
+    "desc": "微信电脑版主程序。自启是为了后台收消息。禁用后需要手动打开，消息会在打开时补齐，不会丢失。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "dingtalk",
+      "dingtalkupdater"
+    ],
+    "title": "钉钉",
+    "vendor": "阿里巴巴",
+    "desc": "钉钉办公软件，自启用于接收消息、日程提醒。不用钉钉办公的话可以放心禁用。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "feishu",
+      "lark",
+      "feishuupdater"
+    ],
+    "title": "飞书 / Lark",
+    "vendor": "字节跳动",
+    "desc": "飞书协作办公套件。自启用于消息与日程推送。不使用时可以禁用。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "wpscloudsvr",
+      "wpsupdate",
+      "wpscenter",
+      "wpsnotify",
+      "ksomisc"
+    ],
+    "title": "WPS Office 附属组件",
+    "vendor": "金山办公",
+    "desc": "WPS 的云文档同步、自动更新、推送提醒等附属模块。禁用后 WPS 文档编辑功能完全不受影响，只是不再后台同步云盘和自动更新。注意不要禁用 WPS 的输入法或内核组件。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "wps",
+      "wpp",
+      "wpscloud",
+      "kingsoft office"
+    ],
+    "title": "WPS Office 主组件",
+    "vendor": "金山办公",
+    "desc": "WPS 的表格 / 文字 / 演示主程序。作为开机自启项出现时通常是预加载，禁用后只是首次打开稍慢。",
+    "advice": "谨慎处理"
+  },
+  {
+    "keys": [
+      "thunder",
+      "downloadsdkserver",
+      "xldl",
+      "thunderplatform",
+      "xunlei",
+      "xlwfp"
+    ],
+    "title": "迅雷下载组件",
+    "vendor": "迅雷",
+    "desc": "迅雷的后台服务与下载加速模块，自启后会在后台常驻并上传分享（P2P）。不用迅雷时禁用可以明显减少后台上传和磁盘占用。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "baidunetdisk",
+      "yunguanjia",
+      "baiduyunguanjia"
+    ],
+    "title": "百度网盘",
+    "vendor": "百度",
+    "desc": "百度网盘客户端与其「云管家」后台组件。自启用于自动备份与同步。禁用后不会自动上传备份，需要时手动打开即可。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "aliworkbench",
+      "alitalk",
+      "alibaba",
+      "taobaoprotect"
+    ],
+    "title": "阿里旺旺 / 千牛",
+    "vendor": "阿里巴巴",
+    "desc": "阿里系商家与买家聊天工具的常驻组件。不做电商客服的话通常用不到。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "cloudmusic",
+      "neteasecloudmusic"
+    ],
+    "title": "网易云音乐",
+    "vendor": "网易",
+    "desc": "网易云音乐客户端的后台常驻，用于托盘控制与开机启动播放。禁用后需要手动打开。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "qqmusic",
+      "qqmusicupd"
+    ],
+    "title": "QQ 音乐",
+    "vendor": "腾讯",
+    "desc": "QQ 音乐客户端的后台常驻与更新组件。不影响听歌，只是需要手动打开。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "iqiyi",
+      "qiyi",
+      "iqiyiclient"
+    ],
+    "title": "爱奇艺",
+    "vendor": "爱奇艺",
+    "desc": "爱奇艺客户端的后台常驻组件，部分版本会常驻加速服务。禁用后不影响到网页或手动打开观看。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "tencentvideo",
+      "qqlive",
+      "tencentvideoupdate"
+    ],
+    "title": "腾讯视频",
+    "vendor": "腾讯",
+    "desc": "腾讯视频客户端后台常驻与更新组件。禁用只影响自动更新。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "bilibili",
+      "bili",
+      "bilibilipush"
+    ],
+    "title": "哔哩哔哩",
+    "vendor": "哔哩哔哩",
+    "desc": "B 站客户端的后台常驻组件。禁用后需要手动打开客户端。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "360safe",
+      "360tray",
+      "360se",
+      "360safeguard",
+      "zhudongfangyu",
+      "360sd",
+      "360leakfixer",
+      "360helper"
+    ],
+    "title": "360 安全卫士组件",
+    "vendor": "奇虎 360",
+    "desc": "360 安全卫士的主程序、托盘与主动防御模块。它会常驻多个进程并持续扫描。如果你在用 360 做杀毒，禁用会失去实时防护；如果只是被捆绑安装进来的，可以放心禁用。",
+    "advice": "谨慎处理"
+  },
+  {
+    "keys": [
+      "kingsoft",
+      "kav",
+      "kxescore",
+      "kwsprotect64",
+      "kwatch",
+      "duba"
+    ],
+    "title": "金山毒霸组件",
+    "vendor": "金山",
+    "desc": "金山毒霸的防护与托盘组件。正在用它做杀毒时禁用会失去防护；被捆绑安装的可以禁用。",
+    "advice": "谨慎处理"
+  },
+  {
+    "keys": [
+      "huorong",
+      "hipsdaemon",
+      "huorongsecurity",
+      "sysdiag"
+    ],
+    "title": "火绒安全",
+    "vendor": "火绒",
+    "desc": "火绒安全软件的守护进程，负责实时防护与主动防御。它本身以轻量著称，建议保留 —— 禁用等于关掉杀毒。",
+    "advice": "建议保留"
+  },
+  {
+    "keys": [
+      "drivergenius",
+      "drivergeniusupd",
+      "drivergeniusassist"
+    ],
+    "title": "驱动精灵",
+    "vendor": "驱动精灵",
+    "desc": "驱动管理与更新工具，自启用于检测驱动更新。这类国产驱动工具常带推广与后台常驻，驱动装好后可以禁用。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "drivetheme",
+      "drivethemeupd",
+      "drivethemeassist"
+    ],
+    "title": "驱动人生",
+    "vendor": "驱动人生",
+    "desc": "驱动管理工具的后台常驻与更新组件。驱动装好后不需要常驻。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "ludashi",
+      "ludashiupdate"
+    ],
+    "title": "鲁大师",
+    "vendor": "鲁大师",
+    "desc": "硬件检测与跑分工具，自启用于后台监测温度与性能。它会持续读取硬件传感器，长期常驻没必要。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "updater",
+      "update.exe",
+      "autoupdate",
+      "autoupdater"
+    ],
+    "title": "软件自动更新程序",
+    "vendor": "（按名称推断）",
+    "generic": true,
+    "desc": "名字里带 updater / update 的第三方软件更新组件，负责后台检查并下载新版本。一般不影响软件主体使用，禁用后停留在当前版本。但「更新程序」这个名字很常见，落到具体某个程序上是否安全，还要看它属于谁。",
+    "advice": "谨慎处理"
+  },
+  {
+    "keys": [
+      "assistant",
+      "helper",
+      "oem",
+      "tray",
+      "prelaunch",
+      "presence",
+      "setup"
+    ],
+    "title": "厂商助手 / 预装组件",
+    "vendor": "（按名称推断）",
+    "generic": true,
+    "desc": "名字里带 assistant / helper / tray 一类的附属程序，通常是厂商的预装助手、托盘图标或预加载器，多数只做活动提醒与快捷入口。仅凭名字无法确定它的具体用途，禁用前请先确认它是哪个软件的组件。",
+    "advice": "谨慎处理"
+  },
+  {
+    "keys": [
+      "push",
+      "news",
+      "promotion",
+      "advert",
+      "hotspot",
+      "infoflow"
+    ],
+    "title": "资讯推送 / 推广组件",
+    "vendor": "（按名称推断）",
+    "generic": true,
+    "desc": "名字里带 push / news / advert 一类的推送组件，通常常驻内存并定时联网拉取资讯与广告。这类组件一般可以关掉，但同样建议先确认它属于哪个软件。",
+    "advice": "谨慎处理"
+  },
+  {
+    "keys": [
+      "gamecenter",
+      "gamemanager",
+      "gamelobby",
+      "wegame"
+    ],
+    "title": "厂商游戏中心",
+    "vendor": "（随所属软件）",
+    "desc": "厂商的游戏平台或游戏中心，自启用于常驻加速、消息推送。不玩它家游戏时可以禁用。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "steam",
+      "steamwebhelper"
+    ],
+    "title": "Steam 客户端",
+    "vendor": "Valve",
+    "desc": "Steam 平台客户端，自启用于后台下载更新与好友消息。禁用后游戏照常玩（直接启动游戏或用 Steam 时手动打开）。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "epicgameslauncher",
+      "epicwebhelper",
+      "epicgames"
+    ],
+    "title": "Epic Games Launcher",
+    "vendor": "Epic Games",
+    "desc": "Epic 游戏平台客户端，自启用于后台更新。和 Steam 一样，禁用后需要手动打开。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "battle.net",
+      "battlenet",
+      "blizzard",
+      "agent.exe"
+    ],
+    "title": "战网（Battle.net）",
+    "vendor": "暴雪",
+    "desc": "暴雪游戏平台的更新程序与客户端，自启用于预下载补丁。不常玩暴雪游戏时可禁用。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "discord",
+      "discordupdate"
+    ],
+    "title": "Discord",
+    "vendor": "Discord",
+    "desc": "语音与社群聊天软件，自启用于保持在线与接收消息。禁用后不会错过历史消息，只是不在线。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "spotify"
+    ],
+    "title": "Spotify",
+    "vendor": "Spotify",
+    "desc": "音乐流媒体客户端，自启用于快速唤起与托盘控制。禁用不影响播放（手动打开即可）。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "slack"
+    ],
+    "title": "Slack",
+    "vendor": "Slack",
+    "desc": "团队沟通工具，自启用于接收消息提醒。不用 Slack 时可以禁用。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "zoom"
+    ],
+    "title": "Zoom",
+    "vendor": "Zoom",
+    "desc": "视频会议软件，自启用于快速入会提醒。不常开会时可以禁用，需要时手动打开。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "teamviewer"
+    ],
+    "title": "TeamViewer",
+    "vendor": "TeamViewer",
+    "desc": "远程控制软件。自启是为了让你能从外部随时连上这台机器。如果你不需要别人远程访问它，禁用更安全（远程工具常被滥用）。需要时手动启动即可。",
+    "advice": "谨慎处理"
+  },
+  {
+    "keys": [
+      "anydesk"
+    ],
+    "title": "AnyDesk",
+    "vendor": "AnyDesk",
+    "desc": "轻量远程控制软件。同 TeamViewer：不需要随时被远程就连通的话，禁用更安全。",
+    "advice": "谨慎处理"
+  },
+  {
+    "keys": [
+      "sunloginclient",
+      "oray",
+      "sunlogin"
+    ],
+    "title": "向日葵远程控制",
+    "vendor": "贝锐",
+    "desc": "国产远程控制软件，自启后本机可被外部随时连入。不做远程运维的话建议禁用 —— 这类工具是攻击面。",
+    "advice": "谨慎处理"
+  },
+  {
+    "keys": [
+      "todesk"
+    ],
+    "title": "ToDesk",
+    "vendor": "ToDesk",
+    "desc": "国产远程控制软件，自启后可被外部随时连入。不需要远程访问时建议禁用。",
+    "advice": "谨慎处理"
+  },
+  {
+    "keys": [
+      "adobe creative cloud",
+      "creative cloud",
+      "ccxprocess",
+      "adobegcclient",
+      "adobeipcbroker",
+      "coresync",
+      "adobe acrobat"
+    ],
+    "title": "Adobe 创意云组件",
+    "vendor": "Adobe",
+    "desc": "Adobe Creative Cloud 的后台同步、正版校验（GCClient）、进程间通信组件。它们与 Photoshop 等软件能否正常编辑无关，只是负责云同步与授权检查。禁用可以省下明显的常驻内存和 CPU。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "dropbox"
+    ],
+    "title": "Dropbox 同步",
+    "vendor": "Dropbox",
+    "desc": "Dropbox 云盘同步客户端。禁用后不再自动同步，云端文件需要手动访问。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "googledrive",
+      "googledrivefs",
+      "google drive",
+      "googledrivesync"
+    ],
+    "title": "Google Drive 同步",
+    "vendor": "Google",
+    "desc": "谷歌云盘同步客户端（Drive for desktop）。禁用后不再自动同步，本地文件不受影响。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "googleupdate",
+      "googlecrashhandler",
+      "googleupdater"
+    ],
+    "title": "Google 更新程序",
+    "vendor": "Google",
+    "desc": "Chrome 等谷歌软件的静默更新组件，会常驻两三个进程并定时联网。禁用后浏览器不再自动更新（会缺少安全补丁）。",
+    "advice": "谨慎处理"
+  },
+  {
+    "keys": [
+      "docker",
+      "com.docker",
+      "dockerd"
+    ],
+    "title": "Docker Desktop",
+    "vendor": "Docker",
+    "desc": "容器运行时。开机自启会拉起一个 Linux 虚拟机，占用大量内存和磁盘 IO。不用容器开发时禁用能省下 1 GB 以上的内存。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "code",
+      "visual studio code",
+      "vscode"
+    ],
+    "title": "Visual Studio Code",
+    "vendor": "Microsoft",
+    "desc": "代码编辑器。通常不需要开机自启，禁用后手动打开即可。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "notion"
+    ],
+    "title": "Notion",
+    "vendor": "Notion",
+    "desc": "笔记与知识库工具，自启用于快速唤起。禁用不影响数据同步（打开时会拉取）。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "obsidian"
+    ],
+    "title": "Obsidian",
+    "vendor": "Obsidian",
+    "desc": "本地 Markdown 笔记工具。数据在本地，禁用自启不会丢任何内容。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "kmplayer",
+      "potplayer",
+      "vlc"
+    ],
+    "title": "本地播放器",
+    "vendor": "（随软件）",
+    "desc": "视频播放器客户端。自启通常只是为了托盘图标或文件关联，禁用没有任何影响。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "nvidia share",
+      "nvidia overlay",
+      "nvidia geforce experience",
+      "geforce experience",
+      "nvbackend",
+      "nvtelemetrycontainer",
+      "nvcplui"
+    ],
+    "title": "NVIDIA 附加组件",
+    "vendor": "NVIDIA",
+    "desc": "NVIDIA 的录屏（Share / Overlay）、性能面板（GeForce Experience）等附加模块。**它们与显卡驱动本身无关** —— 禁掉不会影响游戏画面与性能，只会失去录屏、一键优化游戏设置、驱动自动更新等功能。注意：带 nvlddmkm、DisplayDriver 字样的驱动服务，以及 nvidia display container，都属于驱动本体，不要动。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "nvcontainer",
+      "nvidia container"
+    ],
+    "title": "NVIDIA 容器服务",
+    "vendor": "NVIDIA",
+    "desc": "NVIDIA 驱动用来托管各附加模块的容器进程（NvContainerLocalSystem）。它本身是驱动体系的一部分，禁掉可能让 NVIDIA 控制面板打不开。一般建议保留。",
+    "advice": "谨慎处理"
+  },
+  {
+    "keys": [
+      "amdnoisesuppression",
+      "amdrsserv",
+      "radeonsoftware",
+      "amdfendr",
+      "amdow",
+      "radeon"
+    ],
+    "title": "AMD Radeon 软件",
+    "vendor": "AMD",
+    "desc": "AMD 显卡的驱动控制面板、降噪、录制等附加功能。禁用后显卡驱动照常工作，只是控制面板和录制功能不可用。",
+    "advice": "谨慎处理"
+  },
+  {
+    "keys": [
+      "igfxtray",
+      "igfxpers",
+      "igfxem",
+      "intelgraphics",
+      "intelcphdcpsvc",
+      "igccservice"
+    ],
+    "title": "Intel 显卡组件",
+    "vendor": "Intel",
+    "desc": "Intel 核显的托盘图标、显示增强与热键支持。禁掉通常只影响托盘图标与部分快捷键，显示输出不受影响。",
+    "advice": "谨慎处理"
+  },
+  {
+    "keys": [
+      "rtkauduservice",
+      "realtek",
+      "rtkaudioservice"
+    ],
+    "title": "Realtek 音频服务",
+    "vendor": "Realtek",
+    "desc": "主板/笔记本板载声卡的驱动服务，负责音频设备的插拔检测与音效。禁用后可能出现没有声音或耳机插入不识别。建议保留。",
+    "advice": "建议保留"
+  },
+  {
+    "keys": [
+      "logioptions",
+      "logibolt",
+      "logitech",
+      "lghub",
+      "logi options"
+    ],
+    "title": "罗技外设驱动",
+    "vendor": "Logitech",
+    "desc": "罗技鼠标/键盘的自定义按键、宏、灯光配置服务。禁用后设备照常使用，但自定义按键、DPI 配置、灯光会失效。",
+    "advice": "谨慎处理"
+  },
+  {
+    "keys": [
+      "razer",
+      "rzaction",
+      "synapse",
+      "rzupdate"
+    ],
+    "title": "雷蛇外设驱动",
+    "vendor": "Razer",
+    "desc": "雷蛇设备的灯光与宏配置服务。禁用后设备可以正常使用，只是灯光效果和宏会失效。这类软件常驻内存较大。",
+    "advice": "谨慎处理"
+  },
+  {
+    "keys": [
+      "corsair",
+      "icue",
+      "corsairservice"
+    ],
+    "title": "海盗船 iCUE",
+    "vendor": "Corsair",
+    "desc": "海盗船外设与散热器的灯效、风扇曲线控制。禁用后硬件照常工作（风扇走主板默认曲线），只是不能自定义。",
+    "advice": "谨慎处理"
+  },
+  {
+    "keys": [
+      "armoury crate",
+      "asusupdate",
+      "asusservice",
+      "asusgpu"
+    ],
+    "title": "华硕 Armoury Crate",
+    "vendor": "华硕",
+    "desc": "华硕主板的灯效、风扇与性能模式控制软件。它常驻内存较大且会联网。禁用后主板功能正常，只是不能软件调灯效和风扇曲线。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "msi afterburner",
+      "msicenter",
+      "msi app player"
+    ],
+    "title": "微星（MSI）配套软件",
+    "vendor": "微星",
+    "desc": "微星的显卡超频、主板灯效、音效增强等配套工具。禁用后硬件正常工作，只失去软件层的调节能力。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "lenovo",
+      "vantage",
+      "lenovoservice"
+    ],
+    "title": "联想 Lenovo Vantage",
+    "vendor": "联想",
+    "desc": "联想笔记本的驱动更新、电池养护、Fn 快捷键支持。禁用后 Fn 功能键（亮度、音量）可能失效，电池养护模式也会停用。",
+    "advice": "谨慎处理"
+  },
+  {
+    "keys": [
+      "dell",
+      "dellcommand",
+      "dellupdate",
+      "supportassist"
+    ],
+    "title": "戴尔 SupportAssist",
+    "vendor": "戴尔",
+    "desc": "戴尔机器的驱动更新与技术支持工具，常驻内存并联网检测。驱动装好后可以禁用，只是不再自动提示更新。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "hpsupport",
+      "hpsysinfo",
+      "hewlett",
+      "hp support assistant"
+    ],
+    "title": "惠普（HP）配套软件",
+    "vendor": "惠普",
+    "desc": "惠普机器的支持助手与驱动更新组件。驱动装好后可以禁用。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "wallpaper engine",
+      "wallpaperengine"
+    ],
+    "title": "Wallpaper Engine 动态壁纸",
+    "vendor": "Wallpaper Engine",
+    "desc": "动态壁纸引擎，会持续渲染占用 GPU 与显存。开机自启只是为了让壁纸尽早生效。省电或玩游戏时可以禁用。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "autohotkey",
+      "ahk"
+    ],
+    "title": "AutoHotkey 脚本",
+    "vendor": "AutoHotkey",
+    "desc": "你自己（或别人）写的键盘鼠标自动化脚本。禁用后脚本不再运行，热键失效。**如果是你不认识的 AHK 脚本，建议先查清来源再决定。**",
+    "advice": "谨慎处理"
+  },
+  {
+    "keys": [
+      "rainmeter"
+    ],
+    "title": "Rainmeter 桌面小工具",
+    "vendor": "Rainmeter",
+    "desc": "桌面美化与信息面板工具，会持续刷新并绘制桌面组件。禁用后桌面恢复干净，省一点 CPU 与 GPU。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "lm studio",
+      "lmstudio"
+    ],
+    "title": "LM Studio",
+    "vendor": "LM Studio",
+    "desc": "本地大模型运行环境，体积很大（几百 MB）。开机自启会把模型服务拉起来占内存。不用本地模型时可以禁用。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "ollama"
+    ],
+    "title": "Ollama",
+    "vendor": "Ollama",
+    "desc": "本地大模型运行时，自启后常驻并占用显存/内存。不用本地模型时禁用可以省下可观资源。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "frpc",
+      "frps",
+      "ngrok",
+      "cloudflared"
+    ],
+    "title": "内网穿透 / 隧道工具",
+    "vendor": "第三方",
+    "desc": "把本机服务暴露到公网的反向代理客户端。如果这台机器不是服务器，或者你不清楚这条隧道是给谁用的，**建议禁用并检查来源** —— 它意味着外部可以直接访问你的机器。",
+    "advice": "谨慎处理"
+  },
+  {
+    "keys": [
+      "vmware",
+      "vmwaretray",
+      "vmware-authd",
+      "vmware-usbarbitrator"
+    ],
+    "title": "VMware 虚拟机组件",
+    "vendor": "VMware",
+    "desc": "VMware 的托盘、授权与 USB 设备直通服务。不开虚拟机时不需要常驻，但禁用后虚拟机可能无法直通 USB 设备。",
+    "advice": "谨慎处理"
+  },
+  {
+    "keys": [
+      "virtualbox",
+      "vboxsvc"
+    ],
+    "title": "VirtualBox 服务",
+    "vendor": "Oracle",
+    "desc": "VirtualBox 的后台服务，用于支持虚拟机网络与 USB。不用虚拟机时可以禁用。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "electron",
+      "cefsharp",
+      "chromium"
+    ],
+    "title": "Electron / Chromium 应用",
+    "vendor": "（随所属软件）",
+    "desc": "用 Electron 或 Chromium 内核打包的桌面应用（如 VS Code、Discord、飞书等）。这类应用**常驻内存普遍偏大**，因为每个窗口都是一个浏览器进程。如果它不是你每天都在用的软件，禁用自启省内存的效果最明显。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "node",
+      "node.exe"
+    ],
+    "title": "Node.js 运行时",
+    "vendor": "OpenJS Foundation",
+    "desc": "JavaScript 运行时。作为开机启动项出现时，通常是某个开发工具或脚本在用它。如果没有对应的开发环境需求，禁用即可。",
+    "advice": "谨慎处理"
+  },
+  {
+    "keys": [
+      "python",
+      "pythonw",
+      "python.exe"
+    ],
+    "title": "Python 脚本",
+    "vendor": "Python 基金会",
+    "desc": "某个用 Python 写的自启脚本。禁用后脚本不再运行。**请先确认这是你自己装的还是某个软件附带的** —— 来源不明的 Python 自启脚本值得警惕。",
+    "advice": "谨慎处理"
+  },
+  {
+    "keys": [
+      "powershell",
+      "pwsh",
+      "mshta",
+      "wscript",
+      "cscript",
+      "rundll32"
+    ],
+    "title": "脚本宿主 / 命令行启动项",
+    "vendor": "Microsoft",
+    "desc": "通过 PowerShell、mshta、脚本宿主或 rundll32 启动的条目。这类写法**本身是合法的**（很多正规软件也用），但因为容易被滥用（隐藏窗口、编码命令），所以需要你确认来源。打开它的「命令行」看一眼：如果指向你认识的软件目录就没事，指向临时目录就该警惕。",
+    "advice": "谨慎处理"
+  },
+  {
+    "keys": [
+      "scheduler",
+      "taskeng",
+      "taskhostw"
+    ],
+    "title": "任务计划宿主",
+    "vendor": "Microsoft",
+    "desc": "Windows 任务计划的宿主进程，负责按计划触发各种任务。它代表的是「计划任务」这个机制本身，不是某个具体软件。通常不建议改动。",
+    "advice": "建议保留"
+  },
+  {
+    "keys": [
+      "mobsync",
+      "mobile devices",
+      "wmpnscfg"
+    ],
+    "title": "移动设备同步 / 媒体共享",
+    "vendor": "Microsoft",
+    "desc": "Windows 旧的移动设备同步与媒体库共享组件。现代系统上基本用不到，禁用无副作用。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "wermgr",
+      "werfault",
+      "windows error reporting"
+    ],
+    "title": "Windows 错误报告",
+    "vendor": "Microsoft",
+    "desc": "程序崩溃时收集并上传错误报告给微软。禁用后程序崩溃照样崩，只是不再上传报告。对日常使用没有影响。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "dwm",
+      "dwm.exe"
+    ],
+    "title": "桌面窗口管理器（DWM）",
+    "vendor": "Microsoft",
+    "desc": "负责窗口合成、透明效果、动画的渲染。是所有窗口能显示出来的基础。绝对不要禁用。",
+    "advice": "建议保留"
+  },
+  {
+    "keys": [
+      "lsass",
+      "services.exe",
+      "wininit",
+      "winlogon",
+      "csrss",
+      "smss",
+      "svchost"
+    ],
+    "title": "Windows 核心系统进程",
+    "vendor": "Microsoft",
+    "desc": "登录验证、服务管理、会话管理、系统初始化等核心组件。它们一旦被结束，系统会立刻蓝屏或强制重启。属于绝对不可动的部分。",
+    "advice": "建议保留"
+  },
+  {
+    "keys": [
+      "audiosrv",
+      "audioendpointbuilder"
+    ],
+    "title": "Windows 音频服务",
+    "vendor": "Microsoft",
+    "desc": "管理音频设备与音效端点。禁用后系统会完全没有声音。请保留。",
+    "advice": "建议保留"
+  },
+  {
+    "keys": [
+      "dhcp",
+      "dnscache",
+      "nsi",
+      "nlasvc",
+      "netprofm"
+    ],
+    "title": "网络基础服务（DHCP / DNS 缓存）",
+    "vendor": "Microsoft",
+    "desc": "自动获取 IP 地址、缓存域名解析结果、识别网络类型。禁用后大概率直接断网。请保留。",
+    "advice": "建议保留"
+  },
+  {
+    "keys": [
+      "rpceptmapper",
+      "rpcss",
+      "dcomlaunch"
+    ],
+    "title": "RPC 远程过程调用",
+    "vendor": "Microsoft",
+    "desc": "Windows 各组件之间通信的基础设施，几乎一切服务都依赖它。禁用会导致系统大面积异常。请保留。",
+    "advice": "建议保留"
+  },
+  {
+    "keys": [
+      "eventlog",
+      "wevtsvc"
+    ],
+    "title": "Windows 事件日志",
+    "vendor": "Microsoft",
+    "desc": "记录系统与应用的运行日志。很多服务依赖它。禁用会导致系统无法正常启动。请保留。",
+    "advice": "建议保留"
+  },
+  {
+    "keys": [
+      "plugplay",
+      "deviceinstall"
+    ],
+    "title": "即插即用 / 设备安装",
+    "vendor": "Microsoft",
+    "desc": "识别新插入的硬件并安装驱动。禁用后插 U 盘、接显示器都可能没反应。请保留。",
+    "advice": "建议保留"
+  },
+  {
+    "keys": [
+      "themes",
+      "uxsms",
+      "profSvc",
+      "profsvc",
+      "user manager"
+    ],
+    "title": "主题 / 用户配置文件服务",
+    "vendor": "Microsoft",
+    "desc": "管理桌面主题、视觉样式与用户配置文件加载。禁用后登录可能失败或界面异常。请保留。",
+    "advice": "建议保留"
+  },
+  {
+    "keys": [
+      "w32time",
+      "tzautoupdate",
+      "windows time"
+    ],
+    "title": "Windows 时间同步",
+    "vendor": "Microsoft",
+    "desc": "与网络时间服务器同步系统时间。时间不准会导致 HTTPS 证书校验失败、双因素认证失败。建议保留。",
+    "advice": "建议保留"
+  },
+  {
+    "keys": [
+      "bits",
+      "dosvc",
+      "deliveryoptimization"
+    ],
+    "title": "后台智能传输 / 交付优化",
+    "vendor": "Microsoft",
+    "desc": "负责后台下载系统更新，并在局域网内与其它电脑分享更新缓存（P2P）。它会占用一定的上传带宽。用 SSD/不限流量的环境可以保留；限流量或网络敏感时可以改为「仅本机」策略。",
+    "advice": "谨慎处理"
+  },
+  {
+    "keys": [
+      "wscsvc",
+      "security center"
+    ],
+    "title": "安全中心服务",
+    "vendor": "Microsoft",
+    "desc": "监控本机杀毒软件与防火墙状态，在托盘显示安全状态。禁用后第三方杀毒软件可能无法正确注册状态，托盘图标会显示异常。",
+    "advice": "建议保留"
+  },
+  {
+    "keys": [
+      "ssdpsrv",
+      "upnphost",
+      "fdrespub",
+      "fdphost"
+    ],
+    "title": "SSDP / UPnP 设备发现",
+    "vendor": "Microsoft",
+    "desc": "在局域网内发现其它 UPnP 设备（路由器、投屏、NAS、打印机）。不用局域网投屏或 DLNA 时可以禁用，能减少一点网络噪音。",
+    "advice": "谨慎处理"
+  },
+  {
+    "keys": [
+      "remoteregistry",
+      "remote registry"
+    ],
+    "title": "远程注册表服务",
+    "vendor": "Microsoft",
+    "desc": "允许其它机器远程读写本机注册表。普通家用电脑完全用不到，禁用还能减少一个攻击面。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "termService",
+      "termservice",
+      "remote desktop"
+    ],
+    "title": "远程桌面服务",
+    "vendor": "Microsoft",
+    "desc": "允许他人通过 RDP 远程登录这台电脑。如果你不使用远程桌面，禁用可以关闭一个高风险入口。",
+    "advice": "谨慎处理"
+  },
+  {
+    "keys": [
+      "computer browser",
+      "computernetwork",
+      "lanmanserver",
+      "lanmanworkstation"
+    ],
+    "title": "局域网共享服务",
+    "vendor": "Microsoft",
+    "desc": "支持局域网文件共享与计算机发现。不用共享文件夹、不访问局域网 NAS 时可以禁用（关闭 445 端口还能减少勒索病毒面）。",
+    "advice": "谨慎处理"
+  },
+  {
+    "keys": [
+      "sppsvc",
+      "slui",
+      "osppsvc"
+    ],
+    "title": "Windows 激活服务",
+    "vendor": "Microsoft",
+    "desc": "负责系统与 Office 的许可证激活校验。禁用后系统可能被判定为未激活（水印、个性化设置被锁）。请保留。",
+    "advice": "建议保留"
+  },
+  {
+    "keys": [
+      "cryptsvc",
+      "appidsvc",
+      "cryptographic"
+    ],
+    "title": "加密服务",
+    "vendor": "Microsoft",
+    "desc": "管理数字证书与加密密钥。HTTPS、软件签名校验、VPN 都依赖它。请保留。",
+    "advice": "建议保留"
+  },
+  {
+    "keys": [
+      "wlan",
+      "wlansvc",
+      "wlanautoconfig"
+    ],
+    "title": "WLAN 无线网络服务",
+    "vendor": "Microsoft",
+    "desc": "管理 Wi-Fi 连接。笔记本禁用后会无法使用无线网络。请保留。",
+    "advice": "建议保留"
+  },
+  {
+    "keys": [
+      "sens",
+      "senssvc",
+      "systemeventnotification"
+    ],
+    "title": "系统事件通知服务",
+    "vendor": "Microsoft",
+    "desc": "分发系统事件（登录、电源状态变化等）给订阅者。是很多登录与企业策略的前置依赖。请保留。",
+    "advice": "建议保留"
+  },
+  {
+    "keys": [
+      "tabletinputservice",
+      "tabtip",
+      "touchkeyboard"
+    ],
+    "title": "平板电脑输入服务 / 触摸键盘",
+    "vendor": "Microsoft",
+    "desc": "支持触摸屏、手写笔与屏幕键盘。台式机没有触摸屏时可以禁用；笔记本带触摸屏则建议保留。",
+    "advice": "谨慎处理"
+  },
+  {
+    "keys": [
+      "wpnuserservice",
+      "wpnservice",
+      "pushnotifications",
+      "push notifications",
+      "推送通知"
+    ],
+    "title": "Windows 推送通知服务",
+    "vendor": "Microsoft",
+    "desc": "负责开始菜单磁贴与应用商店应用的推送通知。禁用后 UWP 应用收不到通知（桌面版微信/QQ 不受影响）。",
+    "advice": "谨慎处理"
+  },
+  {
+    "keys": [
+      "bluetooth",
+      "btagent",
+      "bthserv"
+    ],
+    "title": "蓝牙支持服务",
+    "vendor": "Microsoft",
+    "desc": "管理蓝牙适配器与配对设备。不用蓝牙耳机、键鼠、手柄时可以禁用。",
+    "advice": "谨慎处理"
+  },
+  {
+    "keys": [
+      "camsvc",
+      "frameserver",
+      "windowscamera"
+    ],
+    "title": "Windows 相机帧服务器",
+    "vendor": "Microsoft",
+    "desc": "为摄像头提供媒体采集框架。不用摄像头或视频会议时可以禁用。",
+    "advice": "谨慎处理"
+  },
+  {
+    "keys": [
+      "fax",
+      "wdiservicehost",
+      "wdisystemhost"
+    ],
+    "title": "传真 / 诊断跟踪服务",
+    "vendor": "Microsoft",
+    "desc": "传真服务与 Windows 诊断策略服务（会持续收集诊断数据）。现代环境基本用不到，禁用无副作用。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "diagsvc",
+      "diagnostic",
+      "dmwappushservice"
+    ],
+    "title": "诊断策略 / WAP 推送服务",
+    "vendor": "Microsoft",
+    "desc": "收集并上报系统诊断数据、处理设备管理推送。对个人用户没有实际价值，禁用后不会影响功能。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "mapsbroker",
+      "downloadmapsmanager",
+      "maps"
+    ],
+    "title": "Windows 地图服务",
+    "vendor": "Microsoft",
+    "desc": "为地图应用提供离线地图下载与后台定位。不用系统地图应用时可以禁用。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "retaildemo",
+      "cloudexperiencehost",
+      "windowscommunicationsapps"
+    ],
+    "title": "演示模式 / 系统推广组件",
+    "vendor": "Microsoft",
+    "desc": "零售演示模式、系统推广与预装应用组件。对正常使用没有价值，禁用无副作用。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "onedriveupdater",
+      "skyperemoval"
+    ],
+    "title": "OneDrive / Skype 更新与清理组件",
+    "vendor": "Microsoft",
+    "desc": "OneDrive 更新程序和 Skype 移除工具的计划任务，只在特定条件下运行一次。保留或禁用影响都不大。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "com surrogate",
+      "dllhost"
+    ],
+    "title": "COM Surrogate 宿主",
+    "vendor": "Microsoft",
+    "desc": "为 COM 组件（尤其是缩略图生成、媒体解码）提供宿主进程。它出现是正常的，生成缩略图时会有多个实例。",
+    "advice": "建议保留"
+  },
+  {
+    "keys": [
+      "conhost",
+      "openconsole"
+    ],
+    "title": "控制台窗口宿主",
+    "vendor": "Microsoft",
+    "desc": "为命令行程序提供控制台窗口。只要有程序在后台跑命令行，就会有它。属于正常现象。",
+    "advice": "建议保留"
+  },
+  {
+    "keys": [
+      "crashpad",
+      "crashreporter",
+      "sentry",
+      "bugsnag"
+    ],
+    "title": "崩溃收集组件",
+    "vendor": "（随所属软件）",
+    "desc": "软件崩溃时收集堆栈信息并上报。禁用后软件照样用，只是崩溃时开发者收不到报告（而且不再有上报的网络请求）。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "wemeet",
+      "tencentmeeting",
+      "tencent meeting"
+    ],
+    "title": "腾讯会议",
+    "vendor": "腾讯",
+    "desc": "腾讯会议客户端的后台常驻，用于快速入会与消息提醒。不常开会时可以禁用。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "youdao",
+      "youdaonote",
+      "youdaodict"
+    ],
+    "title": "有道词典 / 有道云笔记",
+    "vendor": "网易有道",
+    "desc": "有道系的词典与笔记客户端，自启用于取词翻译与云同步。不用时可以禁用。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "evernote",
+      "yinxiang"
+    ],
+    "title": "印象笔记",
+    "vendor": "印象笔记",
+    "desc": "笔记软件的云同步与托盘常驻。禁用后需手动打开同步。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "sogouexplorer",
+      "2345",
+      "hao123",
+      "liebao",
+      "maxthon"
+    ],
+    "title": "捆绑浏览器 / 导航推广",
+    "vendor": "（随所属软件）",
+    "desc": "这类浏览器或导航站常被捆绑安装，并会开机自启、抢占默认浏览器。**几乎可以无脑禁用**，禁用后不影响你用 Chrome/Edge。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "baidusd",
+      "baidudownloader",
+      "bddownloader"
+    ],
+    "title": "百度系后台服务",
+    "vendor": "百度",
+    "desc": "百度系软件的后台加速与下载服务，会在后台持续联网并占用少量资源。不使用时建议禁用。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "quicktime",
+      "itunes",
+      "bonjour",
+      "ipodservice",
+      "applesyncnotifier"
+    ],
+    "title": "Apple 辅助服务（Bonjour / iTunes 助手）",
+    "vendor": "Apple",
+    "desc": "iTunes 与 Apple 设备的辅助服务，其中 Bonjour 用于局域网设备发现。它常驻但几乎不会被用到，禁用后 iTunes 仍可正常同步（少数局域网功能受影响）。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "gamepp",
+      "fwupp",
+      "xiaoyou",
+      "youxi"
+    ],
+    "title": "游戏加加 / 游戏优化工具",
+    "vendor": "（随所属软件）",
+    "desc": "第三方游戏加速、帧数显示、硬件监控工具。它们会注入游戏进程并常驻。不需要时禁用。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "delta_force_launcher",
+      "delta force",
+      "deltaforce"
+    ],
+    "title": "三角洲行动（Delta Force）启动器",
+    "vendor": "腾讯 / TiMi",
+    "desc": "《三角洲行动》的游戏启动器，负责校验与更新游戏文件、登录账号并拉起游戏主进程。禁用后无法从启动器进入游戏，需要手动打开；游戏本体并不受影响。",
+    "advice": "建议保留"
+  },
+  {
+    "keys": [
+      "jianyingpro",
+      "剪映"
+    ],
+    "title": "剪映专业版",
+    "vendor": "字节跳动",
+    "desc": "视频剪辑软件，托盘程序常驻用于快速打开工程、同步素材与更新检查。不常剪视频时可以禁用，需要时手动打开即可。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "doubao",
+      "豆包"
+    ],
+    "title": "豆包 AI 助手",
+    "vendor": "字节跳动",
+    "desc": "AI 对话助手客户端，自启用于常驻托盘、接收消息提醒并加快唤起速度。禁用后需要时手动打开，功能不受影响。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "mumuplayernxservice",
+      "mumunxservice",
+      "mumuservice",
+      "mumuplayer",
+      "mumu"
+    ],
+    "title": "MuMu 模拟器",
+    "vendor": "网易",
+    "desc": "安卓模拟器的后台服务，负责虚拟化加速与实例管理。不玩安卓手游时可以禁用，需要时手动打开模拟器即可。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "fevergamesinstaller",
+      "fevergamesservice",
+      "fevergames"
+    ],
+    "title": "发烧游戏平台",
+    "vendor": "多益网络",
+    "desc": "游戏下载与更新平台，自启用于后台更新已安装的游戏。不玩它家游戏时可以禁用。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "workbuddy",
+      "workbuddyai"
+    ],
+    "title": "WorkBuddy AI 助手",
+    "vendor": "WorkBuddy",
+    "desc": "AI 办公助手，常驻托盘提供快捷入口与消息提醒。禁用后需要时手动打开，不影响功能。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "chatgpt"
+    ],
+    "title": "ChatGPT 桌面版",
+    "vendor": "OpenAI",
+    "desc": "ChatGPT 桌面客户端（Microsoft Store 版）的后台组件，用于快速唤起窗口。禁用后需要时手动打开。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "claude"
+    ],
+    "title": "Claude 桌面版",
+    "vendor": "Anthropic",
+    "desc": "Claude 桌面客户端（Microsoft Store 版）的后台组件。禁用后需要时手动打开即可。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "virtualdesktop.service",
+      "virtualdesktop"
+    ],
+    "title": "Virtual Desktop 服务",
+    "vendor": "Virtual Desktop",
+    "desc": "VR 串流软件 Virtual Desktop 的后台服务，负责与头显通信。不玩 VR 时可以禁用。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "msi_central_service",
+      "msi center",
+      "msi_case_service"
+    ],
+    "title": "MSI Center",
+    "vendor": "微星",
+    "desc": "微星主板的灯效、风扇与性能控制套件。设置调好之后通常不必常驻，禁用后需要改设置时手动打开即可。",
+    "advice": "谨慎处理"
+  },
+  {
+    "keys": [
+      "screenconnect"
+    ],
+    "title": "ScreenConnect 远程控制",
+    "vendor": "ConnectWise",
+    "desc": "远程控制 / 远程支持工具。如果不是你自己安装的，请先弄清楚是谁装的 —— 这类软件常被用来远程操控电脑。",
+    "advice": "谨慎处理"
+  },
+  {
+    "keys": [
+      "directxdatabaseupdater"
+    ],
+    "title": "DirectX 着色器数据库更新",
+    "vendor": "Microsoft",
+    "desc": "维护 DirectX 的着色器与显卡适配器缓存，让游戏首次运行更顺畅。属于系统图形组件，建议保留。",
+    "advice": "建议保留"
+  },
+  {
+    "keys": [
+      "dxgiadaptercache"
+    ],
+    "title": "DirectX 适配器缓存",
+    "vendor": "Microsoft",
+    "desc": "缓存显卡适配器信息，加速 DirectX 初始化。系统图形组件，建议保留。",
+    "advice": "建议保留"
+  },
+  {
+    "keys": [
+      "provtool",
+      "mdmdiagnosticscleanup"
+    ],
+    "title": "Windows 预配任务",
+    "vendor": "Microsoft",
+    "desc": "Windows 的设备预配（Provisioning）任务，处理企业策略下发与开机预配流程。系统组件，建议保留。",
+    "advice": "建议保留"
+  },
+  {
+    "keys": [
+      "spaceagent",
+      "spaceman"
+    ],
+    "title": "存储空间管理器",
+    "vendor": "Microsoft",
+    "desc": "管理「存储空间」（Storage Spaces）的磁盘池与自动分层。即使没有组建存储池也建议保留 —— 它只在需要时才工作。",
+    "advice": "建议保留"
+  },
+  {
+    "keys": [
+      "devicecensus"
+    ],
+    "title": "设备信息统计",
+    "vendor": "Microsoft",
+    "desc": "收集设备硬件与配置信息，供 Windows 更新与功能投放使用。禁用通常没有影响，但收益也很有限。",
+    "advice": "谨慎处理"
+  },
+  {
+    "keys": [
+      "ucpdmgr"
+    ],
+    "title": "UCPD 用户选择保护",
+    "vendor": "Microsoft",
+    "desc": "Windows 的「用户选择保护」管理器，防止第三方软件擅自篡改默认浏览器与文件关联。属于系统保护机制，建议保留。",
+    "advice": "建议保留"
+  },
+  {
+    "keys": [
+      "clipup",
+      "fclip"
+    ],
+    "title": "Windows 订阅许可验证",
+    "vendor": "Microsoft",
+    "desc": "验证 Windows 许可证与订阅状态。属于系统授权组件，建议保留。",
+    "advice": "建议保留"
+  },
+  {
+    "keys": [
+      "dsregcmd"
+    ],
+    "title": "工作单位 / 学校账户加入",
+    "vendor": "Microsoft",
+    "desc": "处理「加入工作单位或学校」（Azure AD 注册）的检查与恢复任务。没有加入域或组织账号时它不会真正做事。",
+    "advice": "谨慎处理"
+  },
+  {
+    "keys": [
+      "dfdwiz"
+    ],
+    "title": "磁盘诊断",
+    "vendor": "Microsoft",
+    "desc": "磁盘诊断与故障排查向导组件。系统维护用，建议保留。",
+    "advice": "建议保留"
+  },
+  {
+    "keys": [
+      "appidcertstorecheck"
+    ],
+    "title": "AppID 证书存储检查",
+    "vendor": "Microsoft",
+    "desc": "校验应用证书存储的完整性，属系统安全组件。建议保留。",
+    "advice": "建议保留"
+  },
+  {
+    "keys": [
+      "pushtoinstall"
+    ],
+    "title": "Microsoft Store 推送安装",
+    "vendor": "Microsoft",
+    "desc": "Microsoft Store 的应用「推送安装」服务，用于远程向设备安装应用。不强制关闭也没关系。",
+    "advice": "谨慎处理"
+  },
+  {
+    "keys": [
+      "hpatchmon",
+      "hotpatch"
+    ],
+    "title": "Windows 热补丁监控",
+    "vendor": "Microsoft",
+    "desc": "Windows 热补丁（Hotpatch）功能的监控任务，用于在不重启的情况下安装安全更新。建议保留。",
+    "advice": "建议保留"
+  },
+  {
+    "keys": [
+      "tcpipreg"
+    ],
+    "title": "TCP/IP 注册表兼容驱动",
+    "vendor": "Microsoft",
+    "desc": "为旧版 TCP/IP 配置提供注册表兼容层。系统网络组件，建议保留。",
+    "advice": "建议保留"
+  },
+  {
+    "keys": [
+      "mslldp",
+      "链路层发现协议"
+    ],
+    "title": "Microsoft 链路层发现协议",
+    "vendor": "Microsoft",
+    "desc": "在局域网中广播与发现设备信息（LLDP），用于网络拓扑识别。关掉一般没有影响，但也没什么必要。",
+    "advice": "谨慎处理"
+  },
+  {
+    "keys": [
+      "rspndr",
+      "lltdio",
+      "链路层拓扑发现"
+    ],
+    "title": "链路层拓扑发现",
+    "vendor": "Microsoft",
+    "desc": "绘制局域网拓扑图所用的发现协议（LLTD）。在家庭网络里基本只影响「网络映射图」能否显示。",
+    "advice": "谨慎处理"
+  },
+  {
+    "keys": [
+      "peauth"
+    ],
+    "title": "受保护环境身份验证",
+    "vendor": "Microsoft",
+    "desc": "为受保护环境（PE）提供身份验证服务，与数字版权及安全启动链相关。建议保留。",
+    "advice": "建议保留"
+  },
+  {
+    "keys": [
+      "storqosflt",
+      "storage qos"
+    ],
+    "title": "存储服务质量筛选器",
+    "vendor": "Microsoft",
+    "desc": "存储 QoS 驱动，为指定应用保障磁盘吞吐量。系统组件，建议保留。",
+    "advice": "建议保留"
+  },
+  {
+    "keys": [
+      "cldflt",
+      "cloud files"
+    ],
+    "title": "Windows 云文件筛选器",
+    "vendor": "Microsoft",
+    "desc": "云文件（如 OneDrive 按需文件）的筛选器驱动。使用云盘的「仅在线」占位文件时必须保留。",
+    "advice": "建议保留"
+  },
+  {
+    "keys": [
+      "ndu",
+      "network data usage"
+    ],
+    "title": "网络数据用量监控驱动",
+    "vendor": "Microsoft",
+    "desc": "统计各应用的网络流量，供「设置 → 网络 → 数据使用量」显示。关掉会使该页面失去数据。",
+    "advice": "谨慎处理"
+  },
+  {
+    "keys": [
+      "wanarp",
+      "远程访问 ip arp"
+    ],
+    "title": "远程访问 IP ARP 驱动",
+    "vendor": "Microsoft",
+    "desc": "为远程访问与 VPN 提供 ARP 代理。使用 VPN 或远程接入时建议保留。",
+    "advice": "建议保留"
+  },
+  {
+    "keys": [
+      "luafv",
+      "uac file virtualization"
+    ],
+    "title": "UAC 文件虚拟化",
+    "vendor": "Microsoft",
+    "desc": "UAC 的文件与注册表虚拟化驱动，让旧程序在未提权时也能写入受限位置。系统组件，建议保留。",
+    "advice": "建议保留"
+  },
+  {
+    "keys": [
+      "bindflt",
+      "bind filter"
+    ],
+    "title": "Windows 绑定筛选器驱动",
+    "vendor": "Microsoft",
+    "desc": "为容器与沙箱提供文件系统绑定挂载。系统组件，建议保留。",
+    "advice": "建议保留"
+  },
+  {
+    "keys": [
+      "wcifs",
+      "container isolation"
+    ],
+    "title": "Windows 容器隔离",
+    "vendor": "Microsoft",
+    "desc": "容器 / 沙箱的文件系统隔离驱动（部分安全软件的沙箱也依赖它）。系统组件，建议保留。",
+    "advice": "建议保留"
+  },
+  {
+    "keys": [
+      "bfs",
+      "中转文件系统"
+    ],
+    "title": "中转文件系统",
+    "vendor": "Microsoft",
+    "desc": "系统内部使用的中转文件系统驱动。建议保留。",
+    "advice": "建议保留"
+  },
+  {
+    "keys": [
+      "jhi_service",
+      "dal.inf"
+    ],
+    "title": "Intel 动态应用加载器",
+    "vendor": "Intel",
+    "desc": "Intel 平台的动态应用加载（DAL）服务，为部分安全与芯片组功能提供接口。建议保留。",
+    "advice": "建议保留"
+  },
+  {
+    "keys": [
+      "intel(r) management engine",
+      "management engine wmi",
+      "wmireg",
+      "mei"
+    ],
+    "title": "Intel 管理引擎（ME）组件",
+    "vendor": "Intel",
+    "desc": "Intel 管理引擎的 WMI 提供程序与驱动，用于主板固件接口与带外管理。属平台底层组件，建议保留。",
+    "advice": "建议保留"
+  },
+  {
+    "keys": [
+      "360huabao",
+      "360yasuo",
+      "360画报"
+    ],
+    "title": "360 画报（360 壁纸）",
+    "vendor": "360",
+    "desc": "360 安全卫士与 360 安全浏览器会自动装上的推广组件，会在锁屏与桌面轮播壁纸、推送资讯和广告；注册表里的启动项名常写作 360yasuo，但它指向的确实是 360huabao.exe。它与 360 的压缩、杀毒等功能没有依赖，禁用后其他 360 软件照常使用 —— 360 自家的启动项管理也允许禁止它。想彻底清掉可在控制面板卸载「360壁纸(360画报)」。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "360zip",
+      "360zipupdate",
+      "360压缩"
+    ],
+    "title": "360 压缩 / 它的更新器",
+    "vendor": "360",
+    "desc": "360 压缩是一款免费解压软件，本体按需手动打开即可，没有必须开机自启的理由。360zipUpdate.exe 只是它的自动更新器，禁用后解压功能完全不受影响 —— 手动打开软件时照样会检查更新。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "nvidia display container",
+      "nvdisplaycontainer"
+    ],
+    "title": "NVIDIA 显示容器服务",
+    "vendor": "NVIDIA",
+    "desc": "显卡驱动的配套服务，负责让控制面板、显示模式切换、多屏与色彩设置正常工作。它属于**驱动本体的一部分**，不是可选附加组件 —— 禁用后可能黑屏、分辨率异常或控制面板打不开。想减少 NVIDIA 的开机负担，请只关 Share / Overlay 那几项。",
+    "advice": "建议保留"
+  },
+  {
+    "keys": [
+      "nahimic",
+      "nahimicservice"
+    ],
+    "title": "Nahimic 音频增强",
+    "vendor": "微星 / 外星人等笔记本厂商（Nahimic）",
+    "desc": "厂商预装的音频增强套件（虚拟环绕、麦克风降噪、音效预设），属于驱动级组件。禁用后声卡基础发声不受影响，但音效增强与降噪会失效，部分机型上还可能出现音频设备异常。属于「能用但别乱动」的一类，建议保留。",
+    "advice": "建议保留"
+  },
+  {
+    "keys": [
+      "drvmgrservice",
+      "360drvmgr",
+      "360驱动大师",
+      "drv_mgr_service"
+    ],
+    "title": "360 驱动大师",
+    "vendor": "360",
+    "desc": "360 驱动大师的后台服务，用来检测并安装硬件驱动更新。它由 svchost 承载，所以注册表里只看得到 svchost.exe，真实模块是 360DrvMgr\\DrvMgrService.dll（本机注册表实测）。禁用后硬件驱动照常工作，只是不再自动检测驱动更新 —— 需要时手动打开驱动大师即可。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "tmservice",
+      "360tptmon",
+      "360温度监控",
+      "temp_monitor_service"
+    ],
+    "title": "360 温度监控",
+    "vendor": "360",
+    "desc": "360 温度监控（360TptMon）的后台服务，负责在托盘里显示 CPU / 显卡温度。同样由 svchost 承载，真实模块是 360TptMon\\TMService.dll。它只是「看温度」的附加小工具，禁用后系统的温度管理与风扇调速完全不受影响（那是 BIOS 与硬件驱动的职责）。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "xlserviceplatform",
+      "迅雷下载基础服务"
+    ],
+    "title": "迅雷下载基础服务",
+    "vendor": "迅雷",
+    "desc": "为迅雷提供磁盘空间预分配、接管浏览器下载请求等支持，由 svchost 承载。禁用后迅雷仍可正常下载，只是少了一些加速特性，且浏览器里点下载不会再被迅雷接管。属于可关但看个人习惯的一类。",
+    "advice": "谨慎处理"
+  },
+  {
+    "keys": [
+      "iphlpsvc",
+      "ip helper",
+      "iphelper"
+    ],
+    "title": "IP Helper（IPv6 隧道与网络辅助）",
+    "vendor": "Microsoft",
+    "advice": "建议保留",
+    "desc": "Windows 自带的网络辅助服务，负责 IPv6 过渡技术（6to4 / ISATAP / Teredo）、IP-HTTPS 隧道，以及 WinHTTP 与端口代理。禁用后部分 VPN、远程连接与需要隧道穿透的网络环境会连不上；用不到 IPv6 的机器上它占用极小，留着更省心。"
+  },
+  {
+    "keys": [
+      "pcasvc",
+      "program compatibility assistant",
+      "程序兼容性助手"
+    ],
+    "title": "程序兼容性助手（PcaSvc）",
+    "vendor": "Microsoft",
+    "advice": "谨慎处理",
+    "desc": "检测程序是否按兼容模式运行、记录被拦截的安装与运行行为。它本身不参与开机关键路径，禁用后不会影响系统启动，但遇到「这个程序可能不兼容」类的提示就不会再出现。"
+  },
+  {
+    "keys": [
+      "mmcss",
+      "multimedia class scheduler",
+      "多媒体类计划程序"
+    ],
+    "title": "多媒体类计划程序（MMCSS）",
+    "vendor": "Microsoft",
+    "advice": "建议保留",
+    "desc": "给音频、视频、游戏等多媒体线程临时提升优先级并保证 CPU 时间片，避免播放爆音与卡顿。Windows 把它的启动类型标成「自动」且不允许在服务面板里停用 —— 禁用后音视频可能间歇性卡顿，得不偿失。"
+  }
+]

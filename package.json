@@ -1,0 +1,16 @@
+{
+  "name": "old666",
+  "version": "0.1.0",
+  "private": true,
+  "description": "老六清净 old666 — 无广告纯绿色的 Windows 系统优化工具",
+  "scripts": {
+    "icons": "node tools/build-icons.js",
+    "preview": "node tools/render-preview.js",
+    "dev": "cargo tauri dev --manifest-path src-tauri/Cargo.toml",
+    "build": "cargo tauri build --manifest-path src-tauri/Cargo.toml",
+    "poc": "cargo run --release --manifest-path src-tauri/Cargo.toml --bin old666-poc"
+  },
+  "devDependencies": {
+    "sharp": "^0.33.0"
+  }
+}

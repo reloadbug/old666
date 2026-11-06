@@ -5,10 +5,16 @@ build/
 out/
 target/
 src-tauri/target/
+src-tauri/gen/
 *.exe
 *.msi
 *.dll
 *.pdb
+*.lib
+*.exp
+
+# 图标产物（由 tools/build-icons.js 从 SVG 生成，不入库）
+src-tauri/icons/
 
 # ---- 本地环境与凭据（严禁提交）----
 .env
@@ -42,3 +48,9 @@ assets/logo/_compare.png
 
 # ---- 工作区代理状态（非交付物）----
 .workbuddy-ai/
+
+# ---- 前端测试产物（fixture 与截图，由 tests/gen-fixtures.sh 生成）----
+tests/_out/
+
+# ---- 发布产物（zip 体积大，不入库；构建方法见 README）----
+release/
