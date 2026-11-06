@@ -28,12 +28,15 @@
 //! startup_ctl  启动项禁用 / 延迟 / 删除 与还原执行器
 //! startup_lists 启动项白名单 / 黑名单
 //! knowledge  启动项知识库（内置 140+ 条 + 用户可编辑补充）
+//! crashlog  本地崩溃收集与运行日志（只写本地，不外传）
+//! updater   更新检查（默认关闭、只提示，不自动下载安装）
 //! ```
 
 pub mod blacklist;
 pub mod boot;
 pub mod checkup;
 pub mod checkup_fix;
+pub mod crashlog;
 pub mod idle;
 pub mod junk;
 pub mod killer;
@@ -56,6 +59,7 @@ pub mod startup_lists;
 pub mod startup_risk;
 pub mod store;
 pub mod types;
+pub mod updater;
 
 pub use purge::PurgeEngine;
 pub use types::*;

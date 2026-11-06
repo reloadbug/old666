@@ -624,6 +624,35 @@
     <h3>运行环境</h3>
     <dl class="env-dl" id="envDl"></dl>
 
+    <h3>崩溃与日志</h3>
+    <p class="hint">
+      崩溃现场只写在<b>本机</b>，不会外传。日志目录可以直接用记事本打开，删掉也不影响使用。
+    </p>
+    <div class="kb-path selectable" id="logPath">—</div>
+    <ul class="wl-list" id="crashList"></ul>
+    <div class="wl-add">
+      <button class="btn soft sm" id="btnCrashRead">查看选中崩溃</button>
+      <button class="btn ghost sm" id="btnCrashClear">清空崩溃日志</button>
+    </div>
+
+    <h3>更新</h3>
+    <p class="hint">
+      <b>自动检查更新默认关闭</b>。开启后也只在启动时检查一次并提示，
+      不会自动下载、不会自动安装 —— 更新永远由你决定。
+    </p>
+    <div class="upd-form">
+      <label class="mode-field"><span>版本</span><input type="text" id="verText" readonly></label>
+      <label class="mode-field"><span>自动检查更新</span>
+        <select id="updEnabled"><option value="0">关闭（默认）</option><option value="1">开启</option></select>
+      </label>
+      <label class="mode-field"><span>更新源地址</span><input type="text" id="updUrl" placeholder="留空则使用官方地址"></label>
+    </div>
+    <div class="wl-add">
+      <button class="btn soft sm" id="btnUpdCheck">检查更新</button>
+      <button class="btn primary sm" id="btnUpdSave">保存更新设置</button>
+    </div>
+    <p class="hint" id="updState">—</p>
+
     <h3>净化历史</h3>
     <ul class="snap-list" id="snapList"></ul>
   </div>
@@ -636,5 +665,6 @@
 <script src="mode.js"></script>
 <script src="checkup.js"></script>
 <script src="monitor.js"></script>
+<script src="settings.js"></script>
 </body>
 </html>

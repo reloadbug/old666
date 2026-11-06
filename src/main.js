@@ -121,7 +121,7 @@ async function api(cmd, args) {
   if (!IS_TAURI) {
     if (cmd === 'scan_processes') return mockScan();
     if (cmd === 'env_info') {
-      return { ok: true, data: { version: '0.1.3', cpu_count: 16, pdh_healthy: true, portable: true, data_dir: 'D:\\old666\\data', admin: false, blacklist_coverage: [180, 44, 36] } };
+      return { ok: true, data: { version: '0.1.4', cpu_count: 16, pdh_healthy: true, portable: true, data_dir: 'D:\\old666\\data', admin: false, blacklist_coverage: [180, 44, 36] } };
     }
     if (cmd === 'whitelist_list') return { ok: true, data: state.whitelist };
     if (cmd === 'snapshot_list') return { ok: true, data: [] };

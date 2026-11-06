@@ -950,6 +950,64 @@ pub fn floatball_show(
 }
 
 // ===========================================================================
+// P6 · 崩溃日志（只写本地，不外传）
+// ===========================================================================
+
+/// 列出崩溃日志（最新的在前）。
+#[tauri::command]
+pub fn crash_list() -> Reply<Vec<crate::core::crashlog::CrashEntry>> {
+    Reply::ok(crate::core::crashlog::list_crashes())
+}
+
+/// 读取一份崩溃日志的全文。
+#[tauri::command]
+pub fn crash_read(file: String) -> Reply<String> {
+    match crate::core::crashlog::read_crash(&file) {
+        Ok(s) => Reply::ok(s),
+        Err(e) => Reply::err(e),
+    }
+}
+
+/// 清空所有崩溃日志，返回清掉了几份。
+#[tauri::command]
+pub fn crash_clear() -> Reply<usize> {
+    Reply::ok(crate::core::crashlog::clear_crashes())
+}
+
+/// 日志目录路径（给 UI 显示「日志都在这儿，可直接删」）。
+#[tauri::command]
+pub fn crash_logs_dir() -> Reply<String> {
+    Reply::ok(crate::core::crashlog::logs_dir().display().to_string())
+}
+
+// ===========================================================================
+// P6 · 更新检查（默认关闭、只提示，不自动下载安装）
+// ===========================================================================
+
+/// 读更新设置（默认 enabled=false）。
+#[tauri::command]
+pub fn update_config() -> Reply<crate::core::updater::UpdateConfig> {
+    Reply::ok(crate::core::updater::config())
+}
+
+/// 保存更新设置。
+#[tauri::command]
+pub fn update_config_save(
+    config: crate::core::updater::UpdateConfig,
+) -> Reply<crate::core::updater::UpdateConfig> {
+    match crate::core::updater::save_config(&config) {
+        Ok(()) => Reply::ok(config),
+        Err(e) => Reply::err(e),
+    }
+}
+
+/// 检查更新。开关关闭时**直接返回、不发任何网络请求**。
+#[tauri::command]
+pub fn update_check() -> Reply<crate::core::updater::UpdateStatus> {
+    Reply::ok(crate::core::updater::check(&crate::core::updater::config()))
+}
+
+// ===========================================================================
 // 测试
 // ===========================================================================
 #[cfg(test)]

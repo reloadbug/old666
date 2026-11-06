@@ -373,6 +373,17 @@ tr.proc.forbidden{opacity:.62}
 .env-dl dt{color:var(--muted)}
 .env-dl dd{text-align:right;font-family:Consolas,monospace;word-break:break-all}
 
+/* ============================================================
+   崩溃日志 + 更新设置（P6）
+   ============================================================ */
+.wl-list li.crash-item{cursor:pointer}
+.wl-list li.crash-item:hover{border-color:var(--line)}
+.wl-list li.crash-item.on{border-color:var(--primary);background:rgba(14,165,164,.06)}
+.crash-when{font-family:Consolas,monospace;font-size:11.5px;color:var(--muted);flex:0 0 auto!important}
+.crash-summary{flex:1!important;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.crash-size{flex:0 0 auto!important;font-size:11px;color:var(--muted)}
+.upd-form{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
+
 /* ---------- Toast ---------- */
 .toast{
   position:fixed;left:50%;bottom:28px;transform:translateX(-50%);

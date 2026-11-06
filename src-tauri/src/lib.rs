@@ -37,6 +37,11 @@ pub fn run() {
     let _ = START.set(std::time::Instant::now());
     let bench = std::env::args().any(|a| a == "--bench-startup");
 
+    // P6 · 崩溃收集：尽早装 panic hook，崩了也要留下现场。
+    // 只写本地 data/logs/，绝不外传。
+    core::crashlog::install_panic_hook();
+    core::crashlog::log("INFO", &format!("启动 v{}", env!("CARGO_PKG_VERSION")));
+
     tauri::Builder::default()
         // 单实例保护：第二个实例不再静默退出（退出码 0，看起来像"点了没反应"），
         // 而是把已有窗口拉到前台。必须最先注册。
@@ -148,6 +153,15 @@ pub fn run() {
             ipc::floatball_show,
             // P5 · 窗口空闲探测（前端据此暂停高频扫描）
             ipc::window_idle,
+            // P6 · 崩溃日志
+            ipc::crash_list,
+            ipc::crash_read,
+            ipc::crash_clear,
+            ipc::crash_logs_dir,
+            // P6 · 更新检查（默认关闭，只提示）
+            ipc::update_config,
+            ipc::update_config_save,
+            ipc::update_check,
         ])
         .run(tauri::generate_context!())
         .expect("启动 Tauri 应用失败");
