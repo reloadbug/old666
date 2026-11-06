@@ -417,8 +417,6 @@ Defender 都藏在启动项里）。因此：
 
 ## 许可
 
-许可证待定。
-
----
+MIT（见 [LICENSE](LICENSE)）。
 
 <sub>Brand mark © reloadbug. 商标形状 100% 保留，仅做矢量化与配色延展。</sub>
