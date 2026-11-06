@@ -269,6 +269,63 @@ fn modes_main(json: bool, plan_id: Option<String>, mem_pct_override: Option<u32>
 }
 
 // ---------------------------------------------------------------------------
+// P5 · 常驻监控（只读）
+// ---------------------------------------------------------------------------
+
+/// `--monitor` 的实现：**只读**，采样一次就打印，绝不启后台线程。
+///
+/// 输出的 JSON 形状与 IPC 的 `monitor_snapshot` 完全一致 ——
+/// 前端无头测试直接复用真机导出的 payload。
+fn monitor_main(json: bool) -> i32 {
+    use old666_lib::core::monitor::{MonitorHub, MonitorSample};
+    use old666_lib::core::{memory, perf};
+
+    let sampler = perf::SystemSampler::new();
+    let metrics = sampler.sample(0, 0);
+    let self_ws = memory::working_set_of(std::process::id()).unwrap_or(0);
+
+    let hub = MonitorHub::new();
+    // 只采一次，不进后台线程
+    let sample = MonitorSample {
+        cpu_percent: metrics.cpu_percent,
+        mem_percent: memory::memory_percent(),
+        disk_percent: metrics.disk_percent,
+        net_rx_bps: metrics.net_rx_bps,
+        net_tx_bps: metrics.net_tx_bps,
+        process_count: metrics.process_count,
+        self_working_set_mb: self_ws as f32 / (1024.0 * 1024.0),
+        self_cpu_percent: 0.0,
+        interval_ms: hub.config().clamped_interval(),
+    };
+
+    if json {
+        let payload = serde_json::json!({
+            "running": false,
+            "sample": sample,
+            "peak_cpu": 0.0_f32,
+            "peak_mem": 0.0_f32,
+            "peak_self_mem": 0.0_f32,
+            "rounds": 0_u32,
+            "alerts": Vec::<serde_json::Value>::new(),
+            "config": hub.config(),
+        });
+        println!(
+            "{}",
+            serde_json::to_string_pretty(&payload).unwrap_or_else(|_| "{}".into())
+        );
+        return 0;
+    }
+
+    println!("CPU   {:.1}%", sample.cpu_percent);
+    println!("内存  {:.1}%", sample.mem_percent);
+    println!("磁盘  {:.1}%", sample.disk_percent);
+    println!("网络  ↓{} ↑{}", sample.net_rx_bps, sample.net_tx_bps);
+    println!("进程  {}", sample.process_count);
+    println!("自身  {:.1} MB", sample.self_working_set_mb);
+    0
+}
+
+// ---------------------------------------------------------------------------
 // P4 · 一键体检 + 垃圾清理（只读）
 // ---------------------------------------------------------------------------
 
@@ -428,6 +485,11 @@ fn main() {
             value_of(&args, "--mode-plan"),
             value_of(&args, "--mem-pct").and_then(|v| v.parse::<u32>().ok()),
         ));
+    }
+
+    // --monitor：采样一次并打印（只读，不启后台线程）
+    if args.iter().any(|a| a == "--monitor") {
+        std::process::exit(monitor_main(args.iter().any(|a| a == "--json")));
     }
 
     // --checkup：跑一次体检并打印结果（只读，绝不改动系统）

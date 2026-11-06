@@ -19,11 +19,14 @@ const state = {
   search: '',
   selected: new Set(),
   timer: null,
-  interval: 2000,        // 自适应刷新间隔（1–5s）
+  interval: 8000,        // 自适应刷新间隔（8–15s）
   fullScanCounter: 0,
   busy: false,
   whitelist: { names: [], paths: [] },
   snapshots: [],
+  // 增量渲染用：当前渲染出来的行结构签名 + 每行的可变节点缓存
+  renderSig: '',
+  rows: new Map(),
 };
 
 /* ---------------------- 工具 ---------------------- */
@@ -161,29 +164,59 @@ async function scan(withPaths) {
 
   // 自适应刷新间隔：采集慢就放慢，保证 UI 永远跟手
   const cost = performance.now() - t0;
-  if (cost > 300) state.interval = Math.min(5000, state.interval + 500);
-  else if (cost < 90) state.interval = Math.max(1000, state.interval - 250);
+  if (cost > 300) state.interval = Math.min(15000, state.interval + 500);
+  else if (cost < 90) state.interval = Math.max(8000, state.interval - 250);
   scheduleNext();
 }
 
 function scheduleNext() {
   clearTimeout(state.timer);
   if (document.hidden) return; // 窗口不可见时暂停采集，零打扰
-  state.timer = setTimeout(() => {
-    state.fullScanCounter++;
-    // 每 5 轮做一次带路径的完整扫描（刷新签名信息），其余走轻量模式
-    scan(state.fullScanCounter % 5 === 0);
-  }, state.interval);
+  state.timer = setTimeout(nextTick, state.interval);
+}
+
+/* 窗口最小化时也要停采集。
+
+   document.hidden 在「最小化到任务栏」时并不总是为 true（Windows 上只有
+   真正隐藏才触发），但最小化后没人看得见进程表，继续每 2 秒扫一遍全系统
+   进程纯属白烧 CPU —— P5 的硬指标是常驻 ≤ 0.5%。
+   后端 window_idle 用 IsIconic 精确判断（最小化或隐藏都算）。 */
+async function isWindowIdle() {
+  if (document.hidden) return true;
+  if (!IS_TAURI) return false;
+  try {
+    const r = await invoke('window_idle');
+    return !!(r && r.ok && r.data);
+  } catch (e) {
+    return false;
+  }
+}
+
+async function nextTick() {
+  state.fullScanCounter++;
+  if (await isWindowIdle()) {
+    // 没人看的时候不采集，但保持轮询以便窗口恢复时及时接上
+    state.timer = setTimeout(nextTick, 3000);
+    return;
+  }
+  // 每 20 轮做一次带路径的完整扫描（刷新签名信息），其余走轻量模式。
+  // 签名校验要走 WinVerifyTrust，很贵 —— 没必要每轮都做。
+  scan(state.fullScanCounter % 20 === 0);
 }
 
 function renderMetrics() {
   const m = state.metrics;
   if (!m) return;
 
+  /* 进度条一律用 transform:scaleX —— 改 width 会触发整条布局重排，
+     而 WebView2 每轮重排一次就是常驻 CPU 的一大块。 */
   const setBar = (el, pct) => {
     const i = el;
-    i.style.width = Math.min(100, Math.max(0, pct)) + '%';
-    i.className = pct >= 85 ? 'hot' : pct >= 65 ? 'warn' : '';
+    const p = Math.min(100, Math.max(0, pct)) / 100;
+    const t = 'scaleX(' + p.toFixed(4) + ')';
+    if (i.style.transform !== t) i.style.transform = t;
+    const cls = pct >= 85 ? 'hot' : pct >= 65 ? 'warn' : '';
+    if (i.className !== cls) i.className = cls;
   };
 
   const cpu = m.cpu_percent || 0;
@@ -239,6 +272,8 @@ function renderTable() {
 
   if (!list.length) {
     tb.innerHTML = '';
+    state.renderSig = '';
+    state.rows = new Map();
     $('#empty').hidden = false;
     return;
   }
@@ -252,6 +287,17 @@ function renderTable() {
   }
 
   const maxWs = Math.max(...list.map((p) => p.working_set || 1), 1);
+
+  // 行结构没变时只改数值 —— 整表 innerHTML 重建会让 WebView2 每 2 秒
+  // 重新布局三百多行，是常驻 CPU 的头号来源（P5 硬指标 ≤ 0.5%）。
+  // 注意 pid 列表的**顺序**每轮都可能变（ToolHelp 枚举顺序不固定），
+  // 所以签名必须按 pid 排序，否则永远判定成「结构变了」而全量重建。
+  const sig = list.map((p) => p.pid).sort((a, b) => a - b).join(',');
+  if (sig === state.renderSig && state.rows && state.rows.size) {
+    updateRowsInPlace(list, maxWs);
+    return;
+  }
+
   let html = '';
 
   for (const [g, items] of groups) {
@@ -275,13 +321,13 @@ function renderTable() {
         <td class="c-cpu num">
           <div class="bar-cell">
             <span>${cpu.toFixed(1)}%</span>
-            <span class="mini-bar"><i class="${cpuCls}" style="width:${Math.min(100, cpu * 4)}%"></i></span>
+            <span class="mini-bar"><i class="${cpuCls}" style="transform:scaleX(${Math.min(100, cpu * 4) / 100})"></i></span>
           </div>
         </td>
         <td class="c-mem num">
           <div class="bar-cell">
             <span>${humanBytes(p.working_set)}</span>
-            <span class="mini-bar"><i style="width:${wsPct}%"></i></span>
+            <span class="mini-bar"><i style="transform:scaleX(${wsPct / 100})"></i></span>
           </div>
         </td>
         <td class="c-io num" title="累计读写">${humanBytes((p.io_read_bytes || 0) + (p.io_write_bytes || 0))}</td>
@@ -295,6 +341,64 @@ function renderTable() {
   }
 
   tb.innerHTML = html;
+  state.renderSig = sig;
+  cacheRows();
+}
+
+/* 记住每一行里的可变节点，下一轮直接改 textContent / style.width。 */
+function cacheRows() {
+  const rows = new Map();
+  document.querySelectorAll('#tbody tr.proc').forEach((tr) => {
+    const pid = Number(tr.dataset.pid);
+    const cpuTxt = tr.querySelector('.c-cpu .bar-cell > span');
+    const cpuBar = tr.querySelector('.c-cpu .mini-bar > i');
+    const memTxt = tr.querySelector('.c-mem .bar-cell > span');
+    const memBar = tr.querySelector('.c-mem .mini-bar > i');
+    const ioTxt = tr.querySelector('.c-io');
+    rows.set(pid, { tr, cpuTxt, cpuBar, memTxt, memBar, ioTxt });
+  });
+  state.rows = rows;
+}
+
+function updateRowsInPlace(list, maxWs) {
+  for (const p of list) {
+    const r = state.rows.get(p.pid);
+    if (!r) {
+      // 缓存对不上（进程换了 / 筛选变了）→ 放弃增量，下一轮重建
+      state.renderSig = '';
+      return;
+    }
+    const cpu = p.cpu_percent || 0;
+    const cpuCls = cpu >= 25 ? 'hot' : cpu >= 8 ? 'warn' : '';
+    const wsPct = (p.working_set / maxWs) * 100;
+    // 只写真正变了的文本 —— 绝大多数进程 CPU 恒为 0.0%、内存不变，
+    // 无脑重写会白白触发几百次样式重算与重绘。
+    setText(r.cpuTxt, cpu.toFixed(1) + '%');
+    if (r.cpuBar) {
+      if (r.cpuBar.className !== cpuCls) r.cpuBar.className = cpuCls;
+      setScale(r.cpuBar, Math.min(100, cpu * 4));
+    }
+    setText(r.memTxt, humanBytes(p.working_set));
+    if (r.memBar) setScale(r.memBar, wsPct);
+    setText(r.ioTxt, humanBytes((p.io_read_bytes || 0) + (p.io_write_bytes || 0)));
+    const wantSel = state.selected.has(p.pid);
+    if (r.tr.classList.contains('sel') !== wantSel) {
+      r.tr.classList.toggle('sel', wantSel);
+      const chk = r.tr.querySelector('input[data-chk]');
+      if (chk) chk.checked = wantSel;
+    }
+  }
+}
+
+function setText(el, v) {
+  if (!el) return;
+  if (el.textContent !== v) el.textContent = v;
+}
+
+function setScale(el, pct) {
+  if (!el) return;
+  const v = 'scaleX(' + (Math.max(0, Math.min(100, pct)) / 100).toFixed(3) + ')';
+  if (el.style.transform !== v) el.style.transform = v;
 }
 
 function renderCounts() {
@@ -658,11 +762,16 @@ const VIEW_META = {
     sub: '给系统做一次体检，看看哪里拖后腿，顺手清掉能清的垃圾',
     refresh: false,
   },
+  monitor: {
+    title: '实时监控',
+    sub: '后台低开销采样，内存与 CPU 占用自己盯着',
+    refresh: false,
+  },
 };
 
 function switchView(name) {
   const meta = VIEW_META[name] || VIEW_META.purge;
-  ['purge', 'boot', 'mode', 'checkup'].forEach((v) => {
+  ['purge', 'boot', 'mode', 'checkup', 'monitor'].forEach((v) => {
     const el = document.getElementById('view' + v[0].toUpperCase() + v.slice(1));
     if (el) el.hidden = v !== name;
   });
@@ -682,6 +791,8 @@ function switchView(name) {
     enterModeView();
   } else if (name === 'checkup' && typeof enterCheckupView === 'function') {
     enterCheckupView();
+  } else if (name === 'monitor' && typeof enterMonitorView === 'function') {
+    enterMonitorView();
   } else if (name === 'purge' && !state.timer) {
     scan(true);
   }

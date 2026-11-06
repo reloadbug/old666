@@ -63,6 +63,29 @@ pub fn run() {
                 "[old666] 启动完成 {ms:.1} ms ｜ 管理员={elevated} SeDebugPrivilege={dbg} PDH={pdh}"
             );
 
+            // P5 · 常驻监控：配置默认开着，开机就跑起来。
+            // 采样在后台线程里，5 秒一轮，开销远低于 0.5% CPU。
+            // OLD666_NO_MONITOR=1 可临时关掉（用于对照测量）。
+            let hub = app.state::<ipc::AppState>().monitor.clone();
+            let no_monitor = std::env::var("OLD666_NO_MONITOR")
+                .map(|v| v == "1" || v.eq_ignore_ascii_case("true"))
+                .unwrap_or(false);
+            if !no_monitor && hub.config().enabled {
+                hub.start();
+            }
+
+            // P5 · 悬浮球：上次是显示状态就把它摆回来
+            let fb = core::floatball::FloatBallState::load();
+            if fb.visible {
+                let handle = app.handle().clone();
+                let size = fb.size;
+                let (x, y) = (fb.x, fb.y);
+                std::thread::spawn(move || {
+                    std::thread::sleep(std::time::Duration::from_millis(300));
+                    let _ = ipc::create_floatball_window(&handle, size, x, y);
+                });
+            }
+
             if bench {
                 // 基准模式：打完时间就退出，供 scripts 反复测量取中位数
                 println!("{ms:.1}");
@@ -115,6 +138,16 @@ pub fn run() {
             ipc::junk_scan,
             ipc::junk_delete,
             ipc::checkup_fix,
+            // P5 · 常驻监控
+            ipc::monitor_snapshot,            ipc::monitor_configure,
+            ipc::monitor_toggle,
+            ipc::monitor_clear_alerts,
+            // P5 · 悬浮球
+            ipc::floatball_state,
+            ipc::floatball_save,
+            ipc::floatball_show,
+            // P5 · 窗口空闲探测（前端据此暂停高频扫描）
+            ipc::window_idle,
         ])
         .run(tauri::generate_context!())
         .expect("启动 Tauri 应用失败");

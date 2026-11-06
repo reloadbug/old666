@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>老六清净 悬浮球</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    overflow: hidden;
+    user-select: none;
+    -webkit-user-select: none;
+    font-family: "Microsoft YaHei UI", "Segoe UI", system-ui, sans-serif;
+  }
+
+  .ball {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: grab;
+    transition: transform .15s ease, opacity .2s ease;
+  }
+  .ball:active { cursor: grabbing; }
+  .ball:hover { transform: scale(1.06); }
+  .ball.dragging { transform: scale(0.96); }
+
+  .orb {
+    width: 78%;
+    height: 78%;
+    border-radius: 50%;
+    background: radial-gradient(circle at 32% 28%, #7ee0c0 0%, #3aa78a 45%, #1f6d59 100%);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, .38), inset 0 1px 2px rgba(255, 255, 255, .45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #05231d;
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: .5px;
+  }
+
+  .mini {
+    position: absolute;
+    right: 2px;
+    bottom: 2px;
+    width: 30%;
+    height: 30%;
+    border-radius: 50%;
+    background: #d8433f;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid rgba(255, 255, 255, .8);
+  }
+
+  .tip {
+    position: absolute;
+    bottom: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(20, 24, 26, .92);
+    color: #eaf5f1;
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 8px;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+
+  /* 单击展开的小面板：内存 / CPU / 进程数 + 几个快操作 */
+  .panel {
+    position: absolute;
+    left: 50%;
+    top: 100%;
+    transform: translateX(-50%);
+    margin-top: 8px;
+    width: 220px;
+    background: rgba(16, 22, 24, .94);
+    border: 1px solid rgba(255, 255, 255, .12);
+    border-radius: 14px;
+    padding: 10px 12px;
+    color: #e6f5ef;
+    font-size: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .45);
+    display: none;
+  }
+  .panel.show { display: block; }
+  .panel .row {
+    display: flex;
+    justify-content: space-between;
+    padding: 3px 0;
+  }
+  .panel .row span:last-child { font-variant-numeric: tabular-nums; color: #7ee0c0; }
+  .panel .acts {
+    display: flex;
+    gap: 6px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+  }
+  .panel button {
+    flex: 1 1 auto;
+    background: rgba(255, 255, 255, .10);
+    color: #e6f5ef;
+    border: 1px solid rgba(255, 255, 255, .14);
+    border-radius: 8px;
+    padding: 5px 8px;
+    font-size: 11px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .panel button:hover { background: rgba(126, 224, 192, .22); }
+</style>
+</head>
+<body>
+
+<div class="ball" id="ball">
+  <div class="orb" id="orb">六</div>
+  <div class="mini" id="mini" hidden>!</div>
+  <div class="tip" id="tip">双击打开主界面</div>
+  <div class="panel" id="panel">
+    <div class="row"><span>内存</span><span id="pMem">—</span></div>
+    <div class="row"><span>CPU</span><span id="pCpu">—</span></div>
+    <div class="row"><span>进程</span><span id="pProc">—</span></div>
+    <div class="acts">
+      <button id="pOpen">打开主界面</button>
+      <button id="pCollapse">收起</button>
+      <button id="pHide">隐藏悬浮球</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var IS_TAURI = !!(window.__TAURI__ && window.__TAURI__.core);
+  var $ = function (s) { return document.querySelector(s); };
+  var state = { visible: true, x: 0, y: 0, size: 72, opacity: 0.92, collapsed: false };
+  var drag = null;
+  var justDragged = false; // 刚拖完就松手时，别把这次当成「点击」
+
+  function invoke(cmd, args) {
+    if (!IS_TAURI) return Promise.reject(new Error('预览模式'));
+    return window.__TAURI__.core.invoke(cmd, args || {});
+  }
+
+  function loadState() {
+    return invoke('floatball_state').then(function (r) {
+      if (r && r.ok !== false && r.data) {
+        state = r.data;
+      }
+    }).catch(function () {});
+  }
+
+  function saveState() {
+    if (!IS_TAURI) return;
+    invoke('floatball_save', { state: state }).catch(function () {});
+  }
+
+  /* 拖动：记录鼠标位移，松手时把新坐标写回后端 */
+  var ball = $('#ball');
+  ball.addEventListener('mousedown', function (e) {
+    drag = { sx: e.screenX, sy: e.screenY, ox: state.x, oy: state.y, moved: false };
+    ball.classList.add('dragging');
+  });
+
+  window.addEventListener('mousemove', function (e) {
+    if (!drag) return;
+    var nx = drag.ox + (e.screenX - drag.sx);
+    var ny = drag.oy + (e.screenY - drag.sy);
+    if (Math.abs(nx - drag.ox) > 2 || Math.abs(ny - drag.oy) > 2) drag.moved = true;
+    state.x = nx;
+    state.y = ny;
+    if (IS_TAURI && window.__TAURI__.window && window.__TAURI__.window.getCurrent) {
+      window.__TAURI__.window.getCurrent().then(function (w) {
+        if (w && w.setPosition) w.setPosition(nx, ny);
+      }).catch(function () {});
+    }
+  });
+
+  window.addEventListener('mouseup', function () {
+    if (!drag) return;
+    ball.classList.remove('dragging');
+    var moved = drag.moved;
+    drag = null;
+    justDragged = moved;
+    setTimeout(function () { justDragged = false; }, 0);
+    if (moved) saveState();
+  });
+
+  /* 双击：打开主窗口 */
+  ball.addEventListener('dblclick', function () {
+    if (IS_TAURI && window.__TAURI__.window && window.__TAURI__.window.getCurrent) {
+      window.__TAURI__.window.getCurrent().then(function (w) {
+        if (w && w.setFocus) w.setFocus();
+      }).catch(function () {});
+    }
+    showTip('主界面已在运行');
+  });
+
+  /* 单击：展开小面板（再点一次收起） */
+  var panel = $('#panel');
+  ball.addEventListener('click', function (e) {
+    if (drag && drag.moved) return; // 刚拖完不算点击
+    if (justDragged) return;
+    if (e.target.closest('button')) return;
+    panel.classList.toggle('show');
+    if (panel.classList.contains('show')) refreshStats();
+  });
+
+  function refreshStats() {
+    if (!IS_TAURI) return;
+    invoke('monitor_snapshot').then(function (r) {
+      if (!r || !r.ok || !r.data || !r.data.sample) return;
+      var s = r.data.sample;
+      var mem = s.mem_percent != null ? s.mem_percent.toFixed(0) + '%' : '—';
+      var cpu = s.cpu_percent != null ? s.cpu_percent.toFixed(0) + '%' : '—';
+      var proc = s.process_count != null ? String(s.process_count) : '—';
+      $('#pMem').textContent = mem;
+      $('#pCpu').textContent = cpu;
+      $('#pProc').textContent = proc;
+    }).catch(function () {});
+  }
+
+  $('#pOpen').addEventListener('click', function (e) {
+    e.stopPropagation();
+    if (IS_TAURI && window.__TAURI__.window && window.__TAURI__.window.getCurrent) {
+      window.__TAURI__.window.getCurrent().then(function (w) {
+        if (w && w.setFocus) w.setFocus();
+      }).catch(function () {});
+    }
+    showTip('主界面已在运行');
+  });
+
+  $('#pCollapse').addEventListener('click', function (e) {
+    e.stopPropagation();
+    state.collapsed = !state.collapsed;
+    $('#orb').textContent = state.collapsed ? '小' : '六';
+    $('#mini').hidden = !state.collapsed;
+    saveState();
+    showTip(state.collapsed ? '已收起' : '已展开');
+  });
+
+  $('#pHide').addEventListener('click', function (e) {
+    e.stopPropagation();
+    if (IS_TAURI) {
+      invoke('floatball_show', { show: false }).catch(function () {});
+    }
+    showTip('悬浮球已隐藏，可在「实时监控」页重新打开');
+  });
+
+  /* 右键：轮换场景模式（日常 → 游戏 → 服务器 → 日常） */
+  var MODES = [
+    { id: 'daily', label: '日常' },
+    { id: 'game', label: '游戏' },
+    { id: 'server', label: '服务器' },
+  ];
+  var modeIdx = 0;
+
+  ball.addEventListener('contextmenu', function (e) {
+    e.preventDefault();
+    modeIdx = (modeIdx + 1) % MODES.length;
+    var m = MODES[modeIdx];
+    if (IS_TAURI) {
+      invoke('mode_set_active', { modeId: m.id }).then(function (r) {
+        if (r && r.ok) showTip('已切到「' + m.label + '」模式');
+        else showTip('切换失败：' + ((r && r.error) || '未知错误'), true);
+      }).catch(function () { showTip('切换失败', true); });
+    } else {
+      showTip('已切到「' + m.label + '」模式');
+    }
+  });
+
+  var tipTimer = null;
+  function showTip(msg, isErr) {
+    var t = $('#tip');
+    t.textContent = msg;
+    t.style.background = isErr ? 'rgba(120, 30, 30, .92)' : 'rgba(20, 24, 26, .92)';
+    t.hidden = false;
+    clearTimeout(tipTimer);
+    tipTimer = setTimeout(function () {
+      t.textContent = '双击打开主界面';
+      t.style.background = 'rgba(20, 24, 26, .92)';
+    }, 2500);
+  }
+
+  loadState().then(function () {
+    document.body.style.opacity = String(state.opacity);
+    if (state.collapsed) {
+      $('#orb').textContent = '六';
+      $('#mini').hidden = false;
+    }
+  });
+})();
+</script>
+</body>
+</html>

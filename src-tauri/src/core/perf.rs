@@ -38,6 +38,7 @@ pub struct SystemSampler {
     disk_time: isize,
     net_rx: isize,
     net_tx: isize,
+    processes: isize,
     ok: bool,
 }
 
@@ -69,6 +70,9 @@ impl SystemSampler {
             let disk_time = add(query, r"\PhysicalDisk(_Total)\% Disk Time");
             let net_rx = add(query, r"\Network Interface(*)\Bytes Received/sec");
             let net_tx = add(query, r"\Network Interface(*)\Bytes Sent/sec");
+            // P5 常驻监控：进程数走 PDH 的 \System\Processes，
+            // 不用逐个 OpenProcess —— 那一步会把常驻 CPU 顶到 1% 上下。
+            let processes = add(query, r"\System\Processes");
 
             let s = Self {
                 query,
@@ -78,6 +82,7 @@ impl SystemSampler {
                 disk_time,
                 net_rx,
                 net_tx,
+                processes,
                 ok: true,
             };
             // 速率计数器需要基线采样
@@ -95,6 +100,7 @@ impl SystemSampler {
             disk_time: INVALID,
             net_rx: INVALID,
             net_tx: INVALID,
+            processes: INVALID,
             ok: false,
         }
     }
@@ -102,6 +108,50 @@ impl SystemSampler {
     /// PDH 是否可用（P0 报告要如实体现）。
     pub fn is_healthy(&self) -> bool {
         self.ok
+    }
+
+    /// 轻量采样：**只**取 CPU、内存、进程数。
+    ///
+    /// P5 常驻监控用它，而不是 `sample()`。
+    /// 原因：`% Disk Time` 与 `Network Interface(*)` 这两个计数器
+    /// 单轮要 40 ms 上下，五秒一轮就是 0.8% CPU —— 达不到 0.5% 的指标。
+    /// 监控页要的是「系统忙不忙」，磁盘与网络速率偶尔看一眼就够，
+    /// 所以那条路径改用低频采样。
+    pub fn sample_light(&self, process_count: u32, thread_count: u32) -> SystemMetrics {
+        let mut m = SystemMetrics {
+            process_count,
+            thread_count,
+            ..Default::default()
+        };
+
+        unsafe {
+            let mut ms = MEMORYSTATUSEX {
+                dwLength: std::mem::size_of::<MEMORYSTATUSEX>() as u32,
+                ..Default::default()
+            };
+            if GlobalMemoryStatusEx(&mut ms).is_ok() {
+                m.mem_total = ms.ullTotalPhys;
+                m.mem_used = ms.ullTotalPhys.saturating_sub(ms.ullAvailPhys);
+            }
+        }
+
+        if !self.ok {
+            return m;
+        }
+
+        unsafe {
+            if PdhCollectQueryData(self.query) != 0 {
+                return m;
+            }
+            m.cpu_percent = read_single(self.cpu).unwrap_or(0.0).clamp(0.0, 100.0) as f32;
+            if let Some(v) = read_single(self.processes) {
+                if v.is_finite() && v >= 0.0 {
+                    m.process_count = v as u32;
+                }
+            }
+        }
+
+        m
     }
 
     /// 采集一次系统指标。
@@ -138,6 +188,13 @@ impl SystemSampler {
             m.disk_write_bps = read_single(self.disk_write).unwrap_or(0.0);
             m.net_rx_bps = read_array_sum(self.net_rx).unwrap_or(0.0);
             m.net_tx_bps = read_array_sum(self.net_tx).unwrap_or(0.0);
+            // 进程数：优先用 PDH 计数器（几乎零开销）；
+            // 拿不到时保留调用方传进来的值。
+            if let Some(v) = read_single(self.processes) {
+                if v.is_finite() && v >= 0.0 {
+                    m.process_count = v as u32;
+                }
+            }
         }
 
         m

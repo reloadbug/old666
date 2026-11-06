@@ -2,6 +2,6 @@
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
   "description": "老六清净主窗口的默认权限（只用 core 能力，不开放任何插件命令）",
-  "windows": ["main"],
-  "permissions": ["core:default"]
+  "windows": ["main", "floatball"],
+  "permissions": ["core:default", "core:window:allow-show", "core:window:allow-hide", "core:window:allow-set-focus", "core:window:allow-start-dragging", "core:window:allow-set-position", "core:window:allow-set-size", "core:window:allow-close"]
 }

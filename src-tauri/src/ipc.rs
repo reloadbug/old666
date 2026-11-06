@@ -20,14 +20,34 @@ use crate::core::types::{
 /// 应用全局状态。
 pub struct AppState {
     pub engine: Mutex<PurgeEngine>,
+    /// P5 常驻监控中心（后台采样线程）。
+    pub monitor: std::sync::Arc<crate::core::monitor::MonitorHub>,
 }
 
 impl Default for AppState {
     fn default() -> Self {
         Self {
             engine: Mutex::new(PurgeEngine::new()),
+            monitor: std::sync::Arc::new(crate::core::monitor::MonitorHub::new()),
         }
     }
+}
+
+/// 主窗口当前是否「没人看」（最小化或隐藏）。
+///
+/// 前端据此暂停高频进程扫描。Windows 上 `document.hidden` 只在真正隐藏时
+/// 为真，最小化到任务栏并不触发 —— 而最小化后没人看得见进程表，继续每
+/// 2 秒扫一遍全系统进程纯属白烧 CPU（P5 硬指标：常驻 ≤ 0.5%）。
+#[tauri::command]
+pub fn window_idle(app: tauri::AppHandle) -> Reply<bool> {
+    use tauri::Manager;
+
+    let Some(w) = app.get_webview_window("main") else {
+        return Reply::ok(true);
+    };
+    let minimized = w.is_minimized().unwrap_or(false);
+    let visible = w.is_visible().unwrap_or(true);
+    Reply::ok(minimized || !visible)
 }
 
 /// 统一返回包装：前端只需判断 `ok`。
@@ -788,6 +808,145 @@ pub fn checkup_fix(
     };
     let before = crate::core::checkup::run();
     Reply::ok(crate::core::checkup_fix::run(&mut e, &requests, &before))
+}
+
+// ===========================================================================
+// P5 · 常驻监控
+// ===========================================================================
+
+/// 读取常驻监控快照（最近一次采样 + 峰值 + 未处理告警）。
+#[tauri::command]
+pub fn monitor_snapshot(state: State<'_, AppState>) -> Reply<crate::core::monitor::MonitorSnapshot> {
+    Reply::ok(state.monitor.snapshot())
+}
+
+/// 写入监控配置并（重新）启动后台采样线程。
+#[tauri::command]
+pub fn monitor_configure(
+    state: State<'_, AppState>,
+    config: crate::core::monitor::MonitorConfig,
+) -> Reply<crate::core::monitor::MonitorConfig> {
+    let cfg = state.monitor.set_config(config);
+    if cfg.enabled {
+        state.monitor.start();
+    } else {
+        state.monitor.stop_monitor();
+    }
+    Reply::ok(cfg)
+}
+
+/// 启动 / 停止常驻监控。停止后后台线程退出，常驻占用归零。
+#[tauri::command]
+pub fn monitor_toggle(
+    state: State<'_, AppState>,
+    enabled: bool,
+) -> Reply<crate::core::monitor::MonitorSnapshot> {
+    let mut cfg = state.monitor.config();
+    cfg.enabled = enabled;
+    state.monitor.set_config(cfg);
+    if enabled {
+        state.monitor.start();
+    } else {
+        state.monitor.stop_monitor();
+    }
+    Reply::ok(state.monitor.snapshot())
+}
+
+/// 清空告警列表。
+#[tauri::command]
+pub fn monitor_clear_alerts(state: State<'_, AppState>) -> Reply<usize> {
+    state.monitor.clear_alerts();
+    Reply::ok(state.monitor.snapshot().alerts.len())
+}
+
+// ===========================================================================
+// P5 · 悬浮球
+// ===========================================================================
+
+/// 创建悬浮球窗口（无边框、置顶、不进任务栏、始终可见）。
+///
+/// 悬浮球是一个独立 webview，加载 `floatball.html`。
+/// 窗口本身不加载主应用的 JS —— 悬浮球要保持轻量。
+pub fn create_floatball_window(
+    app: &tauri::AppHandle,
+    size: f64,
+    x: f64,
+    y: f64,
+) -> Result<(), String> {
+    use tauri::{WebviewUrl, WebviewWindowBuilder};
+
+    let url = WebviewUrl::App("floatball.html".into());
+    WebviewWindowBuilder::new(app, "floatball", url)
+        .title("老六清净 悬浮球")
+        .inner_size(size, size)
+        .position(x, y)
+        .decorations(false)
+        .transparent(true)
+        .always_on_top(true)
+        .skip_taskbar(true)
+        .resizable(false)
+        .shadow(false)
+        .focused(false)
+        .visible(true)
+        .build()
+        .map(|_| ())
+        .map_err(|e| e.to_string())
+}
+
+/// 读取悬浮球状态。
+#[tauri::command]
+pub fn floatball_state() -> Reply<crate::core::floatball::FloatBallState> {
+    Reply::ok(crate::core::floatball::FloatBallState::load())
+}
+
+/// 保存悬浮球状态（位置 / 大小 / 透明度 / 收起）。
+#[tauri::command]
+pub fn floatball_save(
+    app: tauri::AppHandle,
+    state: crate::core::floatball::FloatBallState,
+) -> Reply<crate::core::floatball::FloatBallState> {
+    use tauri::{LogicalPosition, LogicalSize, Manager};
+    let s = state.sanitize();
+    s.save();
+    // 同步给窗口：位置与大小立即生效
+    if let Some(w) = app.get_webview_window("floatball") {
+        let _ = w.set_position(LogicalPosition::new(s.x, s.y));
+        let _ = w.set_size(LogicalSize::new(s.size, s.size));
+    }
+    Reply::ok(s)
+}
+
+/// 显示 / 隐藏悬浮球窗口。
+#[tauri::command]
+pub fn floatball_show(
+    app: tauri::AppHandle,
+    show: bool,
+) -> Reply<bool> {
+    use tauri::Manager;
+    if show {
+        if let Some(w) = app.get_webview_window("floatball") {
+            let _ = w.show();
+            let _ = w.set_focus();
+            return Reply::ok(true);
+        }
+        // 窗口还没建过 —— 用配置里的状态现建一个
+        let st = crate::core::floatball::FloatBallState::load();
+        let size = st.size;
+        let x = st.x;
+        let y = st.y;
+        match create_floatball_window(&app, size, x, y) {
+            Ok(_) => Reply::ok(true),
+            Err(e) => Reply::err(format!("悬浮球创建失败：{e}")),
+        }
+    } else {
+        if let Some(w) = app.get_webview_window("floatball") {
+            let _ = w.hide();
+        }
+        let mut st = crate::core::floatball::FloatBallState::load();
+        st.visible = false;
+        st.save();
+        Reply::ok(false)
+    }
 }
 
 // ===========================================================================

@@ -36,9 +36,9 @@
       <svg viewBox="0 0 24 24" class="ic"><path d="M12 21s-7-4.5-7-10a7 7 0 0 1 14 0c0 5.5-7 10-7 10z"/><path d="M12 8v4l2 2"/></svg>
       <span>一键体检</span>
     </button>
-    <button class="nav-item" data-view="monitor" disabled>
+    <button class="nav-item" data-view="monitor">
       <svg viewBox="0 0 24 24" class="ic"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>
-      <span>实时监控</span><em class="soon">P5</em>
+      <span>实时监控</span>
     </button>
     <button class="nav-item" data-view="settings">
       <svg viewBox="0 0 24 24" class="ic"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/></svg>
@@ -420,6 +420,72 @@
 
   </div><!-- /#viewCheckup -->
 
+  <!-- ===================== 实时监控 ===================== -->
+  <div class="view" id="viewMonitor" hidden>
+
+    <section class="card">
+      <div class="card-head">
+        <div>
+          <h2 class="card-title">实时监控</h2>
+          <p class="card-sub" id="monSub">后台低开销采样，占用远低于 0.5% CPU。</p>
+        </div>
+        <div class="card-head-right">
+          <div class="big-num" id="monCpu">—</div>
+          <div class="big-num-sub">CPU %</div>
+        </div>
+      </div>
+
+      <div class="mon-grid" id="monGrid">
+        <div class="mon-cell"><span class="mon-k">内存</span><span class="mon-v" id="monMem">—</span></div>
+        <div class="mon-cell"><span class="mon-k">磁盘</span><span class="mon-v" id="monDisk">—</span></div>
+        <div class="mon-cell"><span class="mon-k">网络</span><span class="mon-v" id="monNet">—</span></div>
+        <div class="mon-cell"><span class="mon-k">进程数</span><span class="mon-v" id="monProc">—</span></div>
+        <div class="mon-cell"><span class="mon-k">自身内存</span><span class="mon-v" id="monSelfMem">—</span></div>
+        <div class="mon-cell"><span class="mon-k">自身 CPU</span><span class="mon-v" id="monSelfCpu">—</span></div>
+      </div>
+
+      <div class="card-head-right checkup-actions">
+        <button class="btn primary" id="btnMonToggle">开启常驻监控</button>
+        <button class="btn soft" id="btnMonClear">清空告警</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <div>
+          <h2 class="card-title">告警</h2>
+          <p class="card-sub">同一种告警两分钟内不重复提示，不打扰。</p>
+        </div>
+      </div>
+      <ul class="mon-alerts" id="monAlerts"></ul>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <div>
+          <h2 class="card-title">阈值与悬浮球</h2>
+          <p class="card-sub">悬浮球可贴边收起、双击唤起主界面。</p>
+        </div>
+      </div>
+
+      <div class="mon-form">
+        <label class="mode-field"><span>CPU 阈值（%）</span><input type="number" id="monCpuTh" min="10" max="100"></label>
+        <label class="mode-field"><span>内存阈值（%）</span><input type="number" id="monMemTh" min="10" max="100"></label>
+        <label class="mode-field"><span>磁盘阈值（%）</span><input type="number" id="monDiskTh" min="10" max="100"></label>
+        <label class="mode-field"><span>采样间隔（秒）</span><input type="number" id="monInterval" min="1" max="60"></label>
+        <label class="mode-field"><span>悬浮球大小（px）</span><input type="number" id="fbSize" min="48" max="160"></label>
+        <label class="mode-field"><span>悬浮球透明度</span><input type="number" id="fbOpacity" min="30" max="100" step="5"></label>
+      </div>
+
+      <div class="card-head-right checkup-actions">
+        <button class="btn soft" id="btnMonSave">保存阈值</button>
+        <button class="btn primary" id="btnFbToggle">显示悬浮球</button>
+        <button class="btn soft" id="btnFbSave">保存悬浮球设置</button>
+      </div>
+    </section>
+
+  </div><!-- /#viewMonitor -->
+
 </main>
 
 <!-- ===================== 确认对话框（启动项变更专用）===================== -->
@@ -569,5 +635,6 @@
 <script src="boot.js"></script>
 <script src="mode.js"></script>
 <script src="checkup.js"></script>
+<script src="monitor.js"></script>
 </body>
 </html>
