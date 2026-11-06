@@ -108,13 +108,13 @@ node tests/frontend_boot.mjs      # 111 项断言 + 截图，产出在 tests/_ou
 
 ---
 
-打包便携包（v0.1.3）：
+打包便携包（v0.1.4）：
 
 ```bash
 cargo build --release             # 两个二进制：old666.exe + old666-poc.exe
 python tools/measure-p0.py        # P0 验收基线：体积 / 冷启动 / 采集耗时
 # 打包（PowerShell）：
-#   Compress-Archive -Path release\old666-v0.1.3-win64 -DestinationPath release\old666-v0.1.3-win64.zip
+#   Compress-Archive -Path release\old666-v0.1.4-win64 -DestinationPath release\old666-v0.1.4-win64.zip
 ```
 
 > 产物目录 `release/` 已加入 `.gitignore`：zip 是二进制，不进版本库；
