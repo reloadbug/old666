@@ -687,15 +687,12 @@ check('选中后按钮提示已全部选中', /已全部选中|无推荐项/.tes
 check('禁用按钮计数 = 推荐项数', recSel.disableBtn.includes(`（${recSel.rec}）`), recSel.disableBtn);
 await clearPicked();
 
-console.log('\n== 11. 启动项说明面板（知识库） ==');
-const kbId = await page.evaluate(() => {
-  for (const b of document.querySelectorAll('#startupBody button[data-info]')) {
-    const line = b.closest('tr').querySelector('.kb-line');
-    if (line && !line.classList.contains('none')) return b.dataset.info;
-  }
-  return null;
-});
-check('列表里存在带内置说明的条目', !!kbId);
+console.log('\n== 11. 启动项详情面板（知识库） ==');
+// 列表里不再显示说明摘要了 —— 那属于「参考信息」，要看进详情页。
+// 所以样本直接从 fixture 里挑：有内置说明的 / 没有说明的，各一条。
+const kbId = fast.items.find((i) => i.knowledge && !i.knowledge.generic)?.id
+  || fast.items.find((i) => i.knowledge)?.id || null;
+check('fixture 里有带内置说明的条目', !!kbId);
 
 await page.click(`#startupBody button[data-info="${kbId}"]`);
 await page.waitForSelector('#infoMask:not([hidden])', { timeout: 5000 });
@@ -706,12 +703,17 @@ const info = await page.evaluate(() => ({
   desc: (document.querySelector('#infoAdvice .adv-desc')?.textContent || '').trim(),
   advTitle: (document.querySelector('#infoAdvice .adv-title')?.textContent || '').trim(),
   tags: document.querySelector('#infoTags').children.length,
+  refOpen: document.querySelector('#infoRef')?.open,
+  refText: (document.querySelector('#infoRefKv')?.textContent || '').trim(),
+  listHasCmd: [...document.querySelectorAll('#startupBody .startup-cmd')].length,
 }));
 check('说明面板打开并显示条目名', info.name.length > 0, info.name.slice(0, 26));
 check('标注说明来自内置库', info.origin === '内置说明', info.origin);
 check('给出综合描述（知识库的核心价值）', info.desc.length > 20, `${info.desc.length} 字：${info.desc.slice(0, 28)}…`);
 check('给出标题与厂商', info.advTitle.length > 0, info.advTitle.slice(0, 30));
-check('显示命令行原文', info.cmd.length > 0, info.cmd.slice(0, 40));
+check('命令行只在详情页里（列表中已移除）', info.cmd.length > 0 && info.listHasCmd === 0,
+  `详情 ${info.cmd.length} 字 / 列表 ${info.listHasCmd} 处`);
+check('参考信息默认折叠', info.refOpen === false, `open=${info.refOpen}`);
 check('标签行有来源与状态', info.tags >= 2, String(info.tags));
 
 // 手动编辑（用户报的「未知进程用户可以手动编辑其信息」）
@@ -742,12 +744,7 @@ await page.waitForFunction(
    条目，这一组必须单独测「库里查不到」的条目：面板要如实说「暂无说明」，
    编辑区要能打开、能存、存完这条就变成「你的补充」。 */
 console.log('\n== 11b. 未收录条目也能手动补充说明 ==');
-const unknownId = await page.evaluate(() => {
-  for (const r of document.querySelectorAll('#startupBody tr')) {
-    if (r.querySelector('.kb-line.none')) return r.querySelector('button[data-info]')?.dataset.info || null;
-  }
-  return null;
-});
+const unknownId = fast.items.find((i) => !i.knowledge)?.id || null;
 check('存在没有内置说明的条目（正好用来验证「手动编辑」）', !!unknownId);
 
 if (unknownId) {

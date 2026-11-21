@@ -506,11 +506,24 @@ tr.proc.forbidden{opacity:.62}
 .hide-off input{accent-color:var(--primary)}
 .hide-off + .search{margin-left:0}
 .startup-scroll{max-height:none}
-.ptable.stable{table-layout:auto}
-.c-src{width:96px}
-.c-risk{width:300px}
+/* 启动项表：固定列宽，各行等宽 —— 命令行这类长文本一律不进列表 */
+.ptable.startup-table{table-layout:fixed;width:100%}
+.ptable.startup-table .c-chk{width:38px}
+.ptable.startup-table .c-name{width:auto;max-width:0;overflow:hidden}
+.ptable.startup-table .c-src{width:96px}
+.ptable.startup-table .c-state{width:92px}
+.ptable.startup-table .c-risk{width:320px}
+.ptable.startup-table .c-act{width:170px;white-space:nowrap;text-align:right}
+.ptable.startup-table .c-act .btn{margin-left:4px}
+.startup-table .startup-name{
+  font-weight:600;font-size:13px;word-break:break-word;overflow-wrap:anywhere;
+  display:flex;align-items:center;gap:6px;flex-wrap:wrap;
+}
+.startup-table .startup-src{font-size:12px;color:var(--muted)}
+.startup-table .startup-env{font-size:12px;color:var(--muted)}
+.startup-table .startup-env.off{color:var(--amber);font-weight:600}
 
-/* 启动项行的动作列要放得下「延迟 / 启用 / 说明」三个按钮 */
+/* 启动项行的动作列要放得下「延迟 / 启用 / 详情」三个按钮 */
 .ptable.stable .c-act{width:190px;white-space:nowrap;text-align:right}
 .ptable.stable .c-act .btn{margin-left:4px}
 
@@ -559,6 +572,25 @@ tr.proc.forbidden{opacity:.62}
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:420px;
 }
 .kb-line.none{color:#94A3B8}
+
+/* 详情页里的「参考信息」折叠区 */
+.info-ref{
+  margin:12px 0;border:1px solid var(--line);border-radius:var(--radius-s);
+  background:var(--surface-2);
+}
+.info-ref-sum{
+  cursor:pointer;padding:8px 12px;font-size:12px;color:var(--muted);
+  user-select:none;list-style:none;
+}
+.info-ref-sum::-webkit-details-marker{display:none}
+.info-ref-sum::before{content:'▸ ';color:var(--primary)}
+.info-ref[open] > .info-ref-sum::before{content:'▾ '}
+.info-ref[open] > .info-ref-sum{border-bottom:1px solid var(--line)}
+.info-ref .info-cmd{
+  font-family:Consolas,monospace;font-size:11px;color:var(--muted);
+  word-break:break-all;margin:10px 12px 0;
+}
+.info-ref .info-kv{margin:10px 12px 12px}
 
 /* ---------- 启动项说明面板 ---------- */
 .modal.wide{max-width:620px}

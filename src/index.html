@@ -246,13 +246,14 @@
       </div>
 
       <div class="table-scroll startup-scroll">
-        <table class="ptable stable">
+        <table class="ptable stable startup-table">
           <thead>
             <tr>
               <th class="c-chk"></th>
               <th class="c-name">启动项</th>
               <th class="c-src">来源</th>
-              <th class="c-risk">影响</th>
+              <th class="c-state">状态</th>
+              <th class="c-risk">建议与影响</th>
               <th class="c-act"></th>
             </tr>
           </thead>
@@ -510,18 +511,24 @@
 <div class="modal-mask" id="infoMask" hidden>
   <div class="modal wide" role="dialog" aria-modal="true" aria-labelledby="infoTitle">
     <header class="modal-head">
-      <h2 id="infoTitle">启动项说明</h2>
+      <h2 id="infoTitle">启动项详情</h2>
       <span class="info-origin" id="infoOrigin"></span>
       <button class="x" id="infoX" aria-label="关闭">×</button>
     </header>
     <div class="modal-body">
       <div class="info-head">
         <div class="info-name" id="infoName">—</div>
-        <div class="info-cmd selectable" id="infoCmd"></div>
         <div class="info-tags" id="infoTags"></div>
       </div>
 
       <div class="info-kv" id="infoKv"></div>
+
+      <!-- 参考信息：平时用不到，折叠起来（默认收起） -->
+      <details class="info-ref" id="infoRef">
+        <summary class="info-ref-sum">参考信息（命令行、位置、发布者…）</summary>
+        <div class="info-cmd selectable" id="infoCmd"></div>
+        <div class="info-kv" id="infoRefKv"></div>
+      </details>
 
       <div class="info-advice" id="infoAdvice" hidden></div>
 

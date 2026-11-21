@@ -81,6 +81,18 @@ const SRC_LABELS = {
   scheduled_task: '计划任务',
 };
 
+/** 签名状态 → 人话。后端给的是 {valid:主体} / unsigned / invalid / unknown。 */
+function bSigText(sig) {
+  if (!sig) return '未知';
+  if (typeof sig === 'object') {
+    if (typeof sig.valid === 'string') return sig.valid ? `已签名 · ${sig.valid}` : '已签名';
+    if (sig.valid === true) return '已签名';
+  }
+  if (sig === 'unsigned') return '无签名';
+  if (sig === 'invalid') return '签名无效';
+  return '无法判定';
+}
+
 /** 建议文案 → 面板上的配色档位。 */
 const ADVICE_CLASS = {
   '可以禁用': '',
@@ -411,6 +423,32 @@ function badgesOf(it) {
   return out.join('');
 }
 
+/** 一行的「建议与影响」格。
+ *
+ *  这里只放**用户要做决定需要看的东西**：能不能禁、为什么、拖慢多少。
+ *  命令行、路径、发布者这些「参考信息」一律搬到详情页，别挤在列表里 ——
+ *  列表的宽度是固定的，一行长命令会把整张表撑得歪歪扭扭。 */
+function renderRiskCell(it) {
+  const reason = it.signature_pending ? '正在确认发布者…' : it.risk_reason;
+  const impact = it.impact_ms
+    ? `<span class="risk-impact">拖慢开机 ${bHumanMs(it.impact_ms)}</span>` : '';
+
+  // 「影响」这一列说的是**现在该怎么处理**，不是风险评估报告。
+  // 已禁用的条目再显示「可安全禁用」会自相矛盾 —— 用户看到「可以禁用」
+  // 却勾不上，只会觉得这软件坏了。这里如实说「已禁用」并告诉他下一步。
+  const offNow = !it.enabled;
+  const riskTag = offNow
+    ? `<span class="risk-tag off" title="风险评估：${bEsc(RISK_LABELS[it.risk] || it.risk)}${it.risk_reason ? '；' + bEsc(it.risk_reason) : ''}">已禁用</span>`
+    : `<span class="risk-tag ${bEsc(it.risk)}">${bEsc(RISK_LABELS[it.risk] || it.risk)}</span>`;
+  const reasonText = offNow
+    ? (it.disabled_by_us ? '由老六禁用，点右侧「启用」可恢复' : '已在系统里被关闭，点右侧「启用」可恢复')
+    : reason;
+  return `<div class="risk-cell">` +
+    riskTag +
+    `<span class="risk-reason">${bEsc(reasonText)}</span>` + impact +
+  `</div>`;
+}
+
 function renderStartup(scan) {
   const body = $b('#startupBody');
   const list = visibleStartups();
@@ -422,31 +460,12 @@ function renderStartup(scan) {
     const tr = document.createElement('tr');
     tr.className = 'startup-row' + (it.enabled ? '' : ' disabled-row');
 
-    const reason = it.signature_pending ? '正在确认发布者…' : it.risk_reason;
-    const impact = it.impact_ms
-      ? `<span class="risk-impact">拖慢开机 ${bHumanMs(it.impact_ms)}</span>` : '';
     const state = it.enabled ? (it.delayed ? '已延迟启动' : '已启用') : '已禁用';
-
-    // 「影响」这一列说的是**现在该怎么处理**，不是风险评估报告。
-    // 已禁用的条目再显示「可安全禁用」会自相矛盾 —— 用户看到「可以禁用」
-    // 却勾不上，只会觉得这软件坏了。这里如实说「已禁用」并告诉他下一步。
-    const offNow = !it.enabled;
-    const riskTag = offNow
-      ? `<span class="risk-tag off" title="风险评估：${bEsc(RISK_LABELS[it.risk] || it.risk)}${it.risk_reason ? '；' + bEsc(it.risk_reason) : ''}">已禁用</span>`
-      : `<span class="risk-tag ${bEsc(it.risk)}">${bEsc(RISK_LABELS[it.risk] || it.risk)}</span>`;
-    const reasonText = offNow
-      ? (it.disabled_by_us ? '由老六禁用，点右侧「启用」可恢复' : '已在系统里被关闭，点右侧「启用」可恢复')
-      : reason;
-    const cmdTitle = it.command ? ` title="${bEsc(it.command)}"` : '';
-    const k = it.knowledge;
-    const kbLine = k
-      ? `<div class="kb-line" title="${bEsc(k.title)}：${bEsc(k.desc)}">${bEsc(k.title)}${k.vendor ? ' · ' + bEsc(k.vendor) : ''}</div>`
-      : `<div class="kb-line none">暂无说明 · 点右侧「说明」补充</div>`;
 
     // 行内动作。三种意图分得很清楚：
     //   启用   —— 已禁用的条目唯一的出路（否则禁用就是单程票）
     //   延迟   —— 「想留但想更快」，只有自动启动服务有这个能力
-    //   说明   —— 知识库 + 加白/加黑/删除的统一入口
+    //   详情   —— 全部参考信息（命令行 / 位置 / 发布者 / 说明）都在那里面
     let acts = '';
     if (!it.enabled) {
       acts += `<button class="btn soft sm bx" data-act="enable" data-id="${bEsc(it.id)}">启用</button>`;
@@ -455,21 +474,16 @@ function renderStartup(scan) {
         ? `<button class="btn soft sm bx" data-act="undelay" data-id="${bEsc(it.id)}">取消延迟</button>`
         : `<button class="btn soft sm bx" data-act="delay" data-id="${bEsc(it.id)}">延迟</button>`;
     }
-    acts += `<button class="btn ghost sm bx" data-info="${bEsc(it.id)}">说明</button>`;
+    acts += `<button class="btn ghost sm bx" data-info="${bEsc(it.id)}">详情</button>`;
 
     tr.innerHTML =
       `<td class="c-chk"><label class="chk" title="${it.enabled ? '勾选后可批量禁用' : '已禁用，点右侧「启用」恢复'}"><input type="checkbox" data-id="${bEsc(it.id)}"
          ${bootState.picked.has(it.id) ? 'checked' : ''}
          ${pickable(it) ? '' : 'disabled'}></label></td>` +
-      `<td><div class="startup-name">${bEsc(it.name)}${badgesOf(it)}</div>` +
-        `<div class="startup-cmd"${cmdTitle}>${bEsc(it.command)}</div>` +
-        kbLine + `</td>` +
-      `<td><div class="startup-src">${bEsc(SRC_LABELS[it.source] || it.source)}</div>` +
-        `<div class="startup-env${it.enabled ? '' : ' off'}">${state}</div></td>` +
-      `<td><div class="risk-cell">` +
-        riskTag +
-        `<span class="risk-reason">${bEsc(reasonText)}</span>` + impact +
-      `</div></td>` +
+      `<td><div class="startup-name">${bEsc(it.name)}${badgesOf(it)}</div></td>` +
+      `<td><div class="startup-src">${bEsc(SRC_LABELS[it.source] || it.source)}</div></td>` +
+      `<td><div class="startup-env${it.enabled ? '' : ' off'}">${state}</div></td>` +
+      `<td>${renderRiskCell(it)}</td>` +
       `<td class="c-act">${acts}</td>`;
     body.appendChild(tr);
   }
@@ -879,13 +893,18 @@ function renderInfo() {
   if (it.in_blacklist) tags.push('<span class="tag black">黑名单</span>');
   $b('#infoTags').innerHTML = tags.join('');
 
-  // 键值区（dt/dd 与 styles.css 里的两列网格对齐）
+  // 键值区。**常用的放前面**（判定理由、拖慢开机），
+  // 命令行 / 位置 / 发布者这些参考信息一律进折叠区（#infoRefKv）。
   const kv = [];
   if (it.risk_reason) kv.push(`<dt>判定理由</dt><dd>${bEsc(it.risk_reason)}</dd>`);
   if (it.impact_ms) kv.push(`<dt>拖慢开机</dt><dd>${bHumanMs(it.impact_ms)}</dd>`);
-  if (it.publisher) kv.push(`<dt>发布者</dt><dd>${bEsc(it.publisher)}</dd>`);
-  if (it.location) kv.push(`<dt>位置</dt><dd class="mono">${bEsc(it.location)}</dd>`);
   $b('#infoKv').innerHTML = kv.join('');
+
+  const refKv = [];
+  if (it.publisher) refKv.push(`<dt>发布者</dt><dd>${bEsc(it.publisher)}</dd>`);
+  if (it.location) refKv.push(`<dt>位置</dt><dd class="mono">${bEsc(it.location)}</dd>`);
+  refKv.push(`<dt>签名</dt><dd>${bEsc(bSigText(it.signature))}</dd>`);
+  $b('#infoRefKv').innerHTML = refKv.join('');
 
   // 说明正文
   const adv = $b('#infoAdvice');
