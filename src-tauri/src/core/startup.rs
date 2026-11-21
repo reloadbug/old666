@@ -153,6 +153,12 @@ fn hydrate(raw: &RawItem, deep: bool) -> StartupItem {
     };
     let can_disable = assessment.can_disable();
     let risk_reason = compose_reason(&raw.reason_prefix, &assessment.reason);
+    // 归属判定：看文件路径落在哪个目录，不看名字
+    let origin = {
+        let exe = exe_path_of(&raw.command);
+        let path = exe.as_deref().unwrap_or(raw.command.as_str());
+        crate::core::startup_origin::classify(&crate::core::startup_risk::expand_env(path))
+    };
     StartupItem {
         id: stable_id(raw.source, &raw.location, &raw.name),
         name: raw.name.clone(),
@@ -168,6 +174,9 @@ fn hydrate(raw: &RawItem, deep: bool) -> StartupItem {
         risk_reason,
         can_disable,
         impact_ms: None,
+        impact_avg_ms: None,
+        impact_samples: 0,
+        origin,
         signature_pending: pending,
         delayed: raw.delayed,
         knowledge: None,
@@ -352,6 +361,9 @@ fn merge_disabled_by_us(items: &mut Vec<StartupItem>) -> usize {
                 risk_reason: "由老六禁用的启动项，条目已从系统移除，可一键启用".into(),
                 can_disable: true,
                 impact_ms: None,
+                impact_avg_ms: None,
+                impact_samples: 0,
+                origin: crate::core::types::StartupOrigin::Unknown,
                 signature_pending: false,
                 delayed: false,
                 knowledge: None,
@@ -1033,6 +1045,70 @@ pub fn attach_impact(items: &mut [StartupItem], culprits: &[crate::core::types::
                 c.total_ms
             };
             it.impact_ms = Some(ms);
+        }
+    }
+}
+
+/// 把**多次开机**的归因回填成「平均拖慢时长」，供列表按启动时长排序。
+///
+/// 为什么不能只看最后一次：单次开机的归因会抖动 —— 磁盘忙一次、网络慢一次，
+/// 同一个条目的数字就能差出几百毫秒。只看最后一次会把「一直很慢」和
+/// 「偶尔很慢」混为一谈，用户按这个排序去关东西就会关错。
+///
+/// * `impact_ms` —— 最近一次开机的实测值（保留原有语义，详情页用）
+/// * `impact_avg_ms` —— 多次开机的平均值（排序用）
+/// * `impact_samples` —— 有效样本数（0 表示历史日志里没匹配到过）
+///
+/// 匹配口径与 [`attach_impact`] 保持一致：exe 名优先，其次显示名全等。
+pub fn attach_impact_history(
+    items: &mut [StartupItem],
+    records: &[crate::core::types::BootRecord],
+) {
+    if records.is_empty() {
+        return;
+    }
+    for it in items.iter_mut() {
+        let exe_base = exe_from_command(&it.command)
+            .map(|p| {
+                p.rsplit(['\\', '/'])
+                    .next()
+                    .unwrap_or_default()
+                    .to_ascii_lowercase()
+            })
+            .unwrap_or_default();
+        let name_l = it.name.to_ascii_lowercase();
+
+        let mut samples: Vec<u64> = Vec::new();
+        let mut latest: Option<u64> = None;
+        // records 是「最新在前」，所以第一个命中的就是最近一次
+        for rec in records.iter() {
+            let Some(hit) = rec.culprits.iter().find(|c| {
+                let cn = c.name.to_ascii_lowercase();
+                (!exe_base.is_empty() && (cn == exe_base || cn.contains(&exe_base)))
+                    || (!name_l.is_empty() && cn == name_l)
+            }) else {
+                continue;
+            };
+            let ms = if hit.degradation_ms > 0 {
+                hit.degradation_ms
+            } else {
+                hit.total_ms
+            };
+            if ms == 0 {
+                continue;
+            }
+            if latest.is_none() {
+                latest = Some(ms);
+            }
+            samples.push(ms);
+        }
+        if let Some(ms) = latest {
+            it.impact_ms = Some(ms);
+        }
+        if !samples.is_empty() {
+            let sum: u64 = samples.iter().sum();
+            it.impact_avg_ms = Some(sum / samples.len() as u64);
+            it.impact_samples = samples.len() as u32;
         }
     }
 }

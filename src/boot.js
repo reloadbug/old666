@@ -22,6 +22,10 @@ const bootState = {
   timeline: null,
   items: [],
   srcFilter: 'all',
+  /** 归属筛选：all / system / third_party / user / unknown。 */
+  originFilter: 'all',
+  /** 排序方式：recommend（推荐优先）/ impact（启动耗时最长）/ name。 */
+  sortBy: 'recommend',
   search: '',
   picked: new Set(),
   verifying: false,
@@ -79,6 +83,14 @@ const SRC_LABELS = {
   startup_folder: '启动文件夹',
   service: '自动服务',
   scheduled_task: '计划任务',
+};
+
+/** 归属 → 人话。跟后端 `StartupOrigin` 一一对应。 */
+const ORIGIN_LABELS = {
+  system: '系统自带',
+  third_party: '安装的程序',
+  user: '用户目录',
+  unknown: '待确认',
 };
 
 /** 签名状态 → 人话。后端给的是 {valid:主体} / unsigned / invalid / unknown。 */
@@ -363,16 +375,43 @@ function visibleStartups() {
   const out = bootState.items.filter((it) => {
     if (bootState.hideDisabled && !it.enabled) return false;
     if (bootState.srcFilter !== 'all' && it.source !== bootState.srcFilter) return false;
+    if (bootState.originFilter !== 'all' && (it.origin || 'unknown') !== bootState.originFilter) return false;
     if (!q) return true;
     return (it.name || '').toLowerCase().includes(q)
       || (it.command || '').toLowerCase().includes(q);
   });
   // 带下标的稳定排序：同档内保持后端给的顺序（来源 + 名称），
   // 不会因为每次渲染的比较结果相同却顺序抖动。
-  return out
-    .map((it, i) => ({ it, i, rank: displayRank(it) }))
-    .sort((a, b) => a.rank - b.rank || a.i - b.i)
-    .map((x) => x.it);
+  const rank = bootState.sortBy === 'recommend'
+    ? displayRank
+    : () => 0;
+  const arr = out.map((it, i) => ({ it, i, rank: rank(it) }));
+  if (bootState.sortBy === 'impact') {
+    // 按启动耗时从长到短。优先用**多次开机的平均值**（impact_avg_ms），
+    // 没有均值就用最近一次的（impact_ms）。相同时保持原顺序。
+    const ms = (it) => (it.impact_avg_ms != null ? it.impact_avg_ms : (it.impact_ms || 0));
+    arr.sort((a, b) => ms(b.it) - ms(a.it) || a.i - b.i);
+  } else if (bootState.sortBy === 'name') {
+    arr.sort((a, b) => String(a.it.name || '').localeCompare(String(b.it.name || ''), 'zh') || a.i - b.i);
+  } else {
+    arr.sort((a, b) => a.rank - b.rank || a.i - b.i);
+  }
+  return arr.map((x) => x.it);
+}
+
+/** 一条启动项的「启动耗时」显示值。
+ *
+ *  后端给的是**多次开机的平均值**（impact_avg_ms）与样本数（impact_samples）——
+ *  单次开机的归因抖动很大，只看最后一次会把「一直很慢」和「偶尔很慢」混为一谈。
+ *  样本不足 3 次时只标「单次」，提醒用户这个数字还不够稳。 */
+function impactText(it) {
+  const avg = it.impact_avg_ms != null ? it.impact_avg_ms : null;
+  const last = it.impact_ms || 0;
+  const ms = avg != null ? avg : last;
+  if (!ms) return '';
+  const n = it.impact_samples || 0;
+  const suffix = n > 1 ? `（${n} 次开机均值）` : (n === 1 ? '（单次）' : '');
+  return `${bHumanMs(ms)}${suffix}`;
 }
 
 /** 能不能被勾选（= 能不能交给「禁用选中项」处理）。
@@ -430,8 +469,9 @@ function badgesOf(it) {
  *  列表的宽度是固定的，一行长命令会把整张表撑得歪歪扭扭。 */
 function renderRiskCell(it) {
   const reason = it.signature_pending ? '正在确认发布者…' : it.risk_reason;
-  const impact = it.impact_ms
-    ? `<span class="risk-impact">拖慢开机 ${bHumanMs(it.impact_ms)}</span>` : '';
+
+  // 启动耗时已经单独占一列了，这里不再重复 —— 同一件事显示两遍
+  // 会让人怀疑是不是两个不同的数字。
 
   // 「影响」这一列说的是**现在该怎么处理**，不是风险评估报告。
   // 已禁用的条目再显示「可安全禁用」会自相矛盾 —— 用户看到「可以禁用」
@@ -445,7 +485,7 @@ function renderRiskCell(it) {
     : reason;
   return `<div class="risk-cell">` +
     riskTag +
-    `<span class="risk-reason">${bEsc(reasonText)}</span>` + impact +
+    `<span class="risk-reason">${bEsc(reasonText)}</span>` +
   `</div>`;
 }
 
@@ -483,6 +523,8 @@ function renderStartup(scan) {
       `<td><div class="startup-name">${bEsc(it.name)}${badgesOf(it)}</div></td>` +
       `<td><div class="startup-src">${bEsc(SRC_LABELS[it.source] || it.source)}</div></td>` +
       `<td><div class="startup-env${it.enabled ? '' : ' off'}">${state}</div></td>` +
+      `<td><div class="startup-origin o-${bEsc(it.origin || 'unknown')}">${bEsc(ORIGIN_LABELS[it.origin] || ORIGIN_LABELS.unknown)}</div></td>` +
+      `<td class="num"><div class="startup-impact">${bEsc(impactText(it))}</div></td>` +
       `<td>${renderRiskCell(it)}</td>` +
       `<td class="c-act">${acts}</td>`;
     body.appendChild(tr);
@@ -560,6 +602,109 @@ function paintSubtitle() {
     (scan.needs_admin ? ' · 以管理员身份重启可枚举更多项' : '');
 }
 
+/* ============================================================
+   游戏模式（游戏在跑时让开启动项，退出后请回来）
+   ============================================================ */
+
+/** 把「a, b、c」这类输入拆成干净的列表。 */
+function splitList(s) {
+  return String(s || '')
+    .split(/[,，;；\n]/)
+    .map((x) => x.trim())
+    .filter(Boolean);
+}
+
+/** 读游戏模式状态并渲染（只读，不改系统）。 */
+async function loadGameMode() {
+  if (!bInvoke) return;
+  try {
+    const st = await bCall('game_mode_status');
+    const cfg = st.config || {};
+    const g = $b('#gameModeEnabled');
+    if (g) g.checked = !!cfg.enabled;
+    const gs = $b('#gameModeGames');
+    if (gs && document.activeElement !== gs) gs.value = (cfg.games || []).join(', ');
+    const ts = $b('#gameModeTargets');
+    if (ts && document.activeElement !== ts) ts.value = (cfg.targets || []).join(', ');
+    const ar = $b('#gameModeAutoRestore');
+    if (ar) ar.checked = cfg.auto_restore !== false;
+
+    const s = st.state || {};
+    const sub = $b('#gameModeSub');
+    if (sub) {
+      sub.textContent = s.in_game
+        ? `检测到游戏「${s.game || ''}」，已让开 ${(s.disabled || []).length} 项`
+        : '游戏在跑的时候先让开抢资源的启动项，打完游戏原样请回来';
+    }
+    const state = $b('#gameModeState');
+    if (state) {
+      state.textContent = st.running
+        ? (s.in_game
+          ? `游戏中 · 已让开：${(s.disabled || []).join('、') || '（无）'}`
+          : '监控中 · 当前没有检测到游戏进程')
+        : '未启用（保存并启用后才会开始监控）';
+    }
+    const cand = $b('#gameModeCandidates');
+    if (cand) {
+      const list = st.candidates || [];
+      cand.textContent = list.length
+        ? `当前机器上会被让开的候选：${list.join('、')}`
+        : '当前没有匹配的候选启动项（检查一下「要让开的启动项」写得对不对）';
+    }
+    const btnRestore = $b('#btnGameModeRestore');
+    if (btnRestore) btnRestore.disabled = !(s.batch_id);
+    const btnCheck = $b('#btnGameModeCheck');
+    if (btnCheck) btnCheck.disabled = !st.running;
+  } catch (e) {
+    console.warn('[old666] 读取游戏模式状态失败', e);
+  }
+}
+
+/** 保存游戏模式配置。 */
+async function saveGameMode() {
+  if (!bInvoke) { bToast('预览模式：不会真的修改任何启动项'); return; }
+  const cfg = {
+    enabled: !!($b('#gameModeEnabled') && $b('#gameModeEnabled').checked),
+    games: splitList($b('#gameModeGames') ? $b('#gameModeGames').value : ''),
+    targets: splitList($b('#gameModeTargets') ? $b('#gameModeTargets').value : ''),
+    auto_restore: !($b('#gameModeAutoRestore') && !$b('#gameModeAutoRestore').checked),
+  };
+  if (cfg.enabled && (!cfg.games.length || !cfg.targets.length)) {
+    bToast('启用游戏模式至少要填一个游戏进程和一个要让开的启动项', true);
+    return;
+  }
+  try {
+    await bCall('game_mode_configure', { config: cfg });
+    bToast(cfg.enabled ? '游戏模式已保存并开始监控' : '游戏模式已保存（当前关闭）');
+    await loadGameMode();
+  } catch (e) {
+    bToast('保存游戏模式失败：' + e, true);
+  }
+}
+
+/** 立即检查一次游戏状态（零副作用）。 */
+async function checkGameMode() {
+  try {
+    await bCall('game_mode_check');
+    await loadGameMode();
+    bToast('已检查一次游戏状态');
+  } catch (e) {
+    bToast('检查失败：' + e, true);
+  }
+}
+
+/** 把让开的启动项请回来（走批次还原，回到动手前的样子）。 */
+async function restoreGameMode() {
+  if (!bInvoke) { bToast('预览模式：不会真的修改任何启动项'); return; }
+  try {
+    const msg = await bCall('game_mode_restore');
+    bToast(msg || '已还原');
+    await Promise.all([loadGameMode(), loadStartup(), loadBatches()]);
+  } catch (e) {
+    bToast('还原失败：' + e, true);
+  }
+}
+
 function syncStartupCounts(counts) {
   const map = {};
   for (const [k, n] of counts) map[k] = n;
@@ -570,6 +715,17 @@ function syncStartupCounts(counts) {
   set('#cntTask', map.scheduled_task);
   const sum = (map.run_key || 0) + (map.startup_folder || 0) + (map.service || 0) + (map.scheduled_task || 0);
   set('#cntStartupAll', sum);
+
+  // 归属分类计数（系统自带 / 安装的程序 / 用户目录 / 待确认）。
+  const o = { system: 0, third_party: 0, user: 0, unknown: 0 };
+  for (const it of bootState.items) {
+    const k = it.origin || 'unknown';
+    if (o[k] != null) o[k] += 1; else o.unknown += 1;
+  }
+  set('#cntOriginSystem', o.system);
+  set('#cntOriginThird', o.third_party);
+  set('#cntOriginUser', o.user);
+  set('#cntOriginUnknown', o.unknown);
 }
 
 /** 勾选项里可能残留已经不在列表里的 ID（重扫之后条目消失了）。
@@ -1128,6 +1284,25 @@ function bindBoot() {
     renderStartup(null);
   });
 
+  // 归属筛选（系统自带 / 安装的程序 / 用户目录 / 待确认）。
+  $b('#startupOrigins').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-origin]');
+    if (!b) return;
+    bootState.originFilter = b.dataset.origin;
+    $b('#startupOrigins').querySelectorAll('.chip').forEach((x) => x.classList.remove('active'));
+    b.classList.add('active');
+    renderStartup(null);
+  });
+
+  // 排序方式：推荐优先 / 启动耗时最长 / 按名称。
+  const sortSel = $b('#startupSort');
+  if (sortSel) {
+    sortSel.addEventListener('change', () => {
+      bootState.sortBy = sortSel.value || 'recommend';
+      renderStartup(null);
+    });
+  }
+
   let sTimer = null;
   $b('#startupSearch').addEventListener('input', (e) => {
     bootState.search = e.target.value;
@@ -1187,6 +1362,23 @@ function bindBoot() {
 
   bindInfo();
   bindSettingsExtras();
+
+  // 游戏模式（三个按钮，各干各的）
+  const gmSave = $b('#btnGameModeSave');
+  if (gmSave && !gmSave._gmBound) {
+    gmSave._gmBound = true;
+    gmSave.addEventListener('click', saveGameMode);
+  }
+  const gmCheck = $b('#btnGameModeCheck');
+  if (gmCheck && !gmCheck._gmBound) {
+    gmCheck._gmBound = true;
+    gmCheck.addEventListener('click', checkGameMode);
+  }
+  const gmRestore = $b('#btnGameModeRestore');
+  if (gmRestore && !gmRestore._gmBound) {
+    gmRestore._gmBound = true;
+    gmRestore.addEventListener('click', restoreGameMode);
+  }
 
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
@@ -1260,9 +1452,9 @@ function bindSettingsExtras() {
 async function enterBootView() {
   bindBoot();
   if (!bootState.timeline || !bootState.items.length) {
-    await Promise.all([loadBoot(), loadStartup(), loadBatches()]);
+    await Promise.all([loadBoot(), loadStartup(), loadBatches(), loadGameMode()]);
   } else {
-    await loadBoot();
+    await Promise.all([loadBoot(), loadGameMode()]);
   }
 }
 

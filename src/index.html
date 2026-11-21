@@ -238,6 +238,22 @@
           <button class="chip" data-src="service">服务 <b id="cntService">0</b></button>
           <button class="chip" data-src="scheduled_task">计划任务 <b id="cntTask">0</b></button>
         </div>
+        <div class="filters" id="startupOrigins">
+          <span class="filters-label">归属</span>
+          <button class="chip active" data-origin="all">不限</button>
+          <button class="chip" data-origin="system">系统自带 <b id="cntOriginSystem">0</b></button>
+          <button class="chip" data-origin="third_party">安装的程序 <b id="cntOriginThird">0</b></button>
+          <button class="chip" data-origin="user">用户目录 <b id="cntOriginUser">0</b></button>
+          <button class="chip" data-origin="unknown">待确认 <b id="cntOriginUnknown">0</b></button>
+        </div>
+        <label class="switch" title="按启动耗时排序：取最近多次开机的平均值，样本越多越可信">
+          <span class="filters-label">排序</span>
+          <select class="search sel" id="startupSort">
+            <option value="recommend">推荐优先</option>
+            <option value="impact">启动耗时最长</option>
+            <option value="name">按名称</option>
+          </select>
+        </label>
         <label class="chk hide-off" title="已经在系统里关闭的启动项，不参与勾选也不影响开机">
           <input type="checkbox" id="chkHideDisabled">
           <span>隐藏已禁用</span>
@@ -253,6 +269,8 @@
               <th class="c-name">启动项</th>
               <th class="c-src">来源</th>
               <th class="c-state">状态</th>
+              <th class="c-origin">归属</th>
+              <th class="c-impact num">启动耗时</th>
               <th class="c-risk">建议与影响</th>
               <th class="c-act"></th>
             </tr>
@@ -261,6 +279,43 @@
         </table>
         <div class="empty" id="startupEmpty" hidden>没有匹配的启动项</div>
       </div>
+    </section>
+
+    <!-- 游戏模式 -->
+    <section class="card" id="gameModeCard">
+      <div class="card-head">
+        <div>
+          <h2 class="card-title">游戏模式</h2>
+          <p class="card-sub" id="gameModeSub">游戏在跑的时候先让开抢资源的启动项，打完游戏原样请回来</p>
+        </div>
+        <div class="card-head-right">
+          <button class="btn soft sm" id="btnGameModeCheck" disabled>立即检查</button>
+          <button class="btn soft sm" id="btnGameModeRestore" disabled>请回来</button>
+        </div>
+      </div>
+
+      <div class="game-mode-form">
+        <label class="switch">
+          <input type="checkbox" id="gameModeEnabled">
+          <span>启用游戏模式</span>
+        </label>
+        <label class="mode-field">
+          <span class="filters-label">游戏进程（exe 名，逗号分隔）</span>
+          <input class="search" id="gameModeGames" type="text" placeholder="例如 steam, cs2, valorant">
+        </label>
+        <label class="mode-field">
+          <span class="filters-label">游戏期间要让开的启动项（逗号分隔）</span>
+          <input class="search" id="gameModeTargets" type="text" placeholder="例如 steamwebhelper, onedrive, googledrive">
+        </label>
+        <label class="switch">
+          <input type="checkbox" id="gameModeAutoRestore" checked>
+          <span>游戏退出后自动恢复</span>
+        </label>
+        <button class="btn primary sm" id="btnGameModeSave">保存游戏模式</button>
+      </div>
+
+      <p class="game-mode-state" id="gameModeState">尚未配置</p>
+      <p class="hint" id="gameModeCandidates"></p>
     </section>
 
     <!-- 还原入口 -->
@@ -623,7 +678,7 @@
     <ul class="wl-list" id="kbList"></ul>
     <h3>启动项名单</h3>
     <p class="hint">
-      白名单里的启动项不会被「一键选中推荐项」勾上；<b>黑名单</b>里的会被直接禁用，不再询问。
+      白名单里的启动项<b>永远不会被禁用</b>（后端硬闸，黑名单也推不翻）；<b>黑名单</b>里的会被直接禁用，不再询问。
     </p>
     <div class="kb-path selectable" id="listPath"></div>
     <ul class="wl-list" id="listRules"></ul>

@@ -22,6 +22,8 @@ pub struct AppState {
     pub engine: Mutex<PurgeEngine>,
     /// P5 常驻监控中心（后台采样线程）。
     pub monitor: std::sync::Arc<crate::core::monitor::MonitorHub>,
+    /// 游戏模式（后台线程：游戏在跑时让开启动项，退出后还原）。
+    pub game_mode: std::sync::Arc<crate::core::game_mode::GameModeHub>,
 }
 
 impl Default for AppState {
@@ -29,6 +31,7 @@ impl Default for AppState {
         Self {
             engine: Mutex::new(PurgeEngine::new()),
             monitor: std::sync::Arc::new(crate::core::monitor::MonitorHub::new()),
+            game_mode: std::sync::Arc::new(crate::core::game_mode::GameModeHub::new()),
         }
     }
 }
@@ -237,9 +240,13 @@ pub fn env_info(state: State<'_, AppState>) -> Reply<EnvInfo> {
 /// 相对快速扫描的 150 ms 只有 1.7%，换来的是一条真实可读的
 /// 「拖慢开机 54.1 s」—— 这一列才是用户愿意点禁用的理由。
 fn attach_boot_impact(scan: &mut StartupScan) {
-    if let Some(rec) = crate::core::boot::latest() {
-        crate::core::startup::attach_impact(&mut scan.items, &rec.culprits);
+    // 取最近 8 次开机：一次给「最近一次实测值」，多次给「平均值」——
+    // 列表要按启动时长排序，单次样本抖动太大，不能只认最后一次。
+    let tl = crate::core::boot::timeline(8);
+    if !tl.available {
+        return;
     }
+    crate::core::startup::attach_impact_history(&mut scan.items, &tl.records);
 }
 
 /// 解析前端传来的 action 字符串。解析不出来就是 None —— 上层要给用户
@@ -1007,6 +1014,102 @@ pub fn update_check() -> Reply<crate::core::updater::UpdateStatus> {
     Reply::ok(crate::core::updater::check(&crate::core::updater::config()))
 }
 
+
+// ===========================================================================
+// 游戏模式（游戏在跑时让开启动项，退出后还原）
+// ===========================================================================
+
+/// 游戏模式的完整状态（配置 + 运行情况）。
+#[derive(Serialize)]
+pub struct GameModePayload {
+    pub config: crate::core::game_mode::GameModeConfig,
+    pub state: crate::core::game_mode::GameModeState,
+    pub running: bool,
+    /// 当前机器上「会被让开」的候选条目（只读预览，不改系统）。
+    pub candidates: Vec<String>,
+}
+
+/// 读游戏模式状态 + 候选预览。
+#[tauri::command]
+pub fn game_mode_status(state: State<'_, AppState>) -> Reply<GameModePayload> {
+    let hub = &state.game_mode;
+    let cfg = hub.config();
+    let candidates = {
+        let scan = crate::core::startup::scan();
+        crate::core::game_mode::pick_targets(&scan.items, &cfg)
+            .into_iter()
+            .map(|i| i.name)
+            .collect()
+    };
+    Reply::ok(GameModePayload {
+        config: cfg,
+        state: hub.state(),
+        running: hub.is_running(),
+        candidates,
+    })
+}
+
+/// 保存游戏模式配置，并按开关启停后台线程。
+#[tauri::command]
+pub fn game_mode_configure(
+    state: State<'_, AppState>,
+    config: crate::core::game_mode::GameModeConfig,
+) -> Reply<GameModePayload> {
+    let hub = &state.game_mode;
+    let cfg = hub.set_config(config);
+    if let Err(e) = crate::core::game_mode::save_config(&cfg) {
+        return Reply::err(e);
+    }
+    if cfg.enabled && cfg.is_usable() {
+        hub.start();
+    } else {
+        hub.stop_monitor();
+    }
+    let candidates = {
+        let scan = crate::core::startup::scan();
+        crate::core::game_mode::pick_targets(&scan.items, &cfg)
+            .into_iter()
+            .map(|i| i.name)
+            .collect()
+    };
+    Reply::ok(GameModePayload {
+        config: cfg,
+        state: hub.state(),
+        running: hub.is_running(),
+        candidates,
+    })
+}
+
+/// 立即检查一次：游戏在跑吗？该不该让开？
+///
+/// 这条命令**零副作用** —— 只回答「该切到哪个状态」，不自己禁用任何东西。
+/// 真正的动作由后台线程在做，避免用户在界面上点一下就改系统。
+#[tauri::command]
+pub fn game_mode_check(state: State<'_, AppState>) -> Reply<crate::core::game_mode::GameModeState> {
+    Reply::ok(state.game_mode.state())
+}
+
+/// 游戏退出后手动「请回来」（不用等后台线程下一轮）。
+///
+/// 走的是批次还原 —— 回到我动手之前的样子，而不是简单地「启用」。
+#[tauri::command]
+pub fn game_mode_restore(state: State<'_, AppState>) -> Reply<String> {
+    let hub = &state.game_mode;
+    let st = hub.state();
+    let Some(batch) = st.batch_id.clone() else {
+        return Reply::err("当前没有让开过任何启动项，没什么可还原的");
+    };
+    let (ok, fail, errors) = crate::core::startup_ctl::restore(&batch);
+    Reply::ok(format!(
+        "已还原 {ok} 项{}",
+        if fail > 0 {
+            format!("，{fail} 项没还原成功：{}", errors.join("；"))
+        } else {
+            String::new()
+        }
+    ))
+}
+
 // ===========================================================================
 // 测试
 // ===========================================================================
@@ -1017,6 +1120,9 @@ mod tests {
 
     /// P2 的启动项扫描必须把「谁拖慢了开机」回填进来 —— 这一列是用户愿意点
     /// 禁用的唯一理由，曾经只在 CLI 里做，GUI 上永远不显示（前端无头测试抓出来的）。
+    ///
+    /// 现在回填的是**最近 8 次开机的聚合**（最近一次值 + 均值 + 样本数），
+    /// 因为列表要按启动耗时排序，单次样本抖动太大。
     #[test]
     fn startup_scan_attaches_boot_impact() {
         let got = startup_scan();
@@ -1024,13 +1130,16 @@ mod tests {
         let items = got.data.expect("ok 时必须带 data").items;
 
         let mut expect = startup::scan();
-        if let Some(rec) = boot::latest() {
-            startup::attach_impact(&mut expect.items, &rec.culprits);
+        let tl = boot::timeline(8);
+        if tl.available {
+            startup::attach_impact_history(&mut expect.items, &tl.records);
         }
         assert_eq!(items.len(), expect.items.len());
         for (a, b) in items.iter().zip(expect.items.iter()) {
             assert_eq!(a.id, b.id);
             assert_eq!(a.impact_ms, b.impact_ms, "{} 的拖慢标注应一致", a.name);
+            assert_eq!(a.impact_avg_ms, b.impact_avg_ms, "{} 的平均拖慢应一致", a.name);
+            assert_eq!(a.impact_samples, b.impact_samples, "{} 的样本数应一致", a.name);
         }
     }
 

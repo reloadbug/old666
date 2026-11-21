@@ -79,6 +79,14 @@ pub fn run() {
                 hub.start();
             }
 
+            // 游戏模式：配置里开着且填了游戏/目标才启动后台线程。
+            // 线程只改启动项（不结束任何进程），白名单与危险档闸照常生效。
+            let ghub = app.state::<ipc::AppState>().game_mode.clone();
+            let gcfg = ghub.config();
+            if gcfg.enabled && gcfg.is_usable() {
+                ghub.start();
+            }
+
             // P5 · 悬浮球：上次是显示状态就把它摆回来
             let fb = core::floatball::FloatBallState::load();
             if fb.visible {
@@ -162,6 +170,11 @@ pub fn run() {
             ipc::update_config,
             ipc::update_config_save,
             ipc::update_check,
+            // 游戏模式（让开 / 还原）
+            ipc::game_mode_status,
+            ipc::game_mode_configure,
+            ipc::game_mode_check,
+            ipc::game_mode_restore,
         ])
         .run(tauri::generate_context!())
         .expect("启动 Tauri 应用失败");

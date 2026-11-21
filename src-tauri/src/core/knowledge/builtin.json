@@ -2012,5 +2012,240 @@
     "vendor": "Microsoft",
     "advice": "建议保留",
     "desc": "给音频、视频、游戏等多媒体线程临时提升优先级并保证 CPU 时间片，避免播放爆音与卡顿。Windows 把它的启动类型标成「自动」且不允许在服务面板里停用 —— 禁用后音视频可能间歇性卡顿，得不偿失。"
+  },
+  {
+    "keys": [
+      "printspooler",
+      "spooler"
+    ],
+    "title": "打印后台处理程序（Print Spooler）",
+    "vendor": "Microsoft",
+    "desc": "所有打印任务都排队给它。不用打印机时它纯属占一个进程和几 MB 内存；要用打印机时没有它就打不出来。按需禁用，别为了省这点内存把打印弄坏。",
+    "advice": "谨慎处理"
+  },
+  {
+    "keys": [
+      "cdpsvc"
+    ],
+    "title": "连接设备平台服务（CDPSvc）",
+    "vendor": "Microsoft",
+    "desc": "给附近设备（手机、耳机、投屏）做发现与连接的服务。Windows 11 自带，很多用不到。禁用后蓝牙耳机连电脑、跨设备剪贴板这类功能会失效。",
+    "advice": "谨慎处理"
+  },
+  {
+    "keys": [
+      "pushnotificationsplatform"
+    ],
+    "title": "Windows 推送通知平台",
+    "vendor": "Microsoft",
+    "desc": "接收系统与应用推送通知的后台服务。关掉之后任务栏右下角不再弹「某某应用有新消息」，邮件和日历提醒也可能不再主动出现。",
+    "advice": "谨慎处理"
+  },
+  {
+    "keys": [
+      "installservice"
+    ],
+    "title": "Microsoft Store 安装服务",
+    "vendor": "Microsoft",
+    "desc": "负责从应用商店下载和安装应用、以及更新商店里已装的那些应用。不用商店的话它启动后基本空转。想更新商店应用时再开回来即可。",
+    "advice": "谨慎处理"
+  },
+  {
+    "keys": [
+      "xboxidentityprovider"
+    ],
+    "title": "Xbox 身份提供程序",
+    "vendor": "Microsoft",
+    "desc": "管理 Xbox 账号登录与授权。玩 Xbox 商店游戏、领 Game Pass、用手柄都需要它；只玩 PC 单机的话用不上。",
+    "advice": "谨慎处理"
+  },
+  {
+    "keys": [
+      "xboxnetapisvc"
+    ],
+    "title": "Xbox 网络 API 服务",
+    "vendor": "Microsoft",
+    "desc": "Xbox 在线多人、语音、成就同步走的服务。不玩 Xbox 联网游戏就没什么用，禁用后进不去好友列表、语音也用不了。",
+    "advice": "谨慎处理"
+  },
+  {
+    "keys": [
+      "diagtrack"
+    ],
+    "title": "遥测（Diagnostics Tracking）",
+    "vendor": "Microsoft",
+    "desc": "Windows 的使用数据上报服务。关掉不影响功能，只是微软收不到这台机器的体验数据。网上流传的「关掉更流畅」多半是错觉，但少一个常驻进程也确实少点后台活动。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "cdpusersvc"
+    ],
+    "title": "连接设备平台用户服务",
+    "vendor": "Microsoft",
+    "desc": "按用户会话启动的「连接设备平台」实例。它和系统级的 CDPSvc 是一对，同样服务于近场设备连接，不用时可关。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "clipsvc"
+    ],
+    "title": "跨设备剪贴板服务（Clipboard）",
+    "vendor": "Microsoft",
+    "desc": "让你在多台 Windows 电脑之间共享剪贴板内容。单机用户用不到，关掉不影响本机复制粘贴。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "storsvc"
+    ],
+    "title": "存储感知（Storage Sense）",
+    "vendor": "Microsoft",
+    "desc": "自动清理临时文件、回收站和下载目录里的旧文件。喜欢自己管磁盘的人可以关掉 —— 但也就失去了「它自动帮你腾地方」的好处。",
+    "advice": "谨慎处理"
+  },
+  {
+    "keys": [
+      "eaplatform"
+    ],
+    "title": "EA App（原 Origin）平台服务",
+    "vendor": "Electronic Arts",
+    "desc": "EA 客户端的后台服务，负责游戏库同步与自动更新。不玩 EA 游戏就整条线关掉；玩的话留着更省事。",
+    "advice": "谨慎处理"
+  },
+  {
+    "keys": [
+      "ubisoftconnect"
+    ],
+    "title": "Ubisoft Connect 后台服务",
+    "vendor": "Ubisoft",
+    "desc": "育碧客户端的后台组件，负责校验登录状态与游戏库更新。不玩育碧游戏就关掉。注意：不要连 Ubisoft App 本体一起误删文件，禁用启动项就够了。",
+    "advice": "谨慎处理"
+  },
+  {
+    "keys": [
+      "neteasemusic"
+    ],
+    "title": "网易云音乐后台",
+    "vendor": "网易",
+    "desc": "音乐客户端常驻后台，用来播放控制和歌词联动。用网易云听歌就留着（关掉后开机不自动启动，手动开也一样）。",
+    "advice": "谨慎处理"
+  },
+  {
+    "keys": [
+      "adobeupdate"
+    ],
+    "title": "Adobe 更新服务",
+    "vendor": "Adobe",
+    "desc": "给 Adobe 系列软件推送安全更新。安全更新有它的价值，只是它会在开机时抢占一点带宽和磁盘。不装 Adobe 软件就没必要留着。",
+    "advice": "谨慎处理"
+  },
+  {
+    "keys": [
+      "lenovovantage"
+    ],
+    "title": "联想 Vantage 后台服务",
+    "vendor": "Lenovo",
+    "desc": "厂商管理工具，负责电源模式、电池养护、驱动更新的后台部分。它同时也是 Fn+Q 性能模式、电池限充这些功能的实现方 —— 关掉这些功能就没了。",
+    "advice": "谨慎处理"
+  },
+  {
+    "keys": [
+      "dellsupportassist"
+    ],
+    "title": "Dell SupportAssist 后台服务",
+    "vendor": "Dell",
+    "desc": "戴尔的支持与检测工具，常驻后台做硬件健康检测和驱动检查。它是各家 OEM 工具里最「重」的一类，关掉后少一堆后台活动，代价是少了自动检测。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "hpsupportassist"
+    ],
+    "title": "HP SupportAssist 后台服务",
+    "vendor": "HP",
+    "desc": "惠普的支持助手，常驻后台收集硬件信息、推送驱动。纯便利性功能，关掉不影响电脑本身。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "intelgraphicsperf"
+    ],
+    "title": "Intel 显卡性能服务",
+    "vendor": "Intel",
+    "desc": "Intel 核显/独显的性能调优后台。多数情况下显卡驱动自己就够了，这个服务额外常驻却几乎不改变帧数。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "igdlcp"
+    ],
+    "title": "Intel 显卡显示组件",
+    "vendor": "Intel",
+    "desc": "Intel 显卡的软件安装辅助组件（安装与更新相关）。装完驱动它基本没用，属于典型的「装完就可以关」的一类。",
+    "advice": "可以禁用"
+  },
+  {
+    "keys": [
+      "tencentpcmanager"
+    ],
+    "title": "腾讯电脑管家后台",
+    "vendor": "腾讯",
+    "desc": "国内安全软件的常驻后台。风险引擎把它列为硬底线 —— 它自己会往系统里塞开机项、拦你的操作，属于「建议直接卸载而不是留着禁用」的那一类。",
+    "advice": "建议保留"
+  },
+  {
+    "keys": [
+      "wecom"
+    ],
+    "title": "企业微信后台",
+    "vendor": "腾讯",
+    "desc": "企业微信的常驻托盘组件，负责消息提醒与文件同步。关掉后不会开机自启，手动打开一样能用。",
+    "advice": "谨慎处理"
+  },
+  {
+    "keys": [
+      "battleye"
+    ],
+    "title": "BattlEye 反作弊服务",
+    "vendor": "BattlEye",
+    "desc": "BattlEye 反作弊组件。部分游戏启动时会拉起它并检查驱动 —— 这类反作弊组件动了就直接进不去游戏，或者被视为作弊。**不要禁用，也不要删除它的驱动。**",
+    "advice": "建议保留"
+  },
+  {
+    "keys": [
+      "beservice"
+    ],
+    "title": "BattlEye 后台服务",
+    "vendor": "BattlEye",
+    "desc": "BattlEye 反作弊的后台服务。禁用它等于告诉游戏「我没装反作弊」，结果是启动被拒或被判定为异常。绝对不要动。",
+    "advice": "建议保留"
+  },
+  {
+    "keys": [
+      "easyanticheat"
+    ],
+    "title": "Easy Anti-Cheat 反作弊服务",
+    "vendor": "Epic Games",
+    "desc": "EAC 反作弊组件，负责在游戏进程里做检测。动它会让游戏拒绝启动，甚至影响账号。绝对不要动。",
+    "advice": "建议保留"
+  },
+  {
+    "keys": [
+      "steamworks"
+    ],
+    "title": "Steamworks 公共运行时",
+    "vendor": "Valve",
+    "desc": "Steam 游戏的公共运行时库（成就、手柄、好友联机等公共部分）。有些游戏启动时需要它。禁用的收益很小，风险却是「某个游戏起不来」，不值当。",
+    "advice": "谨慎处理"
+  },
+  {
+    "keys": [
+      "wdfldr"
+    ],
+    "title": "Windows Defender 文件系统筛选驱动",
+    "vendor": "Microsoft",
+    "desc": "Defender 的实时防护驱动。禁用它等于把杀毒的实时监控关掉 —— 这不是「优化」，是拆掉安全防护。绝对不要动。",
+    "advice": "建议保留"
   }
 ]

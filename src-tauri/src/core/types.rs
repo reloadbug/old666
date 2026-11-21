@@ -359,6 +359,51 @@ pub struct Knowledge {
     pub generic: bool,
 }
 
+/// 启动项的**归属**：系统自带 / 第三方安装 / 用户自己的程序 / 无法判定。
+///
+/// 用途：让用户一眼分清「这是 Windows 自己的，别乱动」和「这是我装的一个软件」。
+/// 判定只看**文件路径落在哪个目录**，不靠名字猜 —— 名字可以被随意伪装，
+/// 路径骗不了人（`C:\Windows\System32\360DrvMgr\DrvMgrService.dll` 名字像系统，
+/// 但它是第三方厂商塞进 System32 的子目录，所以判第三方）。
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
+pub enum StartupOrigin {
+    /// Windows 自带（路径直接落在 System32 / SysWOW64 / WinSxS / DriverStore）
+    System,
+    /// 第三方软件安装（Program Files / ProgramData 等）
+    ThirdParty,
+    /// 用户目录下的程序（%UserProfile% / %AppData% / %LocalAppData%）—— 通常就是用户自己装的
+    User,
+    /// 位置说不清（自定义目录、盘根目录等）—— 需要人工确认，程序不应自动改它
+    Unknown,
+}
+
+impl Default for StartupOrigin {
+    fn default() -> Self {
+        StartupOrigin::Unknown
+    }
+}
+
+impl StartupOrigin {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            StartupOrigin::System => "system",
+            StartupOrigin::ThirdParty => "third_party",
+            StartupOrigin::User => "user",
+            StartupOrigin::Unknown => "unknown",
+        }
+    }
+    /// 中文名，UI 分组头用
+    pub fn label(&self) -> &'static str {
+        match self {
+            StartupOrigin::System => "系统自带",
+            StartupOrigin::ThirdParty => "安装的程序",
+            StartupOrigin::User => "用户目录",
+            StartupOrigin::Unknown => "位置待确认",
+        }
+    }
+}
+
 /// 一个启动项。
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct StartupItem {
@@ -395,6 +440,17 @@ pub struct StartupItem {
     pub can_disable: bool,
     /// 若能在开机归因里匹配到同名对象，则给出它拖慢的毫秒数
     pub impact_ms: Option<u64>,
+    /// 该条目在**多次开机**里的平均拖慢毫秒数（按启动时长排序用）。
+    ///
+    /// 单次开机的归因会抖动 —— 某次磁盘忙、某次网络慢，都会让同一个条目
+    /// 的数字差出几百毫秒。只看最后一次会把「一直很慢」和「偶尔很慢」混为一谈。
+    pub impact_avg_ms: Option<u64>,
+    /// 参与平均的样本数（有效开机的次数）。为 0 表示历史日志里没匹配到过。
+    #[serde(default)]
+    pub impact_samples: u32,
+    /// 归属：系统自带 / 安装的程序 / 用户目录 / 位置待确认
+    #[serde(default)]
+    pub origin: StartupOrigin,
     /// 签名是否尚未校验（快速扫描下为 true，UI 应显示「确认中…」）
     ///
     /// 存在这个字段的原因：`WinVerifyTrust` 必须哈希**整个文件**，
@@ -439,6 +495,9 @@ impl StartupItem {
             risk_reason: "测试".into(),
             can_disable: true,
             impact_ms: None,
+            impact_avg_ms: None,
+            impact_samples: 0,
+            origin: StartupOrigin::Unknown,
             signature_pending: false,
             knowledge: None,
             in_whitelist: false,

@@ -27,6 +27,8 @@
 //! startup_risk 启动项风险分级规则库
 //! startup_ctl  启动项禁用 / 延迟 / 删除 与还原执行器
 //! startup_lists 启动项白名单 / 黑名单
+//! startup_origin 启动项归属判定（系统自带 / 安装的程序 / 用户目录）
+//! game_mode  游戏模式：游戏在跑时让开抢资源的启动项，游戏退出后按批次还原
 //! knowledge  启动项知识库（内置 140+ 条 + 用户可编辑补充）
 //! crashlog  本地崩溃收集与运行日志（只写本地，不外传）
 //! updater   更新检查（默认关闭、只提示，不自动下载安装）
@@ -44,6 +46,7 @@ pub mod knowledge;
 pub mod memory;
 pub mod monitor;
 pub mod floatball;
+pub mod game_mode;
 pub mod modes;
 pub mod mode_actions;
 pub mod mode_runner;
@@ -56,6 +59,7 @@ pub mod signature;
 pub mod startup;
 pub mod startup_ctl;
 pub mod startup_lists;
+pub mod startup_origin;
 pub mod startup_risk;
 pub mod store;
 pub mod types;

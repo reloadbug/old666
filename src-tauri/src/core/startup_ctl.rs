@@ -436,6 +436,23 @@ pub fn apply_with(items: &[StartupItem], dry: bool, mode: Mode) -> StartupResult
             continue;
         }
 
+        // 闸 1b-0：白名单硬闸 —— **加白了的一律不禁用**。
+        //
+        // 用户的原话是「添加到白名单的都不禁用」。这不是一条建议，是承诺：
+        // 加白等于用户对这条明确表了态「这个我要留着」。
+        // 所以它排在风险闸**之前**，且**黑名单不能推翻它** ——
+        // 否则「加白」和「加黑」会互相抵消，用户对同一个条目加两次就说不清意图了。
+        //
+        // 「启用」永不设闸：恢复原样不可能让机器更脆弱。
+        if matches!(mode, Mode::Disable | Mode::Delete) && item.in_whitelist {
+            rec.error = Some(format!(
+                "「{}」在白名单里，按你的设置保留（要禁用请先把它移出白名单）",
+                item.name
+            ));
+            changes.push(rec);
+            continue;
+        }
+
         // 闸 1b：危险项不允许被关掉。
         //
         // 例外只有一条：用户把这条**明确加进了黑名单**，且动作是「禁用」——
@@ -1296,6 +1313,9 @@ mod tests {
             risk_reason: "测试".into(),
             can_disable: true,
             impact_ms: None,
+            impact_avg_ms: None,
+            impact_samples: 0,
+            origin: crate::core::types::StartupOrigin::Unknown,
             signature_pending: false,
             delayed: false,
             knowledge: None,
@@ -1304,7 +1324,6 @@ mod tests {
             reason_prefix: String::new(),
         }
     }
-
     /// 32 位 Run 项的启用状态必须写到 `StartupApproved\Run32`。
     /// 写到 `Run` 的后果是「界面显示禁用成功、重启后照旧自启」——
     /// 这类静默失效比报错更糟，因为它看起来是好的。
@@ -1484,6 +1503,61 @@ mod tests {
         let _ = std::fs::remove_dir_all(file.parent().unwrap());
     }
 
+    /// 白名单是**硬闸**：加白了的启动项，不管风险档、也不管黑名单授权，
+    /// 都不许被禁用或删除 —— 这是用户「这个我要留着」的明确表态。
+    ///
+    /// 之前白名单只在前端生效（不勾「推荐选中」），后端完全没看它，
+    /// 于是「一键禁用选中项」或黑名单路径照样能把用户的私人程序关掉。
+    #[test]
+    fn whitelist_blocks_disable_even_when_blacklisted() {
+        let mut it = item(
+            StartupSource::RunKey,
+            "MyPrivateTool",
+            r"HKCU\Software\Microsoft\Windows\CurrentVersion\Run!MyPrivateTool",
+        );
+        it.in_whitelist = true;
+        it.in_blacklist = true; // 黑名单也不能推翻白名单
+        it.risk = RiskLevel::Dangerous;
+        it.can_disable = false;
+
+        let r = apply_with(&[it], true, Mode::Disable);
+        assert_eq!(r.changes.len(), 1);
+        let err = r.changes[0].error.as_deref().unwrap_or("");
+        assert!(err.contains("白名单"), "错误信息应说明被白名单挡下，实际：{err}");
+        assert!(!r.changes[0].ok, "白名单条目不应被判为可禁用");
+    }
+
+    /// 删除同样要过白名单闸 —— 「留着」意味着既不禁用也不删除。
+    #[test]
+    fn whitelist_blocks_delete() {
+        let mut it = item(
+            StartupSource::RunKey,
+            "MyPrivateTool2",
+            r"HKCU\Software\Microsoft\Windows\CurrentVersion\Run!MyPrivateTool2",
+        );
+        it.in_whitelist = true;
+
+        let r = apply_with(&[it], true, Mode::Delete);
+        let err = r.changes[0].error.as_deref().unwrap_or("");
+        assert!(err.contains("白名单"), "错误信息应说明被白名单挡下，实际：{err}");
+    }
+
+    /// 「启用」永远不受白名单影响 —— 白名单是「别动它」，不是「把它锁死」。
+    #[test]
+    fn whitelist_never_blocks_enable() {
+        let mut it = item(
+            StartupSource::RunKey,
+            "MyPrivateTool3",
+            r"HKCU\Software\Microsoft\Windows\CurrentVersion\Run!MyPrivateTool3",
+        );
+        it.in_whitelist = true;
+        it.enabled = false;
+
+        let r = apply_with(&[it], true, Mode::Enable);
+        let err = r.changes[0].error.as_deref().unwrap_or("");
+        assert!(!err.contains("白名单"), "启用不该被白名单拦住，实际：{err}");
+    }
+
     /// 即使调用方忘了传 dry，安全闸也必须挡住真实写入（注册表路径）。
     #[test]
     fn real_apply_is_blocked_by_circuit_breaker() {
@@ -1511,8 +1585,7 @@ mod tests {
 
     /// 同一道闸对文件类目标也必须生效。
     #[test]
-    fn real_apply_is_blocked_for_files_too() {
-        let (file, it) = temp_startup_file("real");
+    fn real_apply_is_blocked_for_files_too() {        let (file, it) = temp_startup_file("real");
         let r = apply(&[it], false);
         assert!(!r.dry_run);
         assert!(r.changes.iter().all(|c| !c.ok), "{:?}", r.changes);

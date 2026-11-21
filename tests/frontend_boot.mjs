@@ -132,6 +132,7 @@ await page.addInitScript(({ boot, fast, deep }) => {
     userKb: [],          // 用户知识库条目
     userPath: 'D:\\old666\\data\\knowledge\\startup.json',
     listsPath: 'D:\\old666\\data\\startup_lists.json',
+    gameCfg: null,      // 游戏模式配置
   };
   const kbHits = [];     // 记录 knowledge_save / remove 的调用，供断言
 
@@ -150,14 +151,29 @@ await page.addInitScript(({ boot, fast, deep }) => {
   };
   const nameOf = (it) => exeNameOf(it.command) || it.name || '';
   const normName = (s) => String(s || '').trim().toLowerCase().replace(/\.exe$/, '');
+  /** 稳定的字符串哈希（只为了让假数据每次都一样）。 */
+  const hashCode = (s) => {
+    let h = 0;
+    const str = String(s || '');
+    for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) | 0;
+    return h;
+  };
 
   /** 把内存状态叠加到扫描结果上 —— 等价于后端下一次 scan 的产出。 */
   const decorate = (list) => list.map((it) => {
     const off = mockState.off.has(it.id);
     const on = mockState.on.has(it.id);
     const n = normName(nameOf(it));
+    // 启动耗时：真机上这一步可能没有数据（事件 100 缺失），
+    // 但排序这条路径必须有数字才测得到。这里给一份**稳定**的假数据：
+    // 序号越靠前耗时越长，且带多个样本（走 impact_avg_ms 那条路）。
+    const seq = Math.abs(hashCode(it.id)) % 900;
     return {
       ...it,
+      impact_ms: seq,
+      impact_avg_ms: seq,
+      impact_samples: 4,
+      origin: it.origin || 'unknown',
       enabled: on ? true : (off ? false : it.enabled),
       disabled_by_us: off,
       batch_id: off ? 'sb-65f0a1b2-0001-debug' : it.batch_id,
@@ -178,6 +194,17 @@ await page.addInitScript(({ boot, fast, deep }) => {
     user_path: mockState.userPath,
     user_entries: mockState.userKb.map((e) => ({ key: e.key, title: e.title, advice: e.advice })),
   });
+
+  /** 游戏模式的 mock 状态。默认未启用（与后端默认一致）。 */
+  const gameModePayload = () => {
+    const cfg = mockState.gameCfg || { enabled: false, games: [], targets: [], auto_restore: true };
+    return {
+      config: cfg,
+      state: { in_game: false, game: null, batch_id: null, disabled: [], checked_at: 0 },
+      running: !!cfg.enabled,
+      candidates: [],
+    };
+  };
 
   const undoOf = (it) => it.source === 'service'
     ? JSON.stringify({ key: it.location.split('!').pop(), start: 2 })
@@ -306,6 +333,15 @@ await page.addInitScript(({ boot, fast, deep }) => {
             else mockState.black.delete(n);
             return ok(listsPayload());
           }
+
+          /* 游戏模式 */
+          case 'game_mode_status': return ok(gameModePayload());
+          case 'game_mode_check': return ok(gameModePayload().state);
+          case 'game_mode_configure': {
+            mockState.gameCfg = args.config || {};
+            return ok(gameModePayload());
+          }
+          case 'game_mode_restore': return ok('已还原 2 项');
 
           default: throw new Error('未实现的命令: ' + cmd);
         }
@@ -1025,6 +1061,103 @@ check('隐藏已禁用后表格里不再有已禁用行',
   `${hidden.rows} 行（原 ${beforeHide.rows}，应减 ${beforeHide.off}）`);
 check('副标题说明隐藏了多少项',
   new RegExp(`已隐藏 ${beforeHide.off} 项已禁用`).test(hidden.sub), hidden.sub);
+
+console.log('\n== 16b. 归属分类 / 启动耗时排序 ==');
+await page.uncheck('#chkHideDisabled');
+await page.waitForTimeout(250);
+
+// 归属是**按路径**判的，不是按名字 —— 列表里必须有这一列，且取值只有四种。
+const origins = await page.evaluate(() => {
+  const cells = [...document.querySelectorAll('#startupBody .startup-origin')];
+  return {
+    n: cells.length,
+    rows: document.querySelectorAll('#startupBody tr').length,
+    kinds: [...new Set(cells.map((c) => c.className.replace('startup-origin ', '')))],
+    texts: [...new Set(cells.map((c) => c.textContent.trim()))],
+  };
+});
+check('列表有「归属」列且每行都填了', origins.n > 0 && origins.n === origins.rows,
+  `${origins.n} 行 / ${origins.rows} 行`);
+check('归属只出现四种取值',
+  origins.kinds.every((k) => ['o-system', 'o-third_party', 'o-user', 'o-unknown'].includes(k)),
+  origins.kinds.join(','));
+check('归属文案是中文', origins.texts.every((t) => /系统自带|安装的程序|用户目录|待确认/.test(t)),
+  origins.texts.join('/'));
+
+// 归属筛选：点一个 chip，列表里只剩那一类
+const beforeOrigin = await page.evaluate(() => document.querySelectorAll('#startupBody tr').length);
+await page.click('#startupOrigins .chip[data-origin="third_party"]');
+await page.waitForTimeout(250);
+const afterOrigin = await page.evaluate(() => ({
+  rows: document.querySelectorAll('#startupBody tr').length,
+  kinds: [...new Set([...document.querySelectorAll('#startupBody .startup-origin')]
+    .map((c) => c.className.replace('startup-origin ', '')))],
+}));
+check('按归属筛选后只剩该类别',
+  afterOrigin.rows <= beforeOrigin && afterOrigin.kinds.every((k) => k === 'o-third_party'),
+  `${afterOrigin.rows} 行，类别 ${afterOrigin.kinds.join(',')}`);
+await page.click('#startupOrigins .chip[data-origin="all"]');
+await page.waitForTimeout(200);
+
+// 「启动耗时」列：有值的行必须写成「人话时间」，并带上样本说明
+const impacts = await page.evaluate(() => {
+  const cells = [...document.querySelectorAll('#startupBody .startup-impact')];
+  const vals = cells.map((c) => c.textContent.trim()).filter((t) => t && t !== '—');
+  return { n: vals.length, vals: vals.slice(0, 3), allHuman: vals.every((t) => /\d/.test(t)) };
+});
+check('启动耗时列存在且用可读单位', impacts.allHuman, impacts.vals.join(' / '));
+
+// 排序切到「启动耗时最长」后，行内耗时应当单调不增
+await page.selectOption('#startupSort', 'impact');
+await page.waitForTimeout(250);
+const sortedByImpact = await page.evaluate(() => {
+  const cells = [...document.querySelectorAll('#startupBody .startup-impact')];
+  const nums = cells.map((c) => {
+    const t = c.textContent.trim();
+    if (!t || t === '—') return null;
+    const m = t.match(/([\d.]+)\s*(ms|s)/);
+    if (!m) return null;
+    return m[2] === 's' ? parseFloat(m[1]) * 1000 : parseFloat(m[1]);
+  }).filter((v) => v != null);
+  return { n: nums.length, desc: nums.every((v, i) => i === 0 || nums[i - 1] >= v) };
+});
+check('按启动耗时排序后单调不增', sortedByImpact.desc, `${sortedByImpact.n} 个有耗时的条目`);
+await page.selectOption('#startupSort', 'recommend');
+await page.waitForTimeout(200);
+
+console.log('\n== 16c. 游戏模式 ==');
+const gmVisible = await page.isVisible('#gameModeCard');
+check('游戏模式卡片在开机加速页可见', gmVisible);
+check('游戏模式默认未启用',
+  !(await page.isChecked('#gameModeEnabled')));
+check('「请回来」在没有让开记录时是灰的',
+  await page.isDisabled('#btnGameModeRestore'));
+
+// 启用但不填内容 → 必须被拦下（前端自己拦，不去改系统）
+await page.check('#gameModeEnabled');
+await page.fill('#gameModeGames', '');
+await page.fill('#gameModeTargets', '');
+await page.click('#btnGameModeSave');
+await page.waitForTimeout(300);
+const gmBlocked = await page.evaluate(() => ({
+  toast: document.querySelector('#toast')?.textContent || '',
+  stillOn: !!document.querySelector('#gameModeEnabled')?.checked,
+}));
+check('启用时缺内容会被拦下', /至少要填/.test(gmBlocked.toast), gmBlocked.toast);
+await page.uncheck('#gameModeEnabled');
+
+// 填好内容再保存 → 应该真的调用后端
+await page.fill('#gameModeGames', 'steam, cs2');
+await page.fill('#gameModeTargets', 'steamwebhelper, onedrive');
+await page.check('#gameModeEnabled');
+await page.click('#btnGameModeSave');
+await page.waitForTimeout(300);
+const gmSaved = await page.evaluate(() => ({
+  toast: document.querySelector('#toast')?.textContent || '',
+  games: document.querySelector('#gameModeGames')?.value || '',
+}));
+check('保存游戏模式成功并提示', /已保存/.test(gmSaved.toast), gmSaved.toast);
+check('游戏进程输入被保留', gmSaved.games.includes('cs2'), gmSaved.games);
 
 await page.uncheck('#chkHideDisabled');
 await page.waitForTimeout(300);
