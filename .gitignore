@@ -54,3 +54,6 @@ tests/_out/
 
 # ---- 发布产物（zip 体积大，不入库；构建方法见 README）----
 release/
+
+# ---- 本地构建/测试工作区（cargo target、日志；一律留在项目内，方便清理）----
+.work/
